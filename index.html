@@ -574,16 +574,16 @@ header {
 // HYMN DATABASE
 // ══════════════════════════════════════════════════════════════════
 
-const OBC  = 'https://audio.fbckjv.app/hymns/olmstead/';
+const OBC  = 'https://audio.fbckjv.app/olmstead/';
 const SCM  = 'https://www.smallchurchmusic.com/mp3/';
 const BBC  = 'https://bbc-media-files.s3.us-east-2.amazonaws.com/uploads/pianoproject/';
 const TGM  = 'https://audio.fbckjv.app/telegram/';
 const ARC  = 'https://archive.org/download/BaptistMusic/';
 
 const SOURCES = {
-  olmstead: { label:'Olmstead Baptist',      badge:'badge-olmstead', cls:'source-olmstead', icon:'🎼', isPsalm:false },
-  telegram: { label:'IFB Specials & Choir', badge:'badge-telegram', cls:'source-telegram', icon:'🎙️', isPsalm:false },
-  knox:     { label:'Bible Baptist DeLand',  badge:'badge-knox',     cls:'source-knox',     icon:'🎵', isPsalm:false },
+  olmstead: { label:'Olmstead Baptist',      badge:'badge-olmstead', cls:'source-olmstead', icon:'🎼' },
+  telegram: { label:'IFB Specials & Choir', badge:'badge-telegram', cls:'source-telegram', icon:'🎙️' },
+  knox:     { label:'Bible Baptist DeLand',  badge:'badge-knox',     cls:'source-knox',     icon:'🎵' },
 };
 
 // ── PSALM LYRICS (Scottish Metrical Psalter 1650) ────────────────
@@ -1247,8 +1247,6 @@ function getFiltered() {
     // View / source filter
     let matchSrc = false;
     if (activeSource === 'all') matchSrc = h.source==='olmstead'||h.source==='knox'||h.source==='telegram';
-    else if (activeSource === 'psalms') matchSrc = h.source === 'psalms';
-    else if (activeSource === 'genevan') matchSrc = h.source === 'genevan';
     else if (activeSource === 'favorites') matchSrc = favorites.has(h.id);
     else matchSrc = h.source === activeSource;
 
