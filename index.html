@@ -574,7 +574,7 @@ header {
 // HYMN DATABASE
 // ══════════════════════════════════════════════════════════════════
 
-const OBC  = 'https://audio.fbckjv.app/olmstead/';
+const OBC  = 'https://audio.fbckjv.app/hymns/olmstead/';
 const SCM  = 'https://www.smallchurchmusic.com/mp3/';
 const BBC  = 'https://bbc-media-files.s3.us-east-2.amazonaws.com/uploads/pianoproject/';
 const TGM  = 'https://audio.fbckjv.app/telegram/';
@@ -1193,13 +1193,7 @@ function hymnTags(title) {
 }
 
 // Sort non-psalm hymns alphabetically; psalms by number
-HYMNS.sort((a,b) => {
-  const aIsP = SOURCES[a.source].isPsalm;
-  const bIsP = SOURCES[b.source].isPsalm;
-  if (aIsP !== bIsP) return 0; // keep mixed order
-  if (aIsP && a.psalm && b.psalm) return a.psalm - b.psalm;
-  return a.title.localeCompare(b.title);
-});
+HYMNS.sort((a,b) => a.title.localeCompare(b.title));
 
 // ══════════════════════════════════════════════════════════════════
 // STATE
