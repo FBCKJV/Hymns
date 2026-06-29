@@ -1,5 +1,5 @@
-// IFB Hymns & Spiritual Songs — Service Worker v3.0
-const CACHE_NAME = 'ifb-hymns-v4';
+// IFB Hymns & Spiritual Songs — Service Worker v6.0
+const CACHE_NAME = 'ifb-hymns-v6';
 
 const SHELL_ASSETS = [
   '/Hymns/',
@@ -13,7 +13,7 @@ self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(SHELL_ASSETS))
-      .then(() => self.skipWaiting())   // ← take over immediately, don't wait
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -23,17 +23,13 @@ self.addEventListener('activate', e => {
       .then(keys => Promise.all(
         keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
       ))
-      .then(() => self.clients.claim())  // ← claim all open tabs right now
+      .then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-
-  // Cross-origin (R2, S3, fonts, YouTube) — let browser handle it
   if (url.origin !== self.location.origin) return;
-
-  // Own-origin audio — network first, cache on success
   if (url.pathname.endsWith('.mp3') || url.pathname.endsWith('.wav')) {
     e.respondWith(
       caches.open(CACHE_NAME).then(async cache => {
@@ -50,8 +46,6 @@ self.addEventListener('fetch', e => {
     );
     return;
   }
-
-  // App shell — network first so updates land immediately, cache as fallback
   e.respondWith(
     fetch(e.request)
       .then(response => {
