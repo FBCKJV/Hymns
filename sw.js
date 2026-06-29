@@ -1,9 +1,6 @@
-// IFB Hymns & Spiritual Songs — Service Worker v2.0
-// Fixed: removed external URLs from cache.addAll() to prevent install failure
-const CACHE_NAME = 'ifb-hymns-v2';
+// IFB Hymns & Spiritual Songs — Service Worker v3.0
+const CACHE_NAME = 'ifb-hymns-v3';
 
-// Only cache files we KNOW exist and can fetch reliably
-// External URLs (fonts, audio) are handled separately and never block install
 const SHELL_ASSETS = [
   '/Hymns/',
   '/Hymns/index.html',
@@ -16,7 +13,7 @@ self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(SHELL_ASSETS))
-      .then(() => self.skipWaiting())
+      .then(() => self.skipWaiting())   // ← take over immediately, don't wait
   );
 });
 
@@ -26,20 +23,17 @@ self.addEventListener('activate', e => {
       .then(keys => Promise.all(
         keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
       ))
-      .then(() => self.clients.claim())
+      .then(() => self.clients.claim())  // ← claim all open tabs right now
   );
 });
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
-  // Never intercept cross-origin requests (fonts, YouTube, audio sources)
-  // Let those go straight to network — they have their own caching
-  if (url.origin !== self.location.origin) {
-    return; // fall through to browser default
-  }
+  // Cross-origin (R2, S3, fonts, YouTube) — let browser handle it
+  if (url.origin !== self.location.origin) return;
 
-  // Audio files on our own origin — network first, cache on success
+  // Own-origin audio — network first, cache on success
   if (url.pathname.endsWith('.mp3') || url.pathname.endsWith('.wav')) {
     e.respondWith(
       caches.open(CACHE_NAME).then(async cache => {
@@ -57,16 +51,17 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // App shell — cache first, network fallback
+  // App shell — network first so updates land immediately, cache as fallback
   e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-      return fetch(e.request).then(response => {
+    fetch(e.request)
+      .then(response => {
         if (response.ok) {
           caches.open(CACHE_NAME).then(c => c.put(e.request, response.clone()));
         }
         return response;
-      }).catch(() => caches.match('/Hymns/index.html'));
-    })
+      })
+      .catch(() => caches.match(e.request)
+        .then(cached => cached || caches.match('/Hymns/index.html'))
+      )
   );
 });
