@@ -1,5 +1,5 @@
 // IFB Hymns & Spiritual Songs — Service Worker v7.0
-const CACHE_NAME = 'ifb-hymns-v13';
+const CACHE_NAME = 'ifb-hymns-v14';
 const SHELL_ASSETS = [
   '/Hymns/', '/Hymns/index.html', '/Hymns/manifest.json',
   '/Hymns/icons/icon-192.png', '/Hymns/icons/icon-512.png',
