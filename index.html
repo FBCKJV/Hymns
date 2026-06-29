@@ -6,12 +6,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1060">
-<meta name="description" content="IFB Hymns &amp; Spiritual Songs — KJV congregational singing, public domain hymns, and sung Psalms">
+<meta name="description" content="Hymns &amp; Songs — Faith Baptist Church of Plymouth County · KJV">
 <link rel="manifest" href="/Hymns/manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="/Hymns/icons/icon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/Hymns/icons/icon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/Hymns/icons/icon-180.png">
-<title>IFB Hymns &amp; Spiritual Songs</title>
+<title>FBC Hymns &amp; Songs — Faith Baptist Church</title>
 <!-- base tag set per-deploy; for GitHub Pages /Hymns/ subpath this is fine as-is -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Merriweather:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -360,6 +360,10 @@ header {
 .nav-btn.yt-nav.active{color:#e05050;}
 #auto-btn.on{color:var(--gold);}
 
+
+/* Shuffle */
+#shuffle-btn{background:none;border:none;color:var(--text-mute);padding:6px;display:flex;align-items:center;border-radius:50%;transition:color .15s;}
+#shuffle-btn.active{color:var(--gold);}
 </style>
 </head>
 <body>
@@ -370,8 +374,8 @@ header {
   <div class="header-top">
     <img src="/Hymns/icons/icon-192.png" alt="IFB Hymns" width="36" height="36" style="border-radius:8px;flex-shrink:0;object-fit:cover;">
     <div>
-      <div class="app-title">IFB Hymns &amp; Songs</div>
-      <div class="app-sub">KJV · Congregational · Psalms</div>
+      <div class="app-title">FBC Hymns &amp; Songs</div>
+      <div class="app-sub">Faith Baptist Church · Plymouth County · KJV</div>
     </div>
     <button id="info-btn" style="margin-left:auto;background:none;border:none;color:var(--text-mute);padding:6px;display:flex;align-items:center;border-radius:50%">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
@@ -399,8 +403,6 @@ header {
   <button class="tab active" data-src="all">All</button>
   <button class="tab" data-src="olmstead">Olmstead Baptist</button>
   <button class="tab" data-src="knox">Bible Baptist DeLand</button>
-  <button class="tab psalm-tab" data-src="psalms">Sung Psalms</button>
-  <button class="tab psalm-tab" data-src="genevan">Genevan Psalter</button>
   <button class="tab" data-src="telegram">🎙️ IFB Specials</button>
   <button class="tab fav-tab" data-src="favorites">★ Favorites</button>
 </div>
@@ -426,7 +428,8 @@ header {
       <button class="ctrl-btn" id="fav-btn-player" title="Favorite">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
       </button>
-      <button class="ctrl-btn" id="prev-btn">
+      <button id="shuffle-btn" title="Shuffle"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></button>
+        <button class="ctrl-btn" id="prev-btn">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6V6zm3.5 6 8.5 6V6l-8.5 6z"/></svg>
       </button>
       <button id="play-btn">
@@ -519,7 +522,7 @@ header {
     </div>
     <div class="info-source" style="border:none">
       <h3>ℹ️ About This App</h3>
-      <p>IFB Hymns &amp; Spiritual Songs — companion to the FBC KJV Bible App (<a href="https://fbckjv.app" target="_blank">fbckjv.app</a>). Favorites and listening history are stored locally on your device. Audio streams directly from the source archives.</p>
+      <p>FBC Hymns &amp; Songs — companion to the FBC KJV Bible App (<a href="https://fbckjv.app" target="_blank">fbckjv.app</a>). Favorites and listening history are stored locally on your device. Audio streams directly from the source archives.</p>
     </div>
   </div>
 </div>
@@ -547,7 +550,7 @@ header {
       <span style="font-size:18px">▶</span>
       <div class="yt-hdr-txt">
         <div class="yt-hdr-title" id="yt-title">IFB Hymns — YouTube</div>
-        <div class="yt-hdr-sub">Independent Fundamental Baptist · KJV</div>
+        <div class="yt-hdr-sub">Faith Baptist Church · Plymouth County</div>
       </div>
       <button class="yt-x" id="yt-x"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
@@ -574,50 +577,16 @@ header {
 const OBC  = 'https://audio.fbckjv.app/hymns/olmstead/';
 const SCM  = 'https://www.smallchurchmusic.com/mp3/';
 const BBC  = 'https://bbc-media-files.s3.us-east-2.amazonaws.com/uploads/pianoproject/';
-const TGM = 'https://audio.fbckjv.app/hymns/telegram/';
+const TGM  = 'https://audio.fbckjv.app/telegram/';
 const ARC  = 'https://archive.org/download/BaptistMusic/';
 
 const SOURCES = {
   olmstead: { label:'Olmstead Baptist',      badge:'badge-olmstead', cls:'source-olmstead', icon:'🎼', isPsalm:false },
   telegram: { label:'IFB Specials & Choir', badge:'badge-telegram', cls:'source-telegram', icon:'🎙️', isPsalm:false },
   knox:     { label:'Bible Baptist DeLand',  badge:'badge-knox',     cls:'source-knox',     icon:'🎵', isPsalm:false },
-  psalms:   { label:'Scottish Psalter 1650', badge:'badge-psalms',   cls:'source-psalms',   icon:'📖', isPsalm:true  },
-  genevan:  { label:'Genevan Psalter',       badge:'badge-genevan',  cls:'source-genevan',  icon:'🎶', isPsalm:true  },
 };
 
 // ── PSALM LYRICS (Scottish Metrical Psalter 1650) ────────────────
-const PSALM_LYRICS = {
-  'Psalm 23': {
-    ref:'The LORD is my shepherd; I shall not want. — Psalm 23:1',
-    verses:[
-      { label:'Verse 1', text:'The Lord\'s my Shepherd, I\'ll not want.\nHe makes me down to lie\nIn pastures green; He leadeth me\nthe quiet waters by.' },
-      { label:'Verse 2', text:'My soul He doth restore again;\nand me to walk doth make\nWithin the paths of righteousness,\nev\'n for His own name\'s sake.' },
-      { label:'Verse 3', text:'Yea, though I walk in death\'s dark vale,\nyet will I fear none ill:\nFor Thou art with me; and Thy rod\nand staff me comfort still.' },
-      { label:'Verse 4', text:'My table Thou hast furnishèd\nin presence of my foes;\nMy head Thou dost with oil anoint,\nand my cup overflows.' },
-      { label:'Verse 5', text:'Goodness and mercy all my life\nshall surely follow me:\nAnd in God\'s house forevermore\nmy dwelling-place shall be.' },
-    ],
-    attr:'Scottish Metrical Psalter, 1650. Tune: Crimond or Martyrdom.'
-  },
-  'Psalm 100': {
-    ref:'Make a joyful noise unto the LORD, all ye lands. — Psalm 100:1',
-    verses:[
-      { label:'Verse 1', text:'All people that on earth do dwell,\nsing to the Lord with cheerful voice;\nHim serve with mirth, His praise forth tell,\ncome ye before Him and rejoice.' },
-      { label:'Verse 2', text:'Know that the Lord is God indeed;\nwithout our aid He did us make;\nWe are His flock, He doth us feed,\nand for His sheep He doth us take.' },
-      { label:'Verse 3', text:'O enter then His gates with praise,\napproach with joy His courts unto;\nPraise, laud, and bless His name always,\nfor it is seemly so to do.' },
-      { label:'Verse 4', text:'For why? the Lord our God is good,\nHis mercy is for ever sure;\nHis truth at all times firmly stood,\nand shall from age to age endure.' },
-    ],
-    attr:'Scottish Metrical Psalter, 1650. Tune: Old Hundredth (Genevan Psalter, 1551).'
-  },
-  'Psalm 119 (Aleph)': {
-    ref:'Blessed are the undefiled in the way, who walk in the law of the LORD. — Psalm 119:1',
-    verses:[
-      { label:'Verse 1', text:'Blessèd are they that undefilèd\nand straight are in the way;\nwho in the law of God the Lord\ndo walk, and do not stray.' },
-      { label:'Verse 2', text:'Blessèd are they His testimonies\nthat faithfully observe;\nand who to seek Him with their heart\ndo always truly serve.' },
-      { label:'Verse 3', text:'They also do no wickedness\nwho walk in all His ways.\nThou hast commanded us to keep\nThy precepts all our days.' },
-    ],
-    attr:'Scottish Metrical Psalter, 1650.'
-  },
-};
 
 // ── HYMN LYRICS ──────────────────────────────────────────────────
 const HYMN_LYRICS = {
@@ -1030,151 +999,146 @@ const HYMNS = [
       url:'https://archive.org/download/GenevaPsalter/Psalm134.mp3',
       tags:['psalm','evening','blessing','servants','Genevan'] },
   ],
-];
 
-// ── TAG HELPER ────────────────────────────────────────────────
-function hymnTags(title) {
-  const t = title.toLowerCase();
-  const tags = [,
 
-  // TELEGRAM — IFB Music (mixed vocal hymns & specials)
+  // TELEGRAM — IFB Specials, Quartets & Choirs (via R2)
   { id:'tg001', title:'A Beautiful Life', source:'telegram', artist:'', url:TGM+encodeURIComponent('A-Beautiful-Life.m4a'), tags:[] },
-  { id:'tg002', title:'Hallelujah, We Shall Rise', source:'telegram', artist:'Ambassador Baptist College', url:TGM+encodeURIComponent('Ambassador Baptist College - Topic - Hallelujah, We Shall Ris....m4a'), tags:['vocal','resurrection'] },
+  { id:'tg002', title:'Hallelujah, We Shall Rise', source:'telegram', artist:'Ambassador Baptist College', url:TGM+encodeURIComponent('Ambassador Baptist College - Topic - Hallelujah, We Shall Ris....m4a'), tags:['resurrection','vocal'] },
   { id:'tg003', title:'Softly and Tenderly', source:'telegram', artist:'Ambassador Baptist College', url:TGM+encodeURIComponent('Ambassador Baptist College - Topic - Softly and Tenderly.m4a'), tags:['vocal'] },
   { id:'tg004', title:'Bring Them In', source:'telegram', artist:'Ambassador Baptist College Staff Quartet', url:TGM+encodeURIComponent('Ambassador Baptist College Staff Quartet - Topic - Bring Them In.m4a'), tags:['vocal'] },
   { id:'tg005', title:'Because He Loved Me', source:'telegram', artist:'', url:TGM+encodeURIComponent('Because-He-Loved-Me.m4a'), tags:[] },
   { id:'tg006', title:'Somebody\'s Brother', source:'telegram', artist:'Benjamin Petrick', url:TGM+encodeURIComponent('Benjamin Petrick - Somebody\'s Brother.m4a'), tags:[] },
-  { id:'tg007', title:'Blood Washed Band', source:'telegram', artist:'', url:TGM+encodeURIComponent('Blood-Washed-Band.m4a'), tags:['cross','blood','atonement'] },
+  { id:'tg007', title:'Blood Washed Band', source:'telegram', artist:'', url:TGM+encodeURIComponent('Blood-Washed-Band.m4a'), tags:['cross','blood'] },
   { id:'tg008', title:'There\'ll Be No Dark Valley', source:'telegram', artist:'Byron Foxx', url:TGM+encodeURIComponent('Byron Foxx - There\'ll Be No Dark Vall....m4a'), tags:[] },
   { id:'tg009', title:'Leaning on the Everlasting Arms', source:'telegram', artist:'Byron Foxx', url:TGM+encodeURIComponent('Byron Foxx - Topic - Leaning On the Everlasti....m4a'), tags:[] },
   { id:'tg010', title:'Unclouded Day', source:'telegram', artist:'CMRBC Choir', url:TGM+encodeURIComponent('CMRBC Choir - Unclouded Day.mp3'), tags:['vocal'] },
   { id:'tg011', title:'It\'s Not in Vain', source:'telegram', artist:'Caleb Garraway', url:TGM+encodeURIComponent('Caleb Garraway - Topic - It\'s Not in Vain.m4a'), tags:[] },
-  { id:'tg012', title:'Lord, You\'re the Best Thing', source:'telegram', artist:'Calvary Baptist Bible College', url:TGM+encodeURIComponent('Calvary Baptist Bible College - Lord, You\'re the Best Th....m4a'), tags:['vocal','jesus'] },
+  { id:'tg012', title:'Lord, You\'re the Best Thing', source:'telegram', artist:'Calvary Baptist Bible College', url:TGM+encodeURIComponent('Calvary Baptist Bible College - Lord, You\'re the Best Th....m4a'), tags:['jesus','vocal'] },
   { id:'tg013', title:'The Old-Time Way', source:'telegram', artist:'Cecily Hamilton and Friends', url:TGM+encodeURIComponent('Cecily Hamilton and Friends - The Old-Time Way.m4a'), tags:['old paths'] },
-  { id:'tg014', title:'The Old-Time Way', source:'telegram', artist:'Cecily Hamilton and Friends', url:TGM+encodeURIComponent('Cecily Hamilton and Friends - Topic - The Old-Time Way.m4a'), tags:['old paths'] },
+  { id:'tg014', title:'The Old-Time Way (Live)', source:'telegram', artist:'Cecily Hamilton and Friends', url:TGM+encodeURIComponent('Cecily Hamilton and Friends - Topic - The Old-Time Way.m4a'), tags:['old paths'] },
   { id:'tg015', title:'Water from the Rock', source:'telegram', artist:'Cecily Hamilton and Friends', url:TGM+encodeURIComponent('Cecily Hamilton and Friends - Topic - Water from the Rock.m4a'), tags:[] },
   { id:'tg016', title:'Child of the King', source:'telegram', artist:'', url:TGM+encodeURIComponent('Child-of-the-King.m4a'), tags:['jesus'] },
   { id:'tg017', title:'Champion of Love', source:'telegram', artist:'Christ Tunes', url:TGM+encodeURIComponent('Christ Tunes - Champion of Love.m4a'), tags:[] },
   { id:'tg018', title:'Here I Am', source:'telegram', artist:'Christ Tunes', url:TGM+encodeURIComponent('Christ Tunes - Here I Am.m4a'), tags:[] },
   { id:'tg019', title:'I Sing Because (Medley)', source:'telegram', artist:'Heartland Baptist Bible College', url:TGM+encodeURIComponent('Christ-Honoring Music - -I Sing Because- Medley - Heartland Baptist Bible College (Witness!).m4a'), tags:['vocal'] },
-  { id:'tg020', title:'Because He Loved Me', source:'telegram', artist:'The Dice Family', url:TGM+encodeURIComponent('Christ-Honoring Music - Because He Loved Me - Th....m4a'), tags:[] },
+  { id:'tg020', title:'Because He Loved Me', source:'telegram', artist:'The Dice Family', url:TGM+encodeURIComponent('Christ-Honoring Music - Because He Loved Me - Th....m4a'), tags:['vocal'] },
   { id:'tg021', title:'Boundless Love', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Christ-Honoring Music - Boundless Love - Golden ....m4a'), tags:['vocal'] },
-  { id:'tg022', title:'Heaven Medley', source:'telegram', artist:'The Dice Family', url:TGM+encodeURIComponent('Christ-Honoring Music - Heaven Medley - The Dice....m4a'), tags:['heaven'] },
+  { id:'tg022', title:'Heaven Medley', source:'telegram', artist:'The Dice Family', url:TGM+encodeURIComponent('Christ-Honoring Music - Heaven Medley - The Dice....m4a'), tags:['heaven','vocal'] },
   { id:'tg023', title:'Higher Ground', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Christ-Honoring Music - Higher Ground - Golden S....m4a'), tags:['vocal'] },
-  { id:'tg024', title:'I Love You, Lord', source:'telegram', artist:'The Dice Family', url:TGM+encodeURIComponent('Christ-Honoring Music - I Love You, Lord - The D....m4a'), tags:['jesus'] },
-  { id:'tg025', title:'I\'m Gonna Rise', source:'telegram', artist:'Commonwealth Baptist College', url:TGM+encodeURIComponent('Christ-Honoring Music - I\'m Gonna Rise - Commonw....m4a'), tags:['vocal','resurrection'] },
+  { id:'tg024', title:'I Love You, Lord', source:'telegram', artist:'The Dice Family', url:TGM+encodeURIComponent('Christ-Honoring Music - I Love You, Lord - The D....m4a'), tags:['jesus','vocal'] },
+  { id:'tg025', title:'I\'m Gonna Rise', source:'telegram', artist:'Commonwealth Baptist College', url:TGM+encodeURIComponent('Christ-Honoring Music - I\'m Gonna Rise - Commonw....m4a'), tags:['resurrection','vocal'] },
   { id:'tg026', title:'I\'m Still Standing', source:'telegram', artist:'Heartland Baptist Bible College', url:TGM+encodeURIComponent('Christ-Honoring Music - I\'m Still Standing - Hea....m4a'), tags:['faith','vocal'] },
   { id:'tg027', title:'It\'s Just a Book', source:'telegram', artist:'Lone Star Baptist College', url:TGM+encodeURIComponent('Christ-Honoring Music - It\'s Just a Book - Lone ....m4a'), tags:['vocal'] },
-  { id:'tg028', title:'It\'s Shouting Time in Heaven', source:'telegram', artist:'Various', url:TGM+encodeURIComponent('Christ-Honoring Music - It\'s Shouting Time in He....m4a'), tags:['heaven','old paths'] },
-  { id:'tg029', title:'It\'s Still the Cross', source:'telegram', artist:'Lone Star Baptist College', url:TGM+encodeURIComponent('Christ-Honoring Music - It\'s Still the Cross - L....m4a'), tags:['cross','vocal','blood','atonement'] },
+  { id:'tg028', title:'It\'s Shouting Time in Heaven', source:'telegram', artist:'Various', url:TGM+encodeURIComponent('Christ-Honoring Music - It\'s Shouting Time in He....m4a'), tags:['heaven'] },
+  { id:'tg029', title:'It\'s Still the Cross', source:'telegram', artist:'Lone Star Baptist College', url:TGM+encodeURIComponent('Christ-Honoring Music - It\'s Still the Cross - L....m4a'), tags:['cross','blood','vocal'] },
   { id:'tg030', title:'I\'ll Take the Old Highway', source:'telegram', artist:'Various', url:TGM+encodeURIComponent('Christ-Honoring Music - I\'ll Take the Old Highwa....m4a'), tags:['old paths'] },
-  { id:'tg031', title:'Just Any Day Now', source:'telegram', artist:'The Dice Family', url:TGM+encodeURIComponent('Christ-Honoring Music - Just Any Day Now - The D....m4a'), tags:[] },
+  { id:'tg031', title:'Just Any Day Now', source:'telegram', artist:'The Dice Family', url:TGM+encodeURIComponent('Christ-Honoring Music - Just Any Day Now - The D....m4a'), tags:['vocal'] },
   { id:'tg032', title:'Leave Your Heavy Burdens', source:'telegram', artist:'Various', url:TGM+encodeURIComponent('Christ-Honoring Music - Leave Your Heavy Burdens....m4a'), tags:[] },
   { id:'tg033', title:'Reach the World', source:'telegram', artist:'Hyles-Anderson College', url:TGM+encodeURIComponent('Christ-Honoring Music - Reach the World - Hyles-....m4a'), tags:['vocal'] },
-  { id:'tg034', title:'The Blessed Old Book', source:'telegram', artist:'Commonwealth Baptist College', url:TGM+encodeURIComponent('Christ-Honoring Music - The Blessed Old Book - C....m4a'), tags:['vocal','old paths'] },
+  { id:'tg034', title:'The Blessed Old Book', source:'telegram', artist:'Commonwealth Baptist College', url:TGM+encodeURIComponent('Christ-Honoring Music - The Blessed Old Book - C....m4a'), tags:['old paths','vocal'] },
   { id:'tg035', title:'The Longer I Serve Him', source:'telegram', artist:'Various', url:TGM+encodeURIComponent('Christ-Honoring Music - The Longer I Serve Him -....m4a'), tags:[] },
-  { id:'tg036', title:'The Solid Rock', source:'telegram', artist:'Hyles-Anderson College', url:TGM+encodeURIComponent('Christ-Honoring Music - The Solid Rock - Hyles-A....m4a'), tags:['vocal'] },
+  { id:'tg036', title:'The Solid Rock', source:'telegram', artist:'Hyles-Anderson College', url:TGM+encodeURIComponent('Christ-Honoring Music - The Solid Rock - Hyles-A....m4a'), tags:['faith','vocal'] },
   { id:'tg037', title:'The Value of One', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Christ-Honoring Music - The Value of One - Golde....m4a'), tags:['vocal'] },
   { id:'tg038', title:'There Is a God', source:'telegram', artist:'Commonwealth Baptist College', url:TGM+encodeURIComponent('Christ-Honoring Music - There Is a God - Commonw....m4a'), tags:['vocal'] },
-  { id:'tg039', title:'There Rose a Lamb', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Christ-Honoring Music - There Rose a Lamb - Gold....m4a'), tags:['vocal'] },
+  { id:'tg039', title:'There Rose a Lamb', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Christ-Honoring Music - There Rose a Lamb - Gold....m4a'), tags:['jesus','vocal'] },
   { id:'tg040', title:'Victory Is Sweet', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Christ-Honoring Music - Victory Is Sweet - Golde....m4a'), tags:['vocal'] },
   { id:'tg041', title:'We Shall Wear a Crown', source:'telegram', artist:'Various', url:TGM+encodeURIComponent('Christ-Honoring Music - We Shall Wear a Crown - ....m4a'), tags:['heaven'] },
-  { id:'tg042', title:'When I Survey the Wondrous Cross', source:'telegram', artist:'Various', url:TGM+encodeURIComponent('Christ-Honoring Music - When I Survey the Wondro....m4a'), tags:['cross','blood','atonement'] },
+  { id:'tg042', title:'When I Survey the Wondrous Cross', source:'telegram', artist:'Various', url:TGM+encodeURIComponent('Christ-Honoring Music - When I Survey the Wondro....m4a'), tags:['cross','blood'] },
   { id:'tg043', title:'When We All Get to Heaven', source:'telegram', artist:'Various', url:TGM+encodeURIComponent('Christ-Honoring Music - When We All Get to Heave....m4a'), tags:['heaven'] },
-  { id:'tg044', title:'Dear Wife (Roloff)', source:'telegram', artist:'Lester Roloff', url:TGM+encodeURIComponent('Christian Living - Lester Roloff - Dear Wif....m4a'), tags:['roloff'] },
-  { id:'tg045', title:'Hold On (Roloff)', source:'telegram', artist:'Lester Roloff', url:TGM+encodeURIComponent('Christian Living - Lester Roloff - Hold On ....m4a'), tags:['roloff','old paths'] },
-  { id:'tg046', title:'I Am So Glad (Roloff)', source:'telegram', artist:'Lester Roloff', url:TGM+encodeURIComponent('Christian Living - Lester Roloff - I Am So ....m4a'), tags:['roloff'] },
+  { id:'tg044', title:'Dear Wife', source:'telegram', artist:'Lester Roloff', url:TGM+encodeURIComponent('Christian Living - Lester Roloff - Dear Wif....m4a'), tags:['roloff'] },
+  { id:'tg045', title:'Hold On', source:'telegram', artist:'Lester Roloff', url:TGM+encodeURIComponent('Christian Living - Lester Roloff - Hold On ....m4a'), tags:['old paths','roloff'] },
+  { id:'tg046', title:'I Am So Glad', source:'telegram', artist:'Lester Roloff', url:TGM+encodeURIComponent('Christian Living - Lester Roloff - I Am So ....m4a'), tags:['roloff'] },
   { id:'tg047', title:'Thank God', source:'telegram', artist:'The Honeybees', url:TGM+encodeURIComponent('Christian Living - The Honeybees - Thank Go....m4a'), tags:[] },
-  { id:'tg048', title:'Come Thou Fount FWBC', source:'telegram', artist:'', url:TGM+encodeURIComponent('Come-Thou-Fount-FWBC.m4a'), tags:[] },
+  { id:'tg048', title:'Come Thou Fount', source:'telegram', artist:'FWBC', url:TGM+encodeURIComponent('Come-Thou-Fount-FWBC.m4a'), tags:[] },
   { id:'tg049', title:'I Came Here to Stay', source:'telegram', artist:'Commonwealth Baptist College', url:TGM+encodeURIComponent('Commonwealth Baptist College - Topic - I Came Here to Stay.m4a'), tags:['vocal'] },
-  { id:'tg050', title:'Jesus Saves', source:'telegram', artist:'Commonwealth Baptist College', url:TGM+encodeURIComponent('Commonwealth Baptist College - Topic - Jesus Saves.m4a'), tags:['vocal','jesus'] },
+  { id:'tg050', title:'Jesus Saves', source:'telegram', artist:'Commonwealth Baptist College', url:TGM+encodeURIComponent('Commonwealth Baptist College - Topic - Jesus Saves.m4a'), tags:['jesus','vocal'] },
   { id:'tg051', title:'Living by Faith', source:'telegram', artist:'Commonwealth Baptist College', url:TGM+encodeURIComponent('Commonwealth Baptist College - Topic - Living by Faith.m4a'), tags:['faith','vocal'] },
   { id:'tg052', title:'Standing on the Solid Rock', source:'telegram', artist:'Commonwealth Baptist College', url:TGM+encodeURIComponent('Commonwealth Baptist College - Topic - Standing on the Solid Ro....m4a'), tags:['faith','vocal'] },
-  { id:'tg053', title:'Are You Washed in the Blood?', source:'telegram', artist:'Dacosta Woltz\'s Southern Broadcasters', url:TGM+encodeURIComponent('Compilations - Are You Washed In The Blood Of The Lamb (Dacosta Woltz\'s Southern….mp3'), tags:['cross','blood','atonement'] },
+  { id:'tg053', title:'Are You Washed in the Blood?', source:'telegram', artist:'Dacosta Woltz\'s Southern Broadcasters', url:TGM+encodeURIComponent('Compilations - Are You Washed In The Blood Of The Lamb (Dacosta Woltz\'s Southern....mp3'), tags:['cross','blood'] },
   { id:'tg054', title:'Brighten the Corner', source:'telegram', artist:'Cornerstone Music', url:TGM+encodeURIComponent('Cornerstone Music - Brighten The Corner - Bu....m4a'), tags:[] },
-  { id:'tg055', title:'Criminal on the Cross', source:'telegram', artist:'', url:TGM+encodeURIComponent('Criminal-on-the-Cross.m4a'), tags:['cross','blood','atonement'] },
+  { id:'tg055', title:'Criminal on the Cross', source:'telegram', artist:'', url:TGM+encodeURIComponent('Criminal-on-the-Cross.m4a'), tags:['cross','blood'] },
   { id:'tg056', title:'Touring That City', source:'telegram', artist:'Crown Music', url:TGM+encodeURIComponent('Crown Music - Touring That City.m4a'), tags:[] },
   { id:'tg057', title:'Farther Along', source:'telegram', artist:'Dailey & Vincent', url:TGM+encodeURIComponent('Dailey & Vincent - Topic - Farther Along.m4a'), tags:[] },
   { id:'tg058', title:'The Life Boat', source:'telegram', artist:'Doyle Lawson', url:TGM+encodeURIComponent('Doyle Lawson - Topic - The Life Boat.m4a'), tags:[] },
-  { id:'tg059', title:'Over In The Glory Land', source:'telegram', artist:'Dry Branch Fire Squad', url:TGM+encodeURIComponent('Dry Branch Fire Squad - Topic - Over In The Glory Land.m4a'), tags:['heaven'] },
-  { id:'tg060', title:'Redeemed!', source:'telegram', artist:'Fairhaven Baptist College', url:TGM+encodeURIComponent('Fairhaven Baptist College - Topic - Redeemed!.m4a'), tags:['salvation','vocal'] },
+  { id:'tg059', title:'Over in the Glory Land', source:'telegram', artist:'Dry Branch Fire Squad', url:TGM+encodeURIComponent('Dry Branch Fire Squad - Topic - Over In The Glory Land.m4a'), tags:['heaven'] },
+  { id:'tg060', title:'Redeemed!', source:'telegram', artist:'Fairhaven Baptist College', url:TGM+encodeURIComponent('Fairhaven Baptist College - Topic - Redeemed!.m4a'), tags:['vocal','salvation'] },
   { id:'tg061', title:'Trust and Obey', source:'telegram', artist:'Fairhaven Baptist College', url:TGM+encodeURIComponent('Fairhaven Baptist College - Topic - Trust and Obey.m4a'), tags:['faith','vocal'] },
-  { id:'tg062', title:'Sound The Battle Cry', source:'telegram', artist:'Faithful Word Choir', url:TGM+encodeURIComponent('Faithful Word Choir - Topic - Sound The Battle Cry.m4a'), tags:['vocal'] },
-  { id:'tg063', title:'Remind Me of Calvary', source:'telegram', artist:'Faithmen Quartet', url:TGM+encodeURIComponent('Faithmen Quartet - Topic - Remind Me of Calvary.m4a'), tags:['cross','vocal','blood','atonement'] },
+  { id:'tg062', title:'Sound the Battle Cry', source:'telegram', artist:'Faithful Word Choir', url:TGM+encodeURIComponent('Faithful Word Choir - Topic - Sound The Battle Cry.m4a'), tags:['vocal'] },
+  { id:'tg063', title:'Remind Me of Calvary', source:'telegram', artist:'Faithmen Quartet', url:TGM+encodeURIComponent('Faithmen Quartet - Topic - Remind Me of Calvary.m4a'), tags:['cross','blood','vocal'] },
   { id:'tg064', title:'Forever Settled', source:'telegram', artist:'', url:TGM+encodeURIComponent('Forever-Settled.m4a'), tags:[] },
   { id:'tg065', title:'City of Refuge', source:'telegram', artist:'The Churchmen Quartet', url:TGM+encodeURIComponent('Fundamental Difference - City of Refuge - The Chu....m4a'), tags:['vocal'] },
   { id:'tg066', title:'He\'s Still in the Fire', source:'telegram', artist:'Various', url:TGM+encodeURIComponent('Fundamental Difference - He\'s Still In The Fire -....m4a'), tags:[] },
-  { id:'tg067', title:'Old Paths', source:'telegram', artist:'The Churchmen Quartet', url:TGM+encodeURIComponent('Fundamental Difference - Old Paths - The Churchme....m4a'), tags:['vocal','old paths'] },
+  { id:'tg067', title:'Old Paths', source:'telegram', artist:'The Churchmen Quartet', url:TGM+encodeURIComponent('Fundamental Difference - Old Paths - The Churchme....m4a'), tags:['old paths','vocal'] },
   { id:'tg068', title:'Other Side of the Boat', source:'telegram', artist:'Various', url:TGM+encodeURIComponent('Fundamental Difference - Other Side of the Boat -....m4a'), tags:[] },
   { id:'tg069', title:'Rescue the Perishing', source:'telegram', artist:'Various', url:TGM+encodeURIComponent('Fundamental Difference - Rescue The Perishing - R....m4a'), tags:['salvation'] },
   { id:'tg070', title:'Sail Away Home', source:'telegram', artist:'Various', url:TGM+encodeURIComponent('Fundamental Difference - Sail Away Home - Someone....m4a'), tags:[] },
-  { id:'tg071', title:'Then Came the Morning', source:'telegram', artist:'Various', url:TGM+encodeURIComponent('Fundamental Difference - Then Came the Morning - ....m4a'), tags:[] },
-  { id:'tg072', title:'We Shall See Jesus', source:'telegram', artist:'The Churchmen Quartet', url:TGM+encodeURIComponent('Fundamental Difference - We Shall See Jesus - The....m4a'), tags:['vocal','jesus'] },
+  { id:'tg071', title:'Then Came the Morning', source:'telegram', artist:'Various', url:TGM+encodeURIComponent('Fundamental Difference - Then Came the Morning - ....m4a'), tags:['resurrection'] },
+  { id:'tg072', title:'We Shall See Jesus', source:'telegram', artist:'The Churchmen Quartet', url:TGM+encodeURIComponent('Fundamental Difference - We Shall See Jesus - The....m4a'), tags:['jesus','vocal'] },
   { id:'tg073', title:'God Saves Old Sinners', source:'telegram', artist:'', url:TGM+encodeURIComponent('God-Saves-Old-Sinners.m4a'), tags:['old paths'] },
   { id:'tg074', title:'God Is Still Good', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Golden State Baptist College - God Is Still Good.m4a'), tags:['vocal'] },
-  { id:'tg075', title:'My Anchor Holds', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Golden State Baptist College - My Anchor Holds.m4a'), tags:['faith','vocal','old paths'] },
+  { id:'tg075', title:'My Anchor Holds', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Golden State Baptist College - My Anchor Holds.m4a'), tags:['faith','old paths','vocal'] },
   { id:'tg076', title:'Living by Faith', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Golden State Baptist College - Topic - Living by Faith.m4a'), tags:['faith','vocal'] },
-  { id:'tg077', title:'Pass Me Not, O Gentle Savior', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Golden State Baptist College - Topic - Pass Me Not, O Gentle Sa....m4a'), tags:['vocal','jesus'] },
-  { id:'tg078', title:'Saved, Saved!', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Golden State Baptist College - Topic - Saved, Saved!.m4a'), tags:['salvation','vocal'] },
+  { id:'tg077', title:'Pass Me Not, O Gentle Savior', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Golden State Baptist College - Topic - Pass Me Not, O Gentle Sa....m4a'), tags:['jesus','vocal'] },
+  { id:'tg078', title:'Saved, Saved!', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Golden State Baptist College - Topic - Saved, Saved!.m4a'), tags:['vocal','salvation'] },
   { id:'tg079', title:'The Haven of Rest', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Golden State Baptist College - Topic - The Haven of Rest.m4a'), tags:['vocal'] },
-  { id:'tg080', title:'The King Is Coming', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Golden State Baptist College - Topic - The King Is Coming.m4a'), tags:['vocal','jesus'] },
-  { id:'tg081', title:'Wonderful Grace of Jesus', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Golden State Baptist College - Topic - Wonderful Grace of Jesus....m4a'), tags:['vocal','grace','jesus'] },
+  { id:'tg080', title:'The King Is Coming', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Golden State Baptist College - Topic - The King Is Coming.m4a'), tags:['jesus','vocal'] },
+  { id:'tg081', title:'Wonderful Grace of Jesus', source:'telegram', artist:'Golden State Baptist College', url:TGM+encodeURIComponent('Golden State Baptist College - Topic - Wonderful Grace of Jesus....m4a'), tags:['jesus','vocal','grace'] },
   { id:'tg082', title:'Goodly Heritage', source:'telegram', artist:'Goodly Heritage', url:TGM+encodeURIComponent('Goodly Heritage - Goodly Heritage.m4a'), tags:[] },
   { id:'tg083', title:'Sweet, Sweet Spirit', source:'telegram', artist:'Goodly Heritage', url:TGM+encodeURIComponent('Goodly Heritage - Sweet, Sweet Spirit.m4a'), tags:[] },
   { id:'tg084', title:'I Can Stand in His Presence', source:'telegram', artist:'Grace Harbor', url:TGM+encodeURIComponent('Grace Harbor - I Can Stand in His Prese....m4a'), tags:['faith'] },
   { id:'tg085', title:'For What Earthly Reason', source:'telegram', artist:'Grace Harbor', url:TGM+encodeURIComponent('Grace Harbor - Topic - For What Earthly Reason.m4a'), tags:[] },
-  { id:'tg086', title:'He Paid A Debt He Did Not Owe', source:'telegram', artist:'', url:TGM+encodeURIComponent('He Paid A Debt He Did Not Owe.mp3'), tags:[] },
-  { id:'tg087', title:'I\'m Stayin\' in', source:'telegram', artist:'Heartland Baptist Bible College', url:TGM+encodeURIComponent('Heartland Baptist Bible College - I\'m Stayin\' in.m4a'), tags:['vocal'] },
-  { id:'tg088', title:'The Old Gospel Story', source:'telegram', artist:'Heartland Baptist Bible College', url:TGM+encodeURIComponent('Heartland Baptist Bible College Music - The Old Gospel Story- Gl....m4a'), tags:['vocal','old paths'] },
+  { id:'tg086', title:'He Paid a Debt He Did Not Owe', source:'telegram', artist:'', url:TGM+encodeURIComponent('He Paid A Debt He Did Not Owe.mp3'), tags:[] },
+  { id:'tg087', title:'I\'m Stayin\' In', source:'telegram', artist:'Heartland Baptist Bible College', url:TGM+encodeURIComponent('Heartland Baptist Bible College - I\'m Stayin\' in.m4a'), tags:['vocal'] },
+  { id:'tg088', title:'The Old Gospel Story', source:'telegram', artist:'Heartland Baptist Bible College', url:TGM+encodeURIComponent('Heartland Baptist Bible College Music - The Old Gospel Story- Gl....m4a'), tags:['old paths','vocal'] },
   { id:'tg089', title:'Faith of Our Fathers', source:'telegram', artist:'Hylander Singing Men', url:TGM+encodeURIComponent('Hylander Singing Men - Topic - Faith of Our Fathers.m4a'), tags:['faith'] },
-  { id:'tg090', title:'Isn\'t the Love of Jesus', source:'telegram', artist:'Hyles-Anderson College', url:TGM+encodeURIComponent('Hyles-Anderson College - Topic - Isn\'t the Love of Jesus ....m4a'), tags:['vocal','jesus'] },
+  { id:'tg090', title:'Isn\'t the Love of Jesus Something', source:'telegram', artist:'Hyles-Anderson College', url:TGM+encodeURIComponent('Hyles-Anderson College - Topic - Isn\'t the Love of Jesus ....m4a'), tags:['jesus','vocal'] },
   { id:'tg091', title:'Just One More Soul', source:'telegram', artist:'Hyles-Anderson College', url:TGM+encodeURIComponent('Hyles-Anderson College - Topic - Just One More Soul.m4a'), tags:['vocal'] },
-  { id:'tg092', title:'I Stand Redeemed', source:'telegram', artist:'', url:TGM+encodeURIComponent('I-Stand-Redeemed.m4a'), tags:['salvation','faith'] },
+  { id:'tg092', title:'I Stand Redeemed', source:'telegram', artist:'', url:TGM+encodeURIComponent('I-Stand-Redeemed.m4a'), tags:['faith','salvation'] },
   { id:'tg093', title:'I Wanna Die on the Battlefield', source:'telegram', artist:'', url:TGM+encodeURIComponent('I-Wanna-Die-on-the-Battlefield.m4a'), tags:[] },
   { id:'tg094', title:'I\'m Going There', source:'telegram', artist:'Glorybound Quartet', url:TGM+encodeURIComponent('I-m-Going-There-Glorybound-Quartet.m4a'), tags:['vocal'] },
   { id:'tg095', title:'I\'m Standing on the Solid Rock', source:'telegram', artist:'', url:TGM+encodeURIComponent('I-m-Standing-on-the-Solid-Rock-Lyric-Video.m4a'), tags:['faith'] },
   { id:'tg096', title:'I\'m on the Winning Side', source:'telegram', artist:'', url:TGM+encodeURIComponent('I-m-on-the-Winning-Side.m4a'), tags:[] },
-  { id:'tg097', title:'There Is a Fountain Filled with Blood', source:'telegram', artist:'Elohim Baptist Church', url:TGM+encodeURIComponent('Iglesia Bautista Elohim - Elohim Baptist Church - There is a Fountain Fill....m4a'), tags:['cross','blood','atonement'] },
+  { id:'tg097', title:'There Is a Fountain Filled with Blood', source:'telegram', artist:'Elohim Baptist Church', url:TGM+encodeURIComponent('Iglesia Bautista Elohim - Elohim Baptist Church - There is a Fountain Fill....m4a'), tags:['cross','blood'] },
   { id:'tg098', title:'In the Depths of the Sea', source:'telegram', artist:'Assurance Trio', url:TGM+encodeURIComponent('In-the-Depths-of-the-Sea-Assurance-Trio.m4a'), tags:[] },
-  { id:'tg099', title:'A Wedding Invitation', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - A Wedding Invitation.mp3'), tags:[] },
-  { id:'tg100', title:'Ain\'t God Good', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - Ain\'t God Good.mp3'), tags:[] },
-  { id:'tg101', title:'Deeper Than The Stain', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - Deeper Than The Stain.mp3'), tags:[] },
-  { id:'tg102', title:'More To Go To Heaven For', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - More To Go To Heaven For.mp3'), tags:['heaven'] },
-  { id:'tg103', title:'Once In The Stillness', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - Once In The Stillness.mp3'), tags:[] },
-  { id:'tg104', title:'Precious Memories', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - Precious Memories.mp3'), tags:[] },
-  { id:'tg105', title:'Soul Savin\' Meeting', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - Soul Savin\' Meeting.mp3'), tags:[] },
-  { id:'tg106', title:'Sweet Beulah Land', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - Sweet Beulah Land.mp3'), tags:[] },
-  { id:'tg107', title:'Thank God I\'m Free', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - Thank God I\'m Free.mp3'), tags:[] },
-  { id:'tg108', title:'The Lighthouse', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - The Lighthouse.mp3'), tags:[] },
-  { id:'tg109', title:'We Used To Go To Meetings', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - We Used To Go To Meetings.mp3'), tags:[] },
-  { id:'tg110', title:'Zion\'s Hill', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - Zion\'s Hill.mp3'), tags:[] },
+  { id:'tg099', title:'A Wedding Invitation', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - A Wedding Invitation.mp3'), tags:['vocal'] },
+  { id:'tg100', title:'Ain\'t God Good', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - Ain\'t God Good.mp3'), tags:['vocal'] },
+  { id:'tg101', title:'Deeper Than the Stain', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - Deeper Than The Stain.mp3'), tags:['vocal'] },
+  { id:'tg102', title:'More to Go to Heaven For', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - More To Go To Heaven For.mp3'), tags:['heaven','vocal'] },
+  { id:'tg103', title:'Once in the Stillness', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - Once In The Stillness.mp3'), tags:['vocal'] },
+  { id:'tg104', title:'Precious Memories', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - Precious Memories.mp3'), tags:['vocal'] },
+  { id:'tg105', title:'Soul Savin\' Meeting', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - Soul Savin\' Meeting.mp3'), tags:['vocal'] },
+  { id:'tg106', title:'Sweet Beulah Land', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - Sweet Beulah Land.mp3'), tags:['vocal'] },
+  { id:'tg107', title:'Thank God I\'m Free', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - Thank God I\'m Free.mp3'), tags:['vocal'] },
+  { id:'tg108', title:'The Lighthouse', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - The Lighthouse.mp3'), tags:['vocal'] },
+  { id:'tg109', title:'We Used to Go to Meetings', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - We Used To Go To Meetings.mp3'), tags:['vocal'] },
+  { id:'tg110', title:'Zion\'s Hill', source:'telegram', artist:'Jack Patterson And The Hylanders', url:TGM+encodeURIComponent('Jack Patterson And The Hylanders - Zion\'s Hill.mp3'), tags:['vocal'] },
   { id:'tg111', title:'An Old Account Settled', source:'telegram', artist:'Jim & Jesse', url:TGM+encodeURIComponent('Jim & Jesse - Topic - An Old Account Settled.m4a'), tags:['old paths'] },
-  { id:'tg112', title:'Then (Churchmen Quartet)', source:'telegram', artist:'Jordan Wilson', url:TGM+encodeURIComponent('Jordan Wilson - Churchmen Quartet - Then....m4a'), tags:[] },
-  { id:'tg113', title:'I\'ll Stick with the Old-Time Way', source:'telegram', artist:'Marksmen Quartet', url:TGM+encodeURIComponent('Landmark Baptist College Marksmen Quartet - I\'ll Stick With the Old ....m4a'), tags:['vocal','old paths'] },
-  { id:'tg114', title:'He Is Mine', source:'telegram', artist:'Landmark Baptist College Marksmen Quartet', url:TGM+encodeURIComponent('Landmark Baptist College Marksmen Quartet - Topic - He Is Mine.m4a'), tags:['vocal'] },
-  { id:'tg115', title:'I Know My God Can Do It', source:'telegram', artist:'Landmark Baptist College Marksmen Quartet', url:TGM+encodeURIComponent('Landmark Baptist College Marksmen Quartet - Topic - I Know My God Can Do It.m4a'), tags:['vocal'] },
-  { id:'tg116', title:'It\'s Still the Blood', source:'telegram', artist:'Marksmen Quartet', url:TGM+encodeURIComponent('Landmark Baptist College Marksmen Quartet - Topic - It\'s Still the Blood - N....m4a'), tags:['cross','vocal','blood','atonement'] },
+  { id:'tg112', title:'Then', source:'telegram', artist:'Churchmen Quartet', url:TGM+encodeURIComponent('Jordan Wilson - Churchmen Quartet - Then....m4a'), tags:['vocal'] },
+  { id:'tg113', title:'I\'ll Stick with the Old-Time Way', source:'telegram', artist:'Marksmen Quartet', url:TGM+encodeURIComponent('Landmark Baptist College Marksmen Quartet - I\'ll Stick With the Old ....m4a'), tags:['old paths','vocal'] },
+  { id:'tg114', title:'He Is Mine', source:'telegram', artist:'Marksmen Quartet', url:TGM+encodeURIComponent('Landmark Baptist College Marksmen Quartet - Topic - He Is Mine.m4a'), tags:['vocal'] },
+  { id:'tg115', title:'I Know My God Can Do It', source:'telegram', artist:'Marksmen Quartet', url:TGM+encodeURIComponent('Landmark Baptist College Marksmen Quartet - Topic - I Know My God Can Do It.m4a'), tags:['vocal'] },
+  { id:'tg116', title:'It\'s Still the Blood', source:'telegram', artist:'Marksmen Quartet', url:TGM+encodeURIComponent('Landmark Baptist College Marksmen Quartet - Topic - It\'s Still the Blood - N....m4a'), tags:['cross','blood','vocal'] },
   { id:'tg117', title:'Here Am I', source:'telegram', artist:'Lone Star Baptist College', url:TGM+encodeURIComponent('Lone Star Baptist College - Here Am I.m4a'), tags:['vocal'] },
   { id:'tg118', title:'I\'ll Take It Like It Is', source:'telegram', artist:'Lone Star Baptist College', url:TGM+encodeURIComponent('Lone Star Baptist College - I\'ll Take It Like It Is.m4a'), tags:['vocal'] },
-  { id:'tg119', title:'Not the Half Has Been Told', source:'telegram', artist:'Lone Star Baptist College', url:TGM+encodeURIComponent('Lone Star Baptist College - Not the Half Has Been To....m4a'), tags:['vocal','old paths'] },
-  { id:'tg120', title:'Thank God for Grace', source:'telegram', artist:'Lone Star Baptist College', url:TGM+encodeURIComponent('Lone Star Baptist College - Thank God for Grace.m4a'), tags:['grace','vocal'] },
-  { id:'tg121', title:'Mansion over the Hilltop', source:'telegram', artist:'', url:TGM+encodeURIComponent('Mansion-over-the-Hilltop.m4a'), tags:[] },
+  { id:'tg119', title:'Not the Half Has Been Told', source:'telegram', artist:'Lone Star Baptist College', url:TGM+encodeURIComponent('Lone Star Baptist College - Not the Half Has Been To....m4a'), tags:['old paths','vocal'] },
+  { id:'tg120', title:'Thank God for Grace', source:'telegram', artist:'Lone Star Baptist College', url:TGM+encodeURIComponent('Lone Star Baptist College - Thank God for Grace.m4a'), tags:['vocal','grace'] },
+  { id:'tg121', title:'Mansion over the Hilltop', source:'telegram', artist:'', url:TGM+encodeURIComponent('Mansion-over-the-Hilltop.m4a'), tags:['heaven'] },
   { id:'tg122', title:'Look for Me at Jesus\' Feet', source:'telegram', artist:'Nate Toulson', url:TGM+encodeURIComponent('Nate Toulson - Look for Me at Jesus\' Fe....m4a'), tags:['jesus'] },
   { id:'tg123', title:'I\'ll Wish I Had Given Him More', source:'telegram', artist:'North Valley Baptist Church', url:TGM+encodeURIComponent('North Valley Baptist Church - Topic - I\'ll Wish I Had Given Hi....m4a'), tags:[] },
   { id:'tg124', title:'Will Your Anchor Hold', source:'telegram', artist:'Northern Baptist Association', url:TGM+encodeURIComponent('Northern Baptist Association - Will your anchor hold in....m4a'), tags:['faith','old paths'] },
-  { id:'tg125', title:'Nothing But The Blood', source:'telegram', artist:'', url:TGM+encodeURIComponent('Nothing-But-The-Blood.m4a'), tags:['cross','blood','atonement'] },
-  { id:'tg126', title:'Oh It Is Wonderful to Be a Christian', source:'telegram', artist:'', url:TGM+encodeURIComponent('Oh-It-Is-Wonderful-to-Be-a-Christian.m4a'), tags:[] },
+  { id:'tg125', title:'Nothing but the Blood', source:'telegram', artist:'', url:TGM+encodeURIComponent('Nothing-But-The-Blood.m4a'), tags:['cross','blood'] },
+  { id:'tg126', title:'Oh, It Is Wonderful to Be a Christian', source:'telegram', artist:'', url:TGM+encodeURIComponent('Oh-It-Is-Wonderful-to-Be-a-Christian.m4a'), tags:[] },
   { id:'tg127', title:'Just Over in the Gloryland', source:'telegram', artist:'Old Time Gospel Hour Quartet', url:TGM+encodeURIComponent('Old Time Gospel Hour Quartet - Topic - Just Over In The Gloryla....m4a'), tags:['heaven','vocal'] },
-  { id:'tg128', title:'Paid-in-Full 2', source:'telegram', artist:'', url:TGM+encodeURIComponent('Paid-in-Full 2.m4a'), tags:[] },
+  { id:'tg128', title:'Paid in Full', source:'telegram', artist:'', url:TGM+encodeURIComponent('Paid-in-Full 2.m4a'), tags:[] },
   { id:'tg129', title:'Turn Them Into Friends', source:'telegram', artist:'Patch The Pirate', url:TGM+encodeURIComponent('Patch The Pirate - Turn Them Into Friends.m4a'), tags:[] },
-  { id:'tg130', title:'There Was a Cross', source:'telegram', artist:'Commonwealth Baptist College', url:TGM+encodeURIComponent('Praise To God - There was a cross - Comm....m4a'), tags:['cross','vocal','blood','atonement'] },
-  { id:'tg131', title:'The Sun\'s Coming Up in the Morning', source:'telegram', artist:'Providence Baptist College', url:TGM+encodeURIComponent('Providence Baptist College - The Sun\'s Coming Up In T....m4a'), tags:['vocal'] },
+  { id:'tg130', title:'There Was a Cross', source:'telegram', artist:'Commonwealth Baptist College', url:TGM+encodeURIComponent('Praise To God - There was a cross - Comm....m4a'), tags:['cross','blood','vocal'] },
+  { id:'tg131', title:'The Sun\'s Coming Up in the Morning', source:'telegram', artist:'Providence Baptist College', url:TGM+encodeURIComponent('Providence Baptist College - The Sun\'s Coming Up In T....m4a'), tags:['resurrection','vocal'] },
   { id:'tg132', title:'Come Home', source:'telegram', artist:'Providence Baptist College', url:TGM+encodeURIComponent('Providence Baptist College - Topic - Come Home.m4a'), tags:['vocal'] },
   { id:'tg133', title:'Constantly Abiding', source:'telegram', artist:'Providence Baptist College', url:TGM+encodeURIComponent('Providence Baptist College - Topic - Constantly Abiding.m4a'), tags:['vocal'] },
-  { id:'tg134', title:'Good Old Gospel Singing', source:'telegram', artist:'Providence Baptist College', url:TGM+encodeURIComponent('Providence Baptist College - Topic - Good Old Gospel Singing.m4a'), tags:['vocal','old paths'] },
-  { id:'tg135', title:'I\'m Bound for the Kingdom', source:'telegram', artist:'Providence Baptist College', url:TGM+encodeURIComponent('Providence Baptist College - Topic - I\'m Bound For The Kingdo....m4a'), tags:['vocal','jesus'] },
+  { id:'tg134', title:'Good Old Gospel Singing', source:'telegram', artist:'Providence Baptist College', url:TGM+encodeURIComponent('Providence Baptist College - Topic - Good Old Gospel Singing.m4a'), tags:['old paths','vocal'] },
+  { id:'tg135', title:'I\'m Bound for the Kingdom', source:'telegram', artist:'Providence Baptist College', url:TGM+encodeURIComponent('Providence Baptist College - Topic - I\'m Bound For The Kingdo....m4a'), tags:['jesus','vocal'] },
   { id:'tg136', title:'I\'m Not Going to Hell', source:'telegram', artist:'Providence Baptist College', url:TGM+encodeURIComponent('Providence Baptist College - Topic - I\'m Not Going To Hell.m4a'), tags:['vocal'] },
-  { id:'tg137', title:'Mercy Came Down', source:'telegram', artist:'Providence Baptist College', url:TGM+encodeURIComponent('Providence Baptist College - Topic - Mercy Came Down.m4a'), tags:['grace','vocal'] },
+  { id:'tg137', title:'Mercy Came Down', source:'telegram', artist:'Providence Baptist College', url:TGM+encodeURIComponent('Providence Baptist College - Topic - Mercy Came Down.m4a'), tags:['vocal','grace'] },
   { id:'tg138', title:'Touring That City', source:'telegram', artist:'Providence Baptist College', url:TGM+encodeURIComponent('Providence Baptist College - Topic - Touring That City.m4a'), tags:['vocal'] },
   { id:'tg139', title:'When I Get Carried Away', source:'telegram', artist:'Providence Baptist College', url:TGM+encodeURIComponent('Providence Baptist College - Topic - When I Get Carried Away.m4a'), tags:['vocal'] },
   { id:'tg140', title:'Lord I Need You', source:'telegram', artist:'Various', url:TGM+encodeURIComponent('Real Christian Music Channel & Exhortation - Lord I need You - Streng....m4a'), tags:['jesus'] },
@@ -1184,21 +1148,21 @@ function hymnTags(title) {
   { id:'tg144', title:'Hallelujah Square', source:'telegram', artist:'Revival Trio', url:TGM+encodeURIComponent('Revival Trio - Topic - Hallelujah Square.m4a'), tags:[] },
   { id:'tg145', title:'Bow the Knee', source:'telegram', artist:'Ron Hamilton', url:TGM+encodeURIComponent('Ron Hamilton - Topic - Bow the Knee.m4a'), tags:[] },
   { id:'tg146', title:'Yes, I Know', source:'telegram', artist:'SE Samonte', url:TGM+encodeURIComponent('SE Samonte - Yes, I Know.m4a'), tags:[] },
-  { id:'tg147', title:'Saved by the Blood of the Crucified One', source:'telegram', artist:'', url:TGM+encodeURIComponent('Saved-by-the-Blood-of-the-Crucified-One-With-Lyrics-Living-H.m4a'), tags:['salvation','cross','blood','atonement'] },
+  { id:'tg147', title:'Saved by the Blood of the Crucified One', source:'telegram', artist:'', url:TGM+encodeURIComponent('Saved-by-the-Blood-of-the-Crucified-One-With-Lyrics-Living-H.m4a'), tags:['cross','blood','salvation'] },
   { id:'tg148', title:'Saved to the Uttermost', source:'telegram', artist:'The Watchmen', url:TGM+encodeURIComponent('Saved-to-the-uttermost-the-Watchmen-SBC.m4a'), tags:['salvation'] },
-  { id:'tg149', title:'In The Sweet By And By', source:'telegram', artist:'Seminole String Band', url:TGM+encodeURIComponent('Seminole String Band - Topic - In The Sweet By And By.m4a'), tags:[] },
+  { id:'tg149', title:'In the Sweet By and By', source:'telegram', artist:'Seminole String Band', url:TGM+encodeURIComponent('Seminole String Band - Topic - In The Sweet By And By.m4a'), tags:[] },
   { id:'tg150', title:'The Old Account Was Settled', source:'telegram', artist:'Seminole String Band', url:TGM+encodeURIComponent('Seminole String Band - Topic - The Old Account Was Sett....m4a'), tags:['old paths'] },
   { id:'tg151', title:'Complete in Thee', source:'telegram', artist:'Singing Servants Quartet', url:TGM+encodeURIComponent('Singing Servants Quartet - Complete in Thee.m4a'), tags:['vocal'] },
   { id:'tg152', title:'I\'d Rather Have Jesus', source:'telegram', artist:'Various', url:TGM+encodeURIComponent('Songs and Everlasting Joy - I\'d Rather Have Jesus - ....m4a'), tags:['jesus'] },
   { id:'tg153', title:'Because He Lives', source:'telegram', artist:'Sounds Like Reign', url:TGM+encodeURIComponent('Sounds Like Reign - Because He Lives -- Her ....m4a'), tags:[] },
   { id:'tg154', title:'Surely Goodness and Mercy', source:'telegram', artist:'Southend Baptist', url:TGM+encodeURIComponent('Southend Baptist - Surely Goodness and Merc....m4a'), tags:['grace'] },
-  { id:'tg155', title:'Some Call It Heaven', source:'telegram', artist:'Stephen Ray Nichols & Family', url:TGM+encodeURIComponent('Stephen Ray Nichols & Family - Some Call It Heaven.m4a'), tags:['heaven'] },
-  { id:'tg156', title:'Tell It Again Roloff', source:'telegram', artist:'', url:TGM+encodeURIComponent('Tell-It-Again-Roloff.m4a'), tags:[] },
+  { id:'tg155', title:'Some Call It Heaven', source:'telegram', artist:'Stephen Ray Nichols & Family', url:TGM+encodeURIComponent('Stephen Ray Nichols & Family - Some Call It Heaven.m4a'), tags:['heaven','vocal'] },
+  { id:'tg156', title:'Tell It Again', source:'telegram', artist:'Lester Roloff', url:TGM+encodeURIComponent('Tell-It-Again-Roloff.m4a'), tags:['roloff'] },
   { id:'tg157', title:'Honey in the Rock', source:'telegram', artist:'The Chuck Wagon Gang', url:TGM+encodeURIComponent('The Chuck Wagon Gang - Topic - Honey In The Rock.m4a'), tags:[] },
-  { id:'tg158', title:'Come On Home', source:'telegram', artist:'The John Marshall Family', url:TGM+encodeURIComponent('The John Marshall Family - Topic - Come On Home - How Beaut....m4a'), tags:[] },
-  { id:'tg159', title:'My Saviour First Of All', source:'telegram', artist:'The John Marshall Family', url:TGM+encodeURIComponent('The John Marshall Family - Topic - My Saviour First Of All.m4a'), tags:[] },
-  { id:'tg160', title:'Must I Go and Empty Handed', source:'telegram', artist:'The Spencer Family', url:TGM+encodeURIComponent('The Spencer Family - Topic - Must I Go and Empty Hand....m4a'), tags:[] },
-  { id:'tg161', title:'The Sweetest Song I Know', source:'telegram', artist:'The Weaver Family', url:TGM+encodeURIComponent('The Weaver Family - Topic - The Sweetest Song I Know....m4a'), tags:[] },
+  { id:'tg158', title:'Come On Home', source:'telegram', artist:'The John Marshall Family', url:TGM+encodeURIComponent('The John Marshall Family - Topic - Come On Home - How Beaut....m4a'), tags:['vocal'] },
+  { id:'tg159', title:'My Saviour First of All', source:'telegram', artist:'The John Marshall Family', url:TGM+encodeURIComponent('The John Marshall Family - Topic - My Saviour First Of All.m4a'), tags:['vocal'] },
+  { id:'tg160', title:'Must I Go and Empty Handed', source:'telegram', artist:'The Spencer Family', url:TGM+encodeURIComponent('The Spencer Family - Topic - Must I Go and Empty Hand....m4a'), tags:['vocal'] },
+  { id:'tg161', title:'The Sweetest Song I Know', source:'telegram', artist:'The Weaver Family', url:TGM+encodeURIComponent('The Weaver Family - Topic - The Sweetest Song I Know....m4a'), tags:['vocal'] },
   { id:'tg162', title:'God on the Mountain', source:'telegram', artist:'The Wellman', url:TGM+encodeURIComponent('The Wellman - God on the Mountain - Ly....m4a'), tags:[] },
   { id:'tg163', title:'The Prodigal Son', source:'telegram', artist:'Chris Stansell', url:TGM+encodeURIComponent('The-Prodigal-son-Chris-Stansell.m4a'), tags:[] },
   { id:'tg164', title:'This World Is Not My Home', source:'telegram', artist:'', url:TGM+encodeURIComponent('This-World-Is-Not-My-Home.m4a'), tags:[] },
@@ -1207,14 +1171,17 @@ function hymnTags(title) {
   { id:'tg167', title:'We Will Stand Our Ground', source:'telegram', artist:'', url:TGM+encodeURIComponent('We-Will-Stand-Our-Ground.m4a'), tags:['faith'] },
   { id:'tg168', title:'It Is Finished', source:'telegram', artist:'West Coast Baptist College', url:TGM+encodeURIComponent('West Coast Baptist College - It Is Finished.m4a'), tags:['vocal'] },
   { id:'tg169', title:'What a Day That Will Be', source:'telegram', artist:'Chris Stansell', url:TGM+encodeURIComponent('What-a-day-that-will-be-Chris-Stansell.m4a'), tags:[] },
-  { id:'tg170', title:'Where The Soul Of Man Never Dies', source:'telegram', artist:'', url:TGM+encodeURIComponent('Where-The-Soul-Of-Man-Never-Dies.m4a'), tags:[] },
+  { id:'tg170', title:'Where the Soul of Man Never Dies', source:'telegram', artist:'', url:TGM+encodeURIComponent('Where-The-Soul-Of-Man-Never-Dies.m4a'), tags:[] },
   { id:'tg171', title:'Old Camp Meeting Days', source:'telegram', artist:'Witness', url:TGM+encodeURIComponent('Witness - Topic - Old Camp Meeting Days.m4a'), tags:['old paths'] },
-  { id:'tg172', title:'Worthy Is the Lamb', source:'telegram', artist:'', url:TGM+encodeURIComponent('Worthy-Is-the-Lamb.m4a'), tags:[] },
-  { id:'tg173', title:'The Last Blood', source:'telegram', artist:'Zachary Mills', url:TGM+encodeURIComponent('Zachary Mills - The Last Blood.m4a'), tags:['cross','blood','atonement'] },
+  { id:'tg172', title:'Worthy Is the Lamb', source:'telegram', artist:'', url:TGM+encodeURIComponent('Worthy-Is-the-Lamb.m4a'), tags:['jesus'] },
+  { id:'tg173', title:'The Last Blood', source:'telegram', artist:'Zachary Mills', url:TGM+encodeURIComponent('Zachary Mills - The Last Blood.m4a'), tags:['cross','blood'] },
 ];
+
+function hymnTags(title) {
+  const t = title.toLowerCase();
+  const tags = [];
   if (t.includes('blood') || t.includes('cross') || t.includes('calvary')) tags.push('blood','cross','atonement');
   if (t.includes('grace') || t.includes('mercy')) tags.push('grace');
-  if (t.includes('pray') || t.includes('prayer')) tags.push('prayer');
   if (t.includes('joy') || t.includes('praise') || t.includes('glory') || t.includes('bless')) tags.push('praise');
   if (t.includes('faith') || t.includes('trust')) tags.push('faith','trust');
   if (t.includes('heaven') || t.includes('glory') || t.includes('eternal')) tags.push('heaven');
@@ -1286,7 +1253,7 @@ function getFiltered() {
     else matchSrc = h.source === activeSource;
 
     // Nav view override
-    if (activeView === 'psalms') matchSrc = SOURCES[h.source].isPsalm;
+    
     if (activeView === 'favorites') matchSrc = favorites.has(h.id);
 
     const q = searchQuery.toLowerCase().trim();
@@ -1722,6 +1689,38 @@ audio.addEventListener('ended', () => { if (autoPlay) playNext(); });
 // ══════════════════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════════════════
+
+// -- SHUFFLE ---------------------------------------------------------------
+var shuffleOn = false;
+var shuffleQueue = [];
+var shuffleBtn = document.getElementById('shuffle-btn');
+shuffleBtn.addEventListener('click', function() {
+  shuffleOn = !shuffleOn;
+  shuffleBtn.classList.toggle('active', shuffleOn);
+  shuffleBtn.title = shuffleOn ? 'Shuffle: On' : 'Shuffle: Off';
+  if (shuffleOn) buildShuffleQueue();
+  toast(shuffleOn ? '🔀 Shuffle on' : 'Shuffle off');
+});
+function buildShuffleQueue() {
+  shuffleQueue = filteredList.map(function(_,i){return i;});
+  for (var i = shuffleQueue.length-1; i > 0; i--) {
+    var j = Math.floor(Math.random()*(i+1));
+    var tmp = shuffleQueue[i]; shuffleQueue[i]=shuffleQueue[j]; shuffleQueue[j]=tmp;
+  }
+}
+var _origPlayNext = playNext;
+playNext = function() {
+  if (shuffleOn && autoPlay) {
+    if (!shuffleQueue.length) buildShuffleQueue();
+    var ci = shuffleQueue.indexOf(currentIdx);
+    if (ci >= 0) shuffleQueue.splice(ci,1);
+    if (!shuffleQueue.length) buildShuffleQueue();
+    loadAndPlay(shuffleQueue.shift());
+    return;
+  }
+  _origPlayNext();
+};
+
 render();
 updateFavBtn(null);
 // ── YOUTUBE PANEL ──────────────────────────────────────────────────────────
