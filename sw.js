@@ -1,11 +1,15 @@
-// Sacred Hymnody PWA Service Worker v1.1
-// Works at any subpath — paths are relative to SW location
-const CACHE_NAME = 'sacred-hymnody-v1';
+// IFB Hymns & Spiritual Songs — Service Worker v2.0
+// Fixed: removed external URLs from cache.addAll() to prevent install failure
+const CACHE_NAME = 'ifb-hymns-v2';
+
+// Only cache files we KNOW exist and can fetch reliably
+// External URLs (fonts, audio) are handled separately and never block install
 const SHELL_ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  'https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Merriweather:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500&display=swap'
+  '/Hymns/',
+  '/Hymns/index.html',
+  '/Hymns/manifest.json',
+  '/Hymns/icons/icon-192.png',
+  '/Hymns/icons/icon-512.png',
 ];
 
 self.addEventListener('install', e => {
@@ -19,33 +23,31 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
+      .then(keys => Promise.all(
+        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+      ))
       .then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-  const isAudio =
-    url.pathname.endsWith('.mp3') ||
-    url.pathname.endsWith('.wav') ||
-    url.hostname.includes('s3.amazonaws') ||
-    url.hostname.includes('baptistarchive') ||
-    url.hostname.includes('smallchurchmusic') ||
-    url.hostname.includes('archive.org') ||
-    url.hostname.includes('thepsalmssung');
 
-  if (isAudio) {
-    // Network-first for audio; cache on success for offline replay
+  // Never intercept cross-origin requests (fonts, YouTube, audio sources)
+  // Let those go straight to network — they have their own caching
+  if (url.origin !== self.location.origin) {
+    return; // fall through to browser default
+  }
+
+  // Audio files on our own origin — network first, cache on success
+  if (url.pathname.endsWith('.mp3') || url.pathname.endsWith('.wav')) {
     e.respondWith(
       caches.open(CACHE_NAME).then(async cache => {
         const cached = await cache.match(e.request);
         if (cached) return cached;
         try {
           const response = await fetch(e.request);
-          if (response.ok && response.status === 200) {
-            cache.put(e.request, response.clone());
-          }
+          if (response.ok) cache.put(e.request, response.clone());
           return response;
         } catch {
           return cached || new Response('Audio unavailable offline', { status: 503 });
@@ -55,7 +57,7 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Shell assets — cache-first
+  // App shell — cache first, network fallback
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
@@ -64,7 +66,7 @@ self.addEventListener('fetch', e => {
           caches.open(CACHE_NAME).then(c => c.put(e.request, response.clone()));
         }
         return response;
-      }).catch(() => caches.match('./index.html'));
+      }).catch(() => caches.match('/Hymns/index.html'));
     })
   );
 });

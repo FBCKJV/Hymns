@@ -1,8 +1,10 @@
 {
+  "id": "/Hymns/",
   "name": "IFB Hymns & Spiritual Songs",
   "short_name": "IFB Hymns",
   "description": "KJV congregational hymns, sung Psalms, and IFB spiritual songs from verified public domain archives",
-  "start_url": "./index.html",
+  "start_url": "/Hymns/",
+  "scope": "/Hymns/",
   "display": "standalone",
   "background_color": "#0b0f1a",
   "theme_color": "#1a1060",
@@ -13,20 +15,20 @@
   ],
   "icons": [
     {
-      "src": "./icons/icon-192.png",
+      "src": "/Hymns/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./icons/icon-512.png",
+      "src": "/Hymns/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     },
     {
-      "src": "./icons/icon-180.png",
-      "sizes": "180x180",
+      "src": "/Hymns/icons/icon-512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     }
@@ -34,33 +36,30 @@
   "shortcuts": [
     {
       "name": "Hymns",
-      "url": "./index.html#hymns",
-      "description": "Browse all hymns",
+      "url": "/Hymns/#hymns",
       "icons": [
         {
-          "src": "./icons/icon-192.png",
+          "src": "/Hymns/icons/icon-192.png",
           "sizes": "192x192"
         }
       ]
     },
     {
       "name": "Psalms",
-      "url": "./index.html#psalms",
-      "description": "Browse sung Psalms",
+      "url": "/Hymns/#psalms",
       "icons": [
         {
-          "src": "./icons/icon-192.png",
+          "src": "/Hymns/icons/icon-192.png",
           "sizes": "192x192"
         }
       ]
     },
     {
       "name": "Favorites",
-      "url": "./index.html#favorites",
-      "description": "Your saved favorites",
+      "url": "/Hymns/#favorites",
       "icons": [
         {
-          "src": "./icons/icon-192.png",
+          "src": "/Hymns/icons/icon-192.png",
           "sizes": "192x192"
         }
       ]

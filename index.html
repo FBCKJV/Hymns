@@ -7,10 +7,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1060">
 <meta name="description" content="IFB Hymns &amp; Spiritual Songs — KJV congregational singing, public domain hymns, and sung Psalms">
-<link rel="manifest" href="./manifest.json">
-<link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="./icons/icon-16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png">
+<link rel="manifest" href="/Hymns/manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="/Hymns/icons/icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/Hymns/icons/icon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/Hymns/icons/icon-180.png">
 <title>IFB Hymns &amp; Spiritual Songs</title>
 <!-- base tag set per-deploy; for GitHub Pages /Hymns/ subpath this is fine as-is -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -341,7 +341,7 @@ header {
 <!-- HEADER -->
 <header>
   <div class="header-top">
-    <img src="./icons/icon-192.png" alt="IFB Hymns" width="36" height="36" style="border-radius:8px;flex-shrink:0;object-fit:cover;">
+    <img src="/Hymns/icons/icon-192.png" alt="IFB Hymns" width="36" height="36" style="border-radius:8px;flex-shrink:0;object-fit:cover;">
     <div>
       <div class="app-title">IFB Hymns &amp; Songs</div>
       <div class="app-sub">KJV · Congregational · Psalms</div>
@@ -385,7 +385,7 @@ header {
 <!-- PLAYER BAR -->
 <div id="player-bar">
   <div class="np-row">
-    <div class="np-art" id="np-art"><img src="./icons/icon-192.png" width="30" height="30" style="border-radius:4px;object-fit:cover;" onerror="this.style.display='none';this.parentNode.textContent='♪'"></div>
+    <div class="np-art" id="np-art"><img src="/Hymns/icons/icon-192.png" width="30" height="30" style="border-radius:4px;object-fit:cover;" onerror="this.style.display='none';this.parentNode.textContent='♪'"></div>
     <div class="np-info">
       <div class="np-title" id="np-title">Select a hymn to begin</div>
       <div class="np-source" id="np-source">—</div>
@@ -1372,7 +1372,7 @@ window.addEventListener('appinstalled', () => {
 // SERVICE WORKER REGISTRATION
 // ══════════════════════════════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(()=>{});
+  navigator.serviceWorker.register('/Hymns/sw.js', { scope: '/Hymns/' }).catch(()=>{});
 }
 
 // Media Session API (lock screen controls)
