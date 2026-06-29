@@ -356,6 +356,8 @@ header {
 .yt-foot{padding:5px 14px calc(var(--safe-bot) + 5px);font-size:10px;color:var(--text-mute);text-align:center;flex-shrink:0;}
 .yt-foot a{color:var(--gold-dim);text-decoration:none;}
 .nav-btn.yt-nav.active{color:#e05050;}
+#auto-btn.on{color:var(--gold);}
+
 </style>
 </head>
 <body>
@@ -412,7 +414,10 @@ header {
       <div class="np-source" id="np-source">—</div>
     </div>
     <div class="controls">
-      <button class="ctrl-btn" id="lyr-btn" title="Lyrics" style="color:var(--text-mute)">
+      <button class="ctrl-btn" id="auto-btn" title="Autoplay: Off" style="color:var(--text-mute);font-size:10px;font-weight:600;letter-spacing:.03em;width:32px">
+          AUTO
+        </button>
+        <button class="ctrl-btn" id="lyr-btn" title="Lyrics" style="color:var(--text-mute)">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
       </button>
       <button class="ctrl-btn" id="fav-btn-player" title="Favorite">
@@ -545,7 +550,7 @@ header {
     </div>
     <div class="yt-chips" id="yt-chips">
       <button class="yt-chip active" data-id="PLq3FwPEx_WZXnb0ig3CS2TCbKJXqRU7LG" data-type="playlist" data-label="IFB Congregational Hymns">🎼 IFB Congregational</button>
-      <button class="yt-chip" data-id="UCNZKuv9U-5bHkLrIqwlFpkg" data-type="channel" data-label="IFB Hymns Channel">📺 IFB Hymns Channel</button>
+      <button class="yt-chip" data-id="PLjm1yU618oqVJbEIuQDEHQu0LUS6plQrC" data-type="playlist" data-label="Congregational Hymn Singing">🎼 Congregational Singing</button>
       <button class="yt-chip" data-id="PLSi6Dpuhof_XSoHMzznDrGShF8oDh9Otl" data-type="playlist" data-label="Lancaster Baptist Music">🏛️ Lancaster Baptist</button>
       <button class="yt-chip" data-id="PLq3FwPEx_WZWsGpxV4A8Or1LKMh8sgMbZ" data-type="playlist" data-label="Baptist Hymns with Lyrics">🎵 Hymns with Lyrics</button>
       <button class="yt-chip" data-id="PLc4tGzg7sAwiaOATg18eklLdhX4kpXYv8" data-type="playlist" data-label="IFB Christ Honoring Music">✝ Christ Honoring</button>
@@ -1519,6 +1524,19 @@ function updateMediaSession() {
   });
 }
 audio.addEventListener('play', updateMediaSession);
+
+// ── AUTOPLAY TOGGLE ──────────────────────────────────────────────────────────
+let autoPlay = false; // off by default
+const autoBtn = document.getElementById('auto-btn');
+autoBtn.addEventListener('click', () => {
+  autoPlay = !autoPlay;
+  autoBtn.classList.toggle('on', autoPlay);
+  autoBtn.title = 'Autoplay: ' + (autoPlay ? 'On' : 'Off');
+  autoBtn.style.color = autoPlay ? 'var(--gold)' : 'var(--text-mute)';
+});
+// Hook into ended event — only advance if autoplay is on
+audio.removeEventListener('ended', playNext);
+audio.addEventListener('ended', () => { if (autoPlay) playNext(); });
 
 // ══════════════════════════════════════════════════════════════════
 // INIT
