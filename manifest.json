@@ -1,18 +1,15 @@
 {
   "id": "/Hymns/",
-  "name": "IFB Hymns & Spiritual Songs",
-  "short_name": "IFB Hymns",
-  "description": "KJV congregational hymns, sung Psalms, and IFB spiritual songs from verified public domain archives",
+  "name": "FBC Hymns & Spiritual Songs",
+  "short_name": "FBC Hymns",
+  "description": "Hymns & Spiritual Songs — Faith Baptist Church of Plymouth County · KJV · IFB",
   "start_url": "/Hymns/",
   "scope": "/Hymns/",
   "display": "standalone",
   "background_color": "#0b0f1a",
   "theme_color": "#1a1060",
   "orientation": "portrait-primary",
-  "categories": [
-    "music",
-    "religion"
-  ],
+  "categories": ["music", "religion"],
   "icons": [
     {
       "src": "/Hymns/icons/icon-192.png",
@@ -35,34 +32,22 @@
   ],
   "shortcuts": [
     {
-      "name": "Hymns",
-      "url": "/Hymns/#hymns",
-      "icons": [
-        {
-          "src": "/Hymns/icons/icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "name": "All Hymns",
+      "url": "/Hymns/",
+      "description": "Browse all hymns",
+      "icons": [{ "src": "/Hymns/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Psalms",
-      "url": "/Hymns/#psalms",
-      "icons": [
-        {
-          "src": "/Hymns/icons/icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "name": "IFB Specials",
+      "url": "/Hymns/#telegram",
+      "description": "IFB quartets, choirs & specials",
+      "icons": [{ "src": "/Hymns/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Favorites",
       "url": "/Hymns/#favorites",
-      "icons": [
-        {
-          "src": "/Hymns/icons/icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "description": "Your saved favorites",
+      "icons": [{ "src": "/Hymns/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
