@@ -7,8 +7,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0b0f1a">
 <meta name="description" content="Stream public domain Baptist hymns and sung Psalms from verified congregational archives">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="./manifest.json">
 <title>Sacred Hymnody</title>
+<!-- base tag set per-deploy; for GitHub Pages /Hymns/ subpath this is fine as-is -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Merriweather:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -1375,7 +1376,7 @@ window.addEventListener('appinstalled', () => {
 // SERVICE WORKER REGISTRATION
 // ══════════════════════════════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(()=>{});
 }
 
 // Media Session API (lock screen controls)
