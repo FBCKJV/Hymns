@@ -3149,14 +3149,23 @@ function tgKnownFilenames() {
 function tgTitleFromFilename(filename) {
   let name = filename.replace(/\.(mp3|m4a|wav|ogg|opus)$/i, '');
   name = name.replace(/\s*\.\.\.\s*$/, '');
+  name = name.replace(/\s{2,}/g, ' ');
   let artist = '';
   if (name.includes(' - Topic - ')) {
     artist = name.split(' - Topic - ')[0].trim();
     name = name.split(' - Topic - ')[1].trim();
   } else if (name.includes(' - ')) {
     const parts = name.split(' - ');
-    artist = parts[0].trim();
-    name = parts.slice(1).join(' - ').trim();
+    const first = parts[0].trim();
+    const second = parts.slice(1).join(' - ').trim();
+    const performerWords = /\b(trio|choir|quartet|family|college|singers|band|ensemble|chorale)\b/i;
+    if (performerWords.test(second) && !performerWords.test(first)) {
+      artist = second;
+      name = first;
+    } else {
+      artist = first;
+      name = second;
+    }
   }
   if (name.includes('-') && !name.includes(' ')) name = name.replace(/-/g, ' ');
   name = name.replace(/\s+/g, ' ').trim();
