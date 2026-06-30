@@ -419,6 +419,91 @@ header {
 }
 #share-btn:active { color: var(--gold); }
 
+/* DOWNLOAD BUTTON */
+.dl-btn {
+  background:none; border:none; color:var(--text-mute); padding:5px; display:flex;
+  align-items:center; justify-content:center; border-radius:50%; transition:color .15s, transform .15s;
+  position:relative;
+}
+.dl-btn:active { transform:scale(1.3); }
+.dl-btn.downloaded { color:#5bb8a8; }
+.dl-btn.downloading { color:var(--gold); }
+.dl-btn.downloading svg { animation: dl-spin 1s linear infinite; }
+@keyframes dl-spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+.dl-progress-ring {
+  position:absolute; inset:0; pointer-events:none;
+}
+
+/* Offline badge on player */
+.offline-pill {
+  font-size:9px; font-weight:700; color:#5bb8a8; background:rgba(91,184,168,.15);
+  border:1px solid rgba(91,184,168,.35); border-radius:8px; padding:1px 6px;
+  margin-left:6px; letter-spacing:.02em; display:inline-block; vertical-align:middle;
+}
+
+/* Downloads manager row in info/tips */
+.dl-manager-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:8px 0; border-bottom:1px solid var(--border);
+}
+.dl-manager-row:last-child { border-bottom:none; }
+.dl-manager-title { font-size:13px; color:var(--text); }
+.dl-manager-meta { font-size:11px; color:var(--text-mute); margin-top:1px; }
+.dl-manager-remove {
+  background:none; border:1px solid var(--border); color:var(--text-mute);
+  border-radius:6px; padding:4px 10px; font-size:11px;
+}
+
+/* TIPS SHEET (mirrors lyrics-panel / info-panel pattern) */
+#tips-panel { position:fixed; inset:0; z-index:300; pointer-events:none; }
+#tips-panel #tips-backdrop {
+  position:absolute; inset:0; background:rgba(0,0,0,.55);
+  opacity:0; transition:opacity .3s; pointer-events:none;
+}
+#tips-panel.open { pointer-events:all; }
+#tips-panel.open #tips-backdrop { opacity:1; pointer-events:all; }
+#tips-sheet-el {
+  position:absolute; bottom:0; left:0; right:0;
+  background:var(--surface); border-radius:20px 20px 0 0; border-top:1px solid var(--border);
+  max-height:84vh; overflow-y:auto; scrollbar-width:thin;
+  transform:translateY(100%); transition:transform .35s cubic-bezier(.4,0,.2,1);
+  padding-bottom:calc(var(--safe-bot) + 20px);
+}
+#tips-panel.open #tips-sheet-el { transform:translateY(0); }
+.tips-section-lbl {
+  font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--gold); margin: 16px 0 8px; padding-bottom:5px; border-bottom:1px solid var(--border);
+}
+.tips-section-lbl:first-child { margin-top:0; }
+.tip-row { display:flex; align-items:flex-start; gap:10px; padding:6px 0; }
+.tip-ico { font-size:16px; flex-shrink:0; width:22px; text-align:center; line-height:1.4; }
+.tip-txt { font-size:13.5px; color:var(--text-dim); line-height:1.55; flex:1; }
+.tip-txt strong { color:var(--gold); font-weight:600; }
+.install-box {
+  background:var(--card2); border:1px solid var(--border); border-radius:10px; padding:12px 14px;
+  margin-top:4px;
+}
+.install-platform {
+  font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:7px;
+}
+.install-step { font-size:13px; color:var(--text-dim); line-height:1.55; margin-bottom:3px; }
+.install-step span { color:var(--gold); font-weight:600; }
+.kjv-cross-link {
+  display:flex; align-items:center; gap:10px; margin-top:18px; padding:12px 14px;
+  background:linear-gradient(135deg, rgba(201,148,58,.10), rgba(26,16,96,.10));
+  border:1px solid var(--gold); border-radius:10px; text-decoration:none;
+}
+.kjv-cross-link-icon {
+  width:34px; height:34px; border-radius:8px; flex-shrink:0;
+  background:linear-gradient(145deg,#3a2da0,#1a1060);
+  display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--gold-l);
+}
+.kjv-cross-link-text { flex:1; }
+.kjv-cross-link-title { font-size:13px; font-weight:700; color:var(--gold); }
+.kjv-cross-link-sub { font-size:11px; color:var(--text-mute); margin-top:1px; }
+
+
 /* NOW PLAYING EXPANDED SHEET */
 #now-playing-panel { position: fixed; inset: 0; z-index: 200; pointer-events: none; }
 #now-playing-panel #np-backdrop {
@@ -503,7 +588,10 @@ header {
       <div class="app-title">FBC Hymns &amp; Spiritual Songs</div>
       <div class="app-sub">Faith Baptist Church · Plymouth County · KJV</div>
     </div>
-    <button id="info-btn" style="margin-left:auto;background:none;border:none;color:var(--text-mute);padding:6px;display:flex;align-items:center;border-radius:50%">
+    <button id="tips-btn" style="margin-left:auto;background:none;border:none;color:var(--text-mute);padding:6px;display:flex;align-items:center;border-radius:50%" aria-label="Tips and Help">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 2-3 4M12 17h.01"/></svg>
+    </button>
+    <button id="info-btn" style="background:none;border:none;color:var(--text-mute);padding:6px;display:flex;align-items:center;border-radius:50%" aria-label="About">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
     </button>
   </div>
@@ -649,6 +737,10 @@ header {
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
         Favorite
       </button>
+      <button id="np-download-large">
+        <svg id="np-dl-icon-large" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span id="np-dl-label-large">Download</span>
+      </button>
       <button id="np-share-large">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
         Share
@@ -656,6 +748,69 @@ header {
     </div>
 
     <div id="np-lyrics-large"></div>
+  </div>
+</div>
+
+<!-- TIPS / HELP SHEET -->
+<div id="tips-panel">
+  <div id="tips-backdrop"></div>
+  <div id="tips-sheet-el">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header" style="position:relative">
+      <div class="sheet-title">Tips &amp; Help</div>
+      <div class="sheet-sub">Get the most out of FBC Hymns &amp; Spiritual Songs</div>
+      <button class="close-sheet" id="close-tips">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div style="padding:14px 20px 20px">
+
+      <div class="tips-section-lbl">Listening</div>
+      <div class="tip-row"><span class="tip-ico">&#9835;</span><span class="tip-txt">Tap the <strong>mini player</strong> at the bottom to expand it into a full view with large artwork, lyrics, and easy-to-tap controls.</span></div>
+      <div class="tip-row"><span class="tip-ico">&#8635;</span><span class="tip-txt">Tap the <strong>shuffle icon</strong> to play songs in random order within the current library tab.</span></div>
+      <div class="tip-row"><span class="tip-ico">A</span><span class="tip-txt">Turn on <strong>AUTO</strong> to automatically continue to the next hymn when one finishes &mdash; great for hands-free listening during devotions.</span></div>
+
+      <div class="tips-section-lbl">Lyrics &amp; Search</div>
+      <div class="tip-row"><span class="tip-ico">&#9834;</span><span class="tip-txt">Tap the <strong>lyrics icon</strong> in the player to follow along verse by verse while a hymn plays. Not every recording has lyrics yet &mdash; more are added regularly.</span></div>
+      <div class="tip-row"><span class="tip-ico">&#128269;</span><span class="tip-txt">Use the <strong>search bar</strong> to find hymns by title or theme &mdash; try searching "grace," "comfort," or "heaven."</span></div>
+
+      <div class="tips-section-lbl">Favorites &amp; Downloads</div>
+      <div class="tip-row"><span class="tip-ico">&#9825;</span><span class="tip-txt">Tap the <strong>heart</strong> on any hymn to save it to Favorites for quick access &mdash; this does not save it for offline use.</span></div>
+      <div class="tip-row"><span class="tip-ico">&#8595;</span><span class="tip-txt">Tap the <strong>download icon</strong> to save a hymn&rsquo;s audio to your device so it plays without an internet connection. A teal checkmark means it&rsquo;s downloaded.</span></div>
+      <div class="tip-row"><span class="tip-ico">&#9888;</span><span class="tip-txt">Downloaded songs use storage space on your device. Only download the hymns you know you&rsquo;ll want offline &mdash; everything else streams normally and uses no storage.</span></div>
+      <div id="tips-downloads-list-wrap">
+        <div class="install-box" style="margin-top:8px">
+          <div class="install-platform">Your Downloads</div>
+          <div id="tips-downloads-list"><div class="install-step" style="color:var(--text-mute)">No hymns downloaded yet.</div></div>
+        </div>
+      </div>
+
+      <div class="tips-section-lbl">Sharing</div>
+      <div class="tip-row"><span class="tip-ico">&#128279;</span><span class="tip-txt">Tap <strong>Share</strong> on any hymn to send it to a friend or family member&rsquo;s phone in one tap.</span></div>
+
+      <div class="tips-section-lbl">Install as an App</div>
+      <div class="install-box">
+        <div class="install-platform">iPhone &amp; iPad (Safari)</div>
+        <div class="install-step">1. Tap the <span>Share</span> button (square with an arrow)</div>
+        <div class="install-step">2. Scroll down and tap <span>Add to Home Screen</span></div>
+        <div class="install-step">3. Tap <span>Add</span> &mdash; the app icon appears on your home screen</div>
+      </div>
+      <div class="install-box" style="margin-top:8px">
+        <div class="install-platform">Android (Chrome)</div>
+        <div class="install-step">1. Tap the <span>&#8942; menu</span> in the top right</div>
+        <div class="install-step">2. Tap <span>Add to Home screen</span> or <span>Install app</span></div>
+        <div class="install-step">3. Tap <span>Install</span> &mdash; done</div>
+      </div>
+
+      <a href="https://fbckjv.app" class="kjv-cross-link">
+        <div class="kjv-cross-link-icon">&#9999;</div>
+        <div class="kjv-cross-link-text">
+          <div class="kjv-cross-link-title">Also try the FBC KJV Bible App</div>
+          <div class="kjv-cross-link-sub">Read, search, and listen to the King James Bible &mdash; free, no account needed</div>
+        </div>
+      </a>
+
+    </div>
   </div>
 </div>
 
@@ -2725,6 +2880,13 @@ let searchQuery  = '';
 let activeView   = 'browse'; // browse | psalms | favorites
 let favorites    = new Set(JSON.parse(localStorage.getItem('sh_favs') || '[]'));
 
+// Offline downloads state (must init before first render())
+var DL_CACHE_NAME = 'ifb-hymns-downloads-v1';
+var DL_INDEX_KEY = 'sh_downloads_v1';
+var dlIndex = {};
+try { dlIndex = JSON.parse(localStorage.getItem(DL_INDEX_KEY) || '{}'); } catch(e) { dlIndex = {}; }
+var dlInProgress = {};
+
 // ══════════════════════════════════════════════════════════════════
 // DOM REFS
 // ══════════════════════════════════════════════════════════════════
@@ -2834,6 +2996,9 @@ function hymnRow(h, fi) {
     </div>
     <div class="hymn-right">
       <span class="source-badge ${src.badge}">${srcLabel(h.source)}</span>
+      <button class="dl-btn ${isDownloaded(h.id)?'downloaded':''}" data-id="${h.id}" data-url="${h.url}" aria-label="Download for offline">
+        ${dlButtonSvg(h.id)}
+      </button>
       <button class="fav-star ${isFav?'active':''}" data-id="${h.id}" data-idx="${fi}" aria-label="Favorite">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="${isFav?'currentColor':'none'}" stroke="currentColor" stroke-width="2">
           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -3020,6 +3185,7 @@ favBtnP.addEventListener('click', () => {
 
 // Hymn list delegation
 listInner.addEventListener('click', e => {
+  if (e.target.closest('.dl-btn')) return; // let it bubble to the document-level download handler
   const star = e.target.closest('.fav-star');
   if (star) { e.stopPropagation(); toggleFav(star.dataset.id); return; }
   const item = e.target.closest('.hymn-item');
@@ -3251,6 +3417,225 @@ if (shareBtnEl) shareBtnEl.addEventListener('click', function(e) {
 
 render();
 updateFavBtn(null);
+
+// -- OFFLINE DOWNLOADS (state initialized earlier, near favorites) --------
+function saveDlIndex() {
+  try { localStorage.setItem(DL_INDEX_KEY, JSON.stringify(dlIndex)); } catch(e) {}
+}
+
+function isDownloaded(id) {
+  return !!dlIndex[id];
+}
+
+function dlButtonSvg(id) {
+  if (dlInProgress[id]) {
+    return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>';
+  }
+  if (isDownloaded(id)) {
+    return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+  }
+  return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+}
+
+async function downloadHymn(id, url, title) {
+  if (!('caches' in window)) { toast('Downloads not supported on this browser'); return; }
+  if (isDownloaded(id)) { return; }
+  dlInProgress[id] = true;
+  render();
+  syncDownloadButtons();
+  try {
+    var cache = await caches.open(DL_CACHE_NAME);
+    var resp = await fetch(url, { mode: 'cors' });
+    if (!resp.ok) throw new Error('fetch failed: ' + resp.status);
+    var sizeHeader = resp.headers.get('content-length');
+    await cache.put(url, resp.clone());
+    dlIndex[id] = {
+      url: url,
+      title: title || '',
+      size: sizeHeader ? parseInt(sizeHeader, 10) : null,
+      ts: Date.now()
+    };
+    saveDlIndex();
+    toast('Downloaded for offline');
+  } catch (err) {
+    toast('Download failed \u2014 try again');
+    console.warn('Download error:', err);
+  } finally {
+    delete dlInProgress[id];
+    render();
+    syncDownloadButtons();
+    renderDownloadsList();
+  }
+}
+
+async function removeDownload(id) {
+  var entry = dlIndex[id];
+  if (!entry) return;
+  try {
+    var cache = await caches.open(DL_CACHE_NAME);
+    await cache.delete(entry.url);
+  } catch (e) {}
+  delete dlIndex[id];
+  saveDlIndex();
+  render();
+  syncDownloadButtons();
+  renderDownloadsList();
+  toast('Download removed');
+}
+
+async function getOfflineUrl(url) {
+  // Returns a blob: URL if this exact audio URL is cached, else null
+  if (!('caches' in window)) return null;
+  try {
+    var cache = await caches.open(DL_CACHE_NAME);
+    var match = await cache.match(url);
+    if (!match) return null;
+    var blob = await match.blob();
+    return URL.createObjectURL(blob);
+  } catch (e) {
+    return null;
+  }
+}
+
+function syncDownloadButtons() {
+  document.querySelectorAll('.dl-btn').forEach(function(btn) {
+    var id = btn.dataset.id;
+    btn.classList.toggle('downloaded', isDownloaded(id) && !dlInProgress[id]);
+    btn.classList.toggle('downloading', !!dlInProgress[id]);
+    btn.innerHTML = dlButtonSvg(id);
+  });
+}
+
+function formatBytes(n) {
+  if (!n) return '';
+  if (n < 1024*1024) return Math.round(n/1024) + ' KB';
+  return (n/(1024*1024)).toFixed(1) + ' MB';
+}
+
+function renderDownloadsList() {
+  var wrap = document.getElementById('tips-downloads-list');
+  if (!wrap) return;
+  var ids = Object.keys(dlIndex);
+  if (!ids.length) {
+    wrap.innerHTML = '<div class="install-step" style="color:var(--text-mute)">No hymns downloaded yet.</div>';
+    return;
+  }
+  var totalBytes = 0;
+  var html = '';
+  ids.forEach(function(id) {
+    var e = dlIndex[id];
+    if (e.size) totalBytes += e.size;
+    html += '<div class="dl-manager-row">' +
+      '<div><div class="dl-manager-title">' + esc(e.title || 'Hymn') + '</div>' +
+      '<div class="dl-manager-meta">' + (e.size ? formatBytes(e.size) : 'Downloaded') + '</div></div>' +
+      '<button class="dl-manager-remove" data-remove-id="' + esc(id) + '">Remove</button>' +
+      '</div>';
+  });
+  html = '<div class="install-step" style="margin-bottom:6px">' + ids.length + ' hymn' + (ids.length === 1 ? '' : 's') +
+    (totalBytes ? ' \u00b7 ' + formatBytes(totalBytes) + ' total' : '') + '</div>' + html;
+  wrap.innerHTML = html;
+}
+
+document.addEventListener('click', function(e) {
+  var dlBtn = e.target.closest('.dl-btn');
+  if (dlBtn) {
+    e.stopPropagation();
+    var id = dlBtn.dataset.id;
+    var url = dlBtn.dataset.url;
+    if (isDownloaded(id)) {
+      removeDownload(id);
+    } else if (!dlInProgress[id]) {
+      var h = HYMNS.find(function(x){ return x.id === id; });
+      downloadHymn(id, url, h ? h.title : '');
+    }
+    return;
+  }
+  var removeBtn = e.target.closest('[data-remove-id]');
+  if (removeBtn) {
+    removeDownload(removeBtn.dataset.removeId);
+  }
+});
+
+// Large player download button
+var npDownloadLarge = document.getElementById('np-download-large');
+var npDlLabelLarge = document.getElementById('np-dl-label-large');
+function syncLargeDownloadButton() {
+  if (currentIdx < 0 || !filteredList[currentIdx]) return;
+  var h = filteredList[currentIdx];
+  var downloaded = isDownloaded(h.id);
+  var inProgress = !!dlInProgress[h.id];
+  npDownloadLarge.classList.toggle('active', downloaded);
+  npDlLabelLarge.textContent = inProgress ? 'Saving\u2026' : (downloaded ? 'Downloaded' : 'Download');
+}
+if (npDownloadLarge) {
+  npDownloadLarge.addEventListener('click', function() {
+    if (currentIdx < 0 || !filteredList[currentIdx]) return;
+    var h = filteredList[currentIdx];
+    if (isDownloaded(h.id)) {
+      removeDownload(h.id).then(syncLargeDownloadButton);
+    } else {
+      downloadHymn(h.id, h.url, h.title).then(syncLargeDownloadButton);
+    }
+  });
+}
+var _origUpdateNowPlayingButtons = updateNowPlayingButtons;
+updateNowPlayingButtons = function() {
+  _origUpdateNowPlayingButtons();
+  syncLargeDownloadButton();
+};
+
+// Prefer offline (cached) audio when available
+var _origLoadAndPlay2 = loadAndPlay;
+loadAndPlay = function(idx) {
+  if (idx < 0 || idx >= filteredList.length) return;
+  var h = filteredList[idx];
+  if (isDownloaded(h.id)) {
+    getOfflineUrl(h.url).then(function(blobUrl) {
+      if (blobUrl) {
+        currentIdx = idx;
+        var src = SOURCES[h.source];
+        audio.src = blobUrl;
+        audio.load();
+        audio.play().catch(function(){ setPlaying(false); });
+        npTitle.textContent = h.title;
+        npSource.innerHTML = (h.artist || src.label) + (h.tune ? ' \u00b7 ' + h.tune : '') + ' <span class="offline-pill">OFFLINE</span>';
+        npArt.textContent = src.icon;
+        npArt.className = 'np-art';
+        playBtn.className = '';
+        playerBar.classList.toggle('playing-state', true);
+        updateFavBtn(h.id);
+        setPlaying(true);
+        render();
+        try { localStorage.setItem('sh_last', JSON.stringify({id:h.id,src:h.source})); } catch(e){}
+        if (typeof npPanel !== 'undefined' && npPanel.classList.contains('open')) syncNowPlayingSheet();
+      } else {
+        _origLoadAndPlay2(idx);
+      }
+    });
+  } else {
+    _origLoadAndPlay2(idx);
+  }
+};
+
+// -- TIPS SHEET --------------------------------------------------------
+var tipsPanel = document.getElementById('tips-panel');
+document.getElementById('tips-btn').addEventListener('click', function() {
+  renderDownloadsList();
+  tipsPanel.classList.add('open');
+  document.body.style.overflow = 'hidden';
+});
+document.getElementById('close-tips').addEventListener('click', function() {
+  tipsPanel.classList.remove('open');
+  document.body.style.overflow = '';
+});
+document.getElementById('tips-backdrop').addEventListener('click', function() {
+  tipsPanel.classList.remove('open');
+  document.body.style.overflow = '';
+});
+
+// Initial sync on load
+renderDownloadsList();
+
 
 // -- NOW PLAYING EXPANDED SHEET -------------------------------------------
 var npPanel = document.getElementById('now-playing-panel');
