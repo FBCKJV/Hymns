@@ -3127,6 +3127,90 @@ if (shareBtnEl) shareBtnEl.addEventListener('click', function(e) {
 
 render();
 updateFavBtn(null);
+
+// -- DYNAMIC TELEGRAM SPECIALS LOADER --------------------------------------
+// Fetches the live file listing from the Cloudflare Worker and auto-adds
+// any new uploads that aren't already in the curated HYMNS list, so new
+// IFB Specials show up without an app code push.
+const TG_LIST_URL = 'https://telegram-list.fbckjv.app/';
+const TG_CACHE_KEY = 'sh_tg_dynamic_v1';
+const TG_CACHE_MS = 5 * 60 * 1000; // re-check every 5 min
+
+function tgKnownFilenames() {
+  const known = new Set();
+  HYMNS.forEach(h => {
+    if (h.source !== 'telegram') return;
+    const m = h.url.match(/telegram\/([^?]+)/);
+    if (m) known.add(decodeURIComponent(m[1]));
+  });
+  return known;
+}
+
+function tgTitleFromFilename(filename) {
+  let name = filename.replace(/\.(mp3|m4a|wav|ogg|opus)$/i, '');
+  name = name.replace(/\s*\.\.\.\s*$/, '');
+  let artist = '';
+  if (name.includes(' - Topic - ')) {
+    artist = name.split(' - Topic - ')[0].trim();
+    name = name.split(' - Topic - ')[1].trim();
+  } else if (name.includes(' - ')) {
+    const parts = name.split(' - ');
+    artist = parts[0].trim();
+    name = parts.slice(1).join(' - ').trim();
+  }
+  if (name.includes('-') && !name.includes(' ')) name = name.replace(/-/g, ' ');
+  name = name.replace(/\s+/g, ' ').trim();
+  return { title: name || filename, artist };
+}
+
+async function loadDynamicTelegramSongs() {
+  try {
+    let data;
+    const cached = localStorage.getItem(TG_CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Date.now() - parsed.fetchedAt < TG_CACHE_MS) {
+        data = parsed.data;
+      }
+    }
+    if (!data) {
+      const res = await fetch(TG_LIST_URL, { cache: 'no-store' });
+      if (!res.ok) return;
+      data = await res.json();
+      localStorage.setItem(TG_CACHE_KEY, JSON.stringify({ fetchedAt: Date.now(), data }));
+    }
+
+    const known = tgKnownFilenames();
+    let added = 0;
+    let nextId = 9000;
+    (data.files || []).forEach(f => {
+      if (known.has(f.filename)) return;
+      const { title, artist } = tgTitleFromFilename(f.filename);
+      HYMNS.push({
+        id: 'tgnew' + (nextId++),
+        title: title,
+        source: 'telegram',
+        artist: artist,
+        url: TGM + encodeURIComponent(f.filename),
+        tags: ['new'],
+      });
+      added++;
+    });
+
+    if (added > 0) {
+      HYMNS.sort((a, b) => a.title.localeCompare(b.title));
+      render();
+      console.log('Loaded ' + added + ' new Specials track(s) from R2');
+    }
+  } catch (err) {
+    // Silent fail -- static list still works fine offline or if Worker is down
+    console.warn('Dynamic Specials load skipped:', err);
+  }
+}
+
+// Kick off after initial render so the static list shows immediately
+loadDynamicTelegramSongs();
+
 // Re-render after tick to ensure DOM is ready
 setTimeout(function() { render(); }, 0);
 // ── YOUTUBE PANEL ──────────────────────────────────────────────────────────
