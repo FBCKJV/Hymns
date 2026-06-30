@@ -2944,6 +2944,9 @@ document.getElementById('bottom-nav').addEventListener('click', e => {
   } else if (activeView === 'favorites') {
     activeSource = 'favorites';
     document.querySelectorAll('.tab').forEach(t=>{t.classList.remove('active');if(t.dataset.src==='favorites')t.classList.add('active');});
+  } else if (activeView === 'youtube') {
+    window.openYtPanel && window.openYtPanel();
+    return;
   }
   currentIdx = -1;
   render();
@@ -3130,6 +3133,7 @@ document.getElementById('share-btn').addEventListener('click', function(e) {
 
 render();
 updateFavBtn(null);
+setTimeout(render, 100);
 // Re-render after tick to ensure DOM is ready
 setTimeout(function() { render(); }, 0);
 // ── YOUTUBE PANEL ──────────────────────────────────────────────────────────
