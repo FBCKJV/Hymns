@@ -373,24 +373,17 @@ header {
 
 
 /* ── EXPANDABLE PLAYER ── */
-#now-playing {
-  transition: max-height .35s cubic-bezier(.4,0,.2,1), padding .35s;
+#player-bar {
+  transition: height .35s cubic-bezier(.4,0,.2,1);
   cursor: pointer;
   overflow: hidden;
-  max-height: none;
 }
-#now-playing.collapsed {
-  max-height: 56px;
-  padding-top: 6px !important;
-  padding-bottom: 6px !important;
+#player-bar.collapsed {
+  height: 44px !important;
 }
-#now-playing.collapsed #np-controls,
-#now-playing.collapsed #np-progress-wrap,
-#now-playing.collapsed #np-time {
+#player-bar.collapsed .controls > *:not(#play-btn),
+#player-bar.collapsed .progress-row {
   display: none !important;
-}
-#now-playing.collapsed #np-meta {
-  margin: 0;
 }
 #np-expand-hint {
   position: absolute;
@@ -3068,7 +3061,7 @@ audio.addEventListener('ended', () => { if (autoPlay) playNext(); });
 var shuffleOn = false;
 var shuffleQueue = [];
 var shuffleBtn = document.getElementById('shuffle-btn');
-shuffleBtn.addEventListener('click', function() {
+if (shuffleBtn) shuffleBtn.addEventListener('click', function() {
   shuffleOn = !shuffleOn;
   shuffleBtn.classList.toggle('active', shuffleOn);
   shuffleBtn.title = shuffleOn ? 'Shuffle: On' : 'Shuffle: Off';
@@ -3096,19 +3089,20 @@ playNext = function() {
 };
 
 
-// ── EXPANDABLE PLAYER ────────────────────────────────────────────────────
-var npEl = document.getElementById('now-playing');
+// -- EXPANDABLE PLAYER ----------------------------------------------------
+var npEl = document.getElementById('player-bar');
 var playerCollapsed = false;
-
-npEl.addEventListener('click', function(e) {
-  // Don't collapse when clicking buttons/controls
-  if (e.target.closest('button') || e.target.closest('input')) return;
-  playerCollapsed = !playerCollapsed;
-  npEl.classList.toggle('collapsed', playerCollapsed);
-});
+if (npEl) {
+  npEl.addEventListener('click', function(e) {
+    if (e.target.closest('button') || e.target.closest('input')) return;
+    playerCollapsed = !playerCollapsed;
+    npEl.classList.toggle('collapsed', playerCollapsed);
+  });
+}
 
 // Share button
-document.getElementById('share-btn').addEventListener('click', function(e) {
+var shareBtnEl = document.getElementById('share-btn');
+if (shareBtnEl) shareBtnEl.addEventListener('click', function(e) {
   e.stopPropagation();
   var h = filteredList[currentIdx];
   var data = {
@@ -3133,7 +3127,6 @@ document.getElementById('share-btn').addEventListener('click', function(e) {
 
 render();
 updateFavBtn(null);
-setTimeout(render, 100);
 // Re-render after tick to ensure DOM is ready
 setTimeout(function() { render(); }, 0);
 // ── YOUTUBE PANEL ──────────────────────────────────────────────────────────
