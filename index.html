@@ -146,6 +146,8 @@ header {
 .badge-scm      { background:rgba(60,80,200,.25); color:#7fa4e8; }
 .badge-knox     { background:rgba(60,150,80,.25); color:#7ec87e; }
 .badge-telegram { background:rgba(0,136,204,.22); color:#5bb8e0; }
+.badge-hammond  { background:rgba(180,60,90,.22); color:#e08aa0; }
+.source-hammond .hymn-icon { background:rgba(180,60,90,.12); }
 .source-telegram .hymn-icon { background:rgba(0,136,204,.12); }
 .badge-archive  { background:rgba(180,80,150,.25); color:#c87ec0; }
 .badge-psalms   { background:rgba(80,130,200,.22); color:#7aa3d0; }
@@ -618,6 +620,7 @@ header {
   <button class="tab" data-src="olmstead">Olmstead Baptist</button>
   <button class="tab" data-src="knox">Bible Baptist DeLand</button>
   <button class="tab" data-src="telegram">🎙️ IFB Specials</button>
+  <button class="tab" data-src="hammond">🎤 First Baptist Hammond</button>
   <button class="tab fav-tab" data-src="favorites">★ Favorites</button>
 </div>
 
@@ -914,6 +917,7 @@ const SOURCES = {
   olmstead: { label:'Olmstead Baptist',      badge:'badge-olmstead', cls:'source-olmstead', icon:'🎼' },
   telegram: { label:'IFB Specials & Choir', badge:'badge-telegram', cls:'source-telegram', icon:'🎙️' },
   knox:     { label:'Bible Baptist DeLand',  badge:'badge-knox',     cls:'source-knox',     icon:'🎵' },
+  hammond:  { label:'First Baptist Hammond', badge:'badge-hammond',  cls:'source-hammond',  icon:'🎤' },
 };
 
 // ── PSALM LYRICS (Scottish Metrical Psalter 1650) ────────────────
@@ -2552,7 +2556,39 @@ const HYMN_LYRICS = {
     { label:'Verse 1', text:'Wonderful grace of Jesus,\ngreater than all my sin;\nhow shall my tongue describe it,\nwhere shall its praise begin?\nTaking away my burden,\nsetting my spirit free;\nfor the wonderful grace of Jesus reaches me.' },
     { chorus:true, label:'Chorus', text:'Wonderful the matchless grace of Jesus,\ndeeper than the mighty rolling sea;\nwonderful grace, all sufficient for me, for even me;\nbroader than the scope of my transgressions,\ngreater far than all my sin and shame;\nO magnify the precious name of Jesus,\npraise His name!' },
     { label:'Verse 2', text:'Wonderful grace of Jesus,\nreaching to all the lost;\nby it I have been pardoned,\nsaved to the uttermost;\nchains have been torn asunder,\ngiving me liberty;\nfor the wonderful grace of Jesus reaches me.' },
-  ], attr:'Words & Music: Haldor Lillenas, 1918. Public Domain.' }
+  ], attr:'Words & Music: Haldor Lillenas, 1918. Public Domain.' },
+
+'What A Friend We Have in Jesus': { verses:[
+    { label:'Verse 1', text:'What a friend we have in Jesus,\nall our sins and griefs to bear!\nWhat a privilege to carry\neverything to God in prayer!\nO what peace we often forfeit,\nO what needless pain we bear,\nall because we do not carry\neverything to God in prayer!' },
+    { label:'Verse 2', text:'Have we trials and temptations?\nIs there trouble anywhere?\nWe should never be discouraged;\ntake it to the Lord in prayer!\nCan we find a friend so faithful\nwho will all our sorrows share?\nJesus knows our every weakness;\ntake it to the Lord in prayer!' },
+    { label:'Verse 3', text:'Are we weak and heavy laden,\ncumbered with a load of care?\nPrecious Savior, still our refuge,\ntake it to the Lord in prayer!\nDo thy friends despise, forsake thee?\nTake it to the Lord in prayer!\nIn His arms He\'ll take and shield thee;\nthou wilt find a solace there.' },
+  ], attr:'Words: Joseph M. Scriven, 1855. Music: Charles C. Converse, 1868. Public Domain.' },
+
+  'Turn Your Eyes Upon Jesus': { verses:[
+    { label:'Verse 1', text:'O soul, are you weary and troubled?\nNo light in the darkness you see?\nThere\'s light for a look at the Savior,\nand life more abundant and free!' },
+    { chorus:true, label:'Chorus', text:'Turn your eyes upon Jesus,\nlook full in His wonderful face,\nand the things of earth will grow strangely dim\nin the light of His glory and grace.' },
+    { label:'Verse 2', text:'Through death into life everlasting\nHe passed, and we follow Him there;\nover us sin no more hath dominion —\nfor more than conqu\'rors we are!' },
+    { label:'Verse 3', text:'His Word shall not fail you — He promised;\nbelieve Him, and all will be well;\nthen go to a world that is dying,\nHis perfect salvation to tell!' },
+  ], attr:'Words & Music: Helen Howarth Lemmel, 1922. Public Domain.' },
+
+  'I Sing the Mighty Power of God': { verses:[
+    { label:'Verse 1', text:'I sing the mighty power of God\nthat made the mountains rise,\nthat spread the flowing seas abroad\nand built the lofty skies.\nI sing the wisdom that ordained\nthe sun to rule the day;\nthe moon shines full at His command,\nand all the stars obey.' },
+    { label:'Verse 2', text:'I sing the goodness of the Lord\nthat filled the earth with food;\nHe formed the creatures with His word\nand then pronounced them good.\nLord, how Thy wonders are displayed\nwhere\'er I turn my eye,\nif I survey the ground I tread,\nor gaze upon the sky!' },
+    { label:'Verse 3', text:'There\'s not a plant or flower below\nbut makes Thy glories known;\nand clouds arise, and tempests blow,\nby order from Thy throne;\nwhile all that borrows life from Thee\nis ever in Thy care,\nand everywhere that man can be,\nThou, God, art present there.' },
+  ], attr:'Words: Isaac Watts, 1715. Public Domain.' },
+
+  'I Know My Redeemer Lives': { verses:[
+    { label:'Verse 1', text:'I know that my Redeemer lives!\nWhat comfort this sweet sentence gives!\nHe lives, He lives, who once was dead;\nHe lives, my ever-living Head.' },
+    { label:'Verse 2', text:'He lives to bless me with His love;\nHe lives to plead for me above;\nHe lives my hungry soul to feed;\nHe lives to bless in time of need.' },
+    { label:'Verse 3', text:'He lives, and grants me daily breath;\nHe lives, and I shall conquer death;\nHe lives my mansion to prepare;\nHe lives to bring me safely there.' },
+    { label:'Verse 4', text:'He lives, all glory to His name!\nHe lives, my Jesus, still the same;\nOh, the sweet joy this sentence gives:\nI know that my Redeemer lives!' },
+  ], attr:'Words: Samuel Medley, 1775. Public Domain.' },
+
+  'All the Way My Saviour Leads Me': { verses:[
+    { label:'Verse 1', text:'All the way my Savior leads me;\nwhat have I to ask beside?\nCan I doubt His tender mercy,\nwho through life has been my guide?\nHeav\'nly peace, divinest comfort,\nhere by faith in Him to dwell!\nFor I know, whate\'er befall me,\nJesus doeth all things well.' },
+    { label:'Verse 2', text:'All the way my Savior leads me;\ncheers each winding path I tread,\ngives me grace for every trial,\nfeeds me with the living bread.\nThough my weary steps may falter\nand my soul athirst may be,\ngushing from the Rock before me,\nlo! a spring of joy I see.' },
+    { label:'Verse 3', text:'All the way my Savior leads me;\noh, the fullness of His love!\nPerfect rest to me is promised\nin my Father\'s house above.\nWhen my spirit, clothed immortal,\nwings its flight to realms of day,\nthis my song through endless ages:\nJesus led me all the way.' },
+  ], attr:'Words: Fanny J. Crosby, 1875. Music: Robert Lowry. Public Domain.' }
 };
 
 // ── FULL HYMN LIST ─────────────────────────────────────────────
@@ -2849,6 +2885,76 @@ const HYMNS = [
   { id:'tg171', title:'Old Camp Meeting Days', source:'telegram', artist:'Witness', url:TGM+encodeURIComponent('Witness - Topic - Old Camp Meeting Days.m4a'), tags:['old paths'] },
   { id:'tg172', title:'Worthy Is the Lamb', source:'telegram', artist:'', url:TGM+encodeURIComponent('Worthy-Is-the-Lamb.m4a'), tags:['jesus'] },
   { id:'tg173', title:'The Last Blood', source:'telegram', artist:'Zachary Mills', url:TGM+encodeURIComponent('Zachary Mills - The Last Blood.m4a'), tags:['cross','blood'] },
+  // FIRST BAPTIST HAMMOND — Choir Specials & Service Music
+  { id:'hb001', title:'What A Friend We Have in Jesus', source:'hammond', artist:'Precious Name Singers', url:TGM+encodeURIComponent('01 - What A Friend We Have in Jesus | Precious Name Singers.mp3'), tags:['jesus','first baptist hammond','vocal'] },
+  { id:'hb002', title:'His Mercy is More', source:'hammond', artist:'FBC Adult Choir', url:TGM+encodeURIComponent('02 - His Mercy is More | FBC Adult Choir.mp3'), tags:['vocal','first baptist hammond','grace'] },
+  { id:'hb003', title:'The River of Life', source:'hammond', artist:'The Bicknell Family', url:TGM+encodeURIComponent('03 - The River of Life | The Bicknell Family.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb004', title:'I Have Prayed for Thee', source:'hammond', artist:'FBC Teen Ensemble', url:TGM+encodeURIComponent('04 - I Have Prayed for Thee | FBC Teen Ensemble.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb005', title:'I Am Blessed', source:'hammond', artist:'Precious Name Singers', url:TGM+encodeURIComponent('05 - I Am Blessed - Precious Name Singers.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb006', title:'I Wish I Could Have Been There', source:'hammond', artist:'Grace & Truth with Calvin Allen', url:TGM+encodeURIComponent('06 - I Wish I Could Have Been There | Grace & Truth with Calvin Allen.mp3'), tags:['first baptist hammond'] },
+  { id:'hb007', title:'We Believe', source:'hammond', artist:'Bicknell & Mitchell Families', url:TGM+encodeURIComponent('07 - We Believe | Bicknell & Mitchell Families.mp3'), tags:['first baptist hammond'] },
+  { id:'hb008', title:'Thy Spirit Is Good', source:'hammond', artist:'Theme Song 2022', url:TGM+encodeURIComponent('08 - Thy Spirit is Good - Theme Song 2022.mp3'), tags:['first baptist hammond'] },
+  { id:'hb009', title:'FBC "A" Teen Choir (Service Music)', source:'hammond', artist:'Sunday Evening, January 30, 2022', url:TGM+encodeURIComponent('09 - FBC "A" Teen Choir - Sunday Evening, January 30, 2022.mp3'), tags:['first baptist hammond'] },
+  { id:'hb010', title:'Chicagoland Teens Choir (Service Music)', source:'hammond', artist:'Sunday Evening, January 30, 2022', url:TGM+encodeURIComponent('10 - Chicagoland Teens Choir - Sunday Evening, January 30, 2022.mp3'), tags:['first baptist hammond'] },
+  { id:'hb011', title:'One of These Days', source:'hammond', artist:'Sunday Evening, February 7, 2022', url:TGM+encodeURIComponent('11 - One of These Days - Sunday Evening, February 7, 2022.mp3'), tags:['first baptist hammond'] },
+  { id:'hb012', title:'Is He Worthy', source:'hammond', artist:'Hammond Baptist Schools Choir', url:TGM+encodeURIComponent('12 - Is He Worthy - Hammond Baptist Schools Choir - Sunday Evening, February 27, 2022.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb013', title:'City Baptist Choir (Service Music)', source:'hammond', artist:'Wednesday Evening, April 13, 2022', url:TGM+encodeURIComponent('13 - City Baptist Choir - Wednesday Evening, April 13, 2022.mp3'), tags:['first baptist hammond'] },
+  { id:'hb014', title:'Peace', source:'hammond', artist:'Junior High Ensemble', url:TGM+encodeURIComponent('14 - Peace - Junior High Ensemble.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb015', title:'I Want to Be that Man', source:'hammond', artist:'Men\'s Ensemble', url:TGM+encodeURIComponent('15 - I Want to Be that Man - Men\'s Ensemble.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb016', title:'My Name Is "I Am"', source:'hammond', artist:'Mixed Quartet', url:TGM+encodeURIComponent('16 - My Name is "I Am" - Mixed Quartet.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb017', title:'One Day I Will (Trio)', source:'hammond', artist:'Deb Wilson, Maria Rivera, Jack Mitchell', url:TGM+encodeURIComponent('17 - One Day I Will - Deb Wilson, Maria Rivera, Jack Mitchell - Sunday Morning, September 25, 2022.mp3'), tags:['first baptist hammond'] },
+  { id:'hb018', title:'Alpha and Omega', source:'hammond', artist:'FBC "A" Teen Choir', url:TGM+encodeURIComponent('18 - Alpha and Omega | FBC "A" Teen Choir.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb019', title:'Psalm 16', source:'hammond', artist:'FBC Junior High Girls Ensemble', url:TGM+encodeURIComponent('19 - Psalm 16 - FBC Junior High Girls Ensemble.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb020', title:'Almighty, Unchangeable God', source:'hammond', artist:'Hyles-Anderson College Concert Choir', url:TGM+encodeURIComponent('20 - Almighty, Unchangeable God - Hyles-Anderson College Concert Choir.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb021', title:'Crucified for Me', source:'hammond', artist:'FBC Adult Choir', url:TGM+encodeURIComponent('21 - Crucified for Me - FBC Adult Choir.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb022', title:'Risen', source:'hammond', artist:'Mother & Daughter Ensemble', url:TGM+encodeURIComponent('22 - Risen - Mother & Daughter Ensemble.mp3'), tags:['vocal','resurrection','first baptist hammond'] },
+  { id:'hb023', title:'The Answer Is Christ', source:'hammond', artist:'FBC Teen Ensemble', url:TGM+encodeURIComponent('23 - The Answer Is Christ - FBC Teen Ensemble.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb024', title:'To the Christ Who Gave It All', source:'hammond', artist:'City Baptist School 8th Grade Girls Ensemble', url:TGM+encodeURIComponent('24 - To the Christ Who Gave It All - City Baptist School 8th Grade Girls Ensemble.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb025', title:'I Am Determined', source:'hammond', artist:'FBC Teen Ensemble', url:TGM+encodeURIComponent('25 - I Am Determined - FBC Teen Ensemble.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb026', title:'Glorious, Amazing God', source:'hammond', artist:'Mixed Quintet', url:TGM+encodeURIComponent('26 - Glorious, Amazing God - Mixed Quintet.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb027', title:'One by One', source:'hammond', artist:'Junior High Ensemble', url:TGM+encodeURIComponent('27 - One by One - Junior High Ensemble.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb028', title:'Nailing My Sins to His Cross', source:'hammond', artist:'Dan & Angey Nelson', url:TGM+encodeURIComponent('28 - Nailing My Sins to His Cross - Dan & Angey Nelson.mp3'), tags:['first baptist hammond','blood'] },
+  { id:'hb029', title:'Bigger Than Any Mountain', source:'hammond', artist:'Mixed Ensemble', url:TGM+encodeURIComponent('29 - Bigger Than Any Mountain - Mixed Ensemble.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb030', title:'One Day I Will', source:'hammond', artist:'Mixed Trio', url:TGM+encodeURIComponent('30 - One Day I Will - Mixed Trio.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb031', title:'If Your Presence Go With Me', source:'hammond', artist:'The Mitchell Family', url:TGM+encodeURIComponent('31 - If Your Presence Go With Me - The Mitchell Family.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb032', title:'God\'s Word Will Stand', source:'hammond', artist:'Men\'s Quartet', url:TGM+encodeURIComponent('32 - God\'s Word Will Stand - Men\'s Quartet - Sunday Evening, July 23, 2023.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb033', title:'Grace Will Always Be Greater Than Sin', source:'hammond', artist:'FBC Adult Choir', url:TGM+encodeURIComponent('33 - Grace Will Always Be Greater Than Sin - FBC Adult Choir - Sunday Evening, July 23, 2023.mp3'), tags:['vocal','first baptist hammond','grace'] },
+  { id:'hb034', title:'I Can Pray', source:'hammond', artist:'Libby, Nathan, & Amber Bosje', url:TGM+encodeURIComponent('34 - I Can Pray - Libby, Nathan, & Amber Bosje - Sunday Morning, August 6, 2023.mp3'), tags:['first baptist hammond'] },
+  { id:'hb035', title:'The Center of Your Will', source:'hammond', artist:'', url:TGM+encodeURIComponent('35 - The Center of Your Will.mp3'), tags:['first baptist hammond'] },
+  { id:'hb036', title:'I Stand Redeemed', source:'hammond', artist:'HAC Men\'s Ensemble', url:TGM+encodeURIComponent('36 - I Stand Redeemed - HAC Men\'s Ensemble.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb037', title:'Turn Your Eyes Upon Jesus', source:'hammond', artist:'Precious Name Singers', url:TGM+encodeURIComponent('37 - Turn Your Eyes Upon Jesus - Precious Name Singers.mp3'), tags:['jesus','first baptist hammond','vocal'] },
+  { id:'hb038', title:'There Is A Healer', source:'hammond', artist:'Ladies\' Ensemble', url:TGM+encodeURIComponent('38 - There Is A Healer - Ladies\' Ensemble.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb039', title:'I Sing the Mighty Power of God', source:'hammond', artist:'FBC Adult Choir', url:TGM+encodeURIComponent('39 - I Sing the Mighty Power of God - FBC Adult Choir.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb040', title:'My Hope Is Jesus', source:'hammond', artist:'FBC Adult Choir', url:TGM+encodeURIComponent('40 - My Hope Is Jesus - FBC Adult Choir.mp3'), tags:['jesus','first baptist hammond','vocal'] },
+  { id:'hb041', title:'When But a Child', source:'hammond', artist:'Wilson Family', url:TGM+encodeURIComponent('41 - When But a Child - Wilson Family.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb042', title:'Ancient Words', source:'hammond', artist:'FBC Adult Choir', url:TGM+encodeURIComponent('42 - Ancient Words - FBC Adult Choir.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb043', title:'We Stand in Awe', source:'hammond', artist:'FBC Adult Choir', url:TGM+encodeURIComponent('43 - We Stand in Awe - FBC Adult Choir.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb044', title:'Love Alone', source:'hammond', artist:'Amber Bosje with Aaron & Joy Eggers', url:TGM+encodeURIComponent('44 - Love Alone - Amber Bosje with Aaron & Joy Eggers.mp3'), tags:['first baptist hammond'] },
+  { id:'hb045', title:'The Blood is Still There', source:'hammond', artist:'The Mitchell Family', url:TGM+encodeURIComponent('45 - The Blood is Still There  - The Mitchell Family.mp3'), tags:['vocal','first baptist hammond','blood'] },
+  { id:'hb046', title:'Help Me Abide', source:'hammond', artist:'Ladies Ensemble', url:TGM+encodeURIComponent('46 - Help Me Abide - Ladies Ensemble.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb047', title:'I Just Wanted You to Know', source:'hammond', artist:'City Baptist School Ensemble', url:TGM+encodeURIComponent('47 - I Just Wanted You to Know - City Baptist School Ensemble.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb048', title:'God\'s Been Good', source:'hammond', artist:'Markowski Trio', url:TGM+encodeURIComponent('48 - God\'s Been Good - Markowski Trio.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb049', title:'New Grace', source:'hammond', artist:'Deb Wilson, Jack Mitchell, & Maria Rivera', url:TGM+encodeURIComponent('49 - New Grace - Deb Wilson, Jack Mitchell, & Maria Rivera.mp3'), tags:['first baptist hammond','grace'] },
+  { id:'hb050', title:'How Great You Are', source:'hammond', artist:'The Pins Family', url:TGM+encodeURIComponent('50 - How Great You Are - The Pins Family.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb051', title:'Happy On My Way', source:'hammond', artist:'Dan & Angey Nelson and Aaron & Joy Eggers', url:TGM+encodeURIComponent('51 - Happy On My Way - Dan & Angey Nelson and Aaron & Joy Eggers.mp3'), tags:['first baptist hammond'] },
+  { id:'hb052', title:'God Has Been Faithful', source:'hammond', artist:'Luke & Keira Mitchell & Ryan Mitchell', url:TGM+encodeURIComponent('52 - God Has Been Faithful - Luke & Keira Mitchell & Ryan Mitchell.mp3'), tags:['first baptist hammond'] },
+  { id:'hb053', title:'Jesus You Are the One', source:'hammond', artist:'The Bicknell Family', url:TGM+encodeURIComponent('53 - Jesus You Are the One - The Bicknell Family.mp3'), tags:['jesus','first baptist hammond','vocal'] },
+  { id:'hb054', title:'God Saves Old Sinners', source:'hammond', artist:'Men\'s Quartet', url:TGM+encodeURIComponent('54 - God Saves Old Sinners - Men\'s Quartet.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb055', title:'A Storm Now and Then', source:'hammond', artist:'Ladies\' Quintet', url:TGM+encodeURIComponent('55 - A Storm Now and Then - Ladies\' Quintet.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb056', title:'I Just Want to Please the Lord', source:'hammond', artist:'Ladies\' Ensemble', url:TGM+encodeURIComponent('56 - I Just Want to Please the Lord - Ladies\' Ensemble.mp3'), tags:['jesus','first baptist hammond','vocal'] },
+  { id:'hb057', title:'I Am Sure of You', source:'hammond', artist:'Derek & Katie Tarr', url:TGM+encodeURIComponent('57 - I Am Sure of You - Derek & Katie Tarr.mp3'), tags:['first baptist hammond'] },
+  { id:'hb058', title:'It\'s Not In Vain', source:'hammond', artist:'Josiah Nelson, Glory Shrock, and Ryan Mitchell', url:TGM+encodeURIComponent('58 - It\'s Not In Vain - Josiah Nelson, Glory Shrock, and Ryan Mitchell.mp3'), tags:['first baptist hammond'] },
+  { id:'hb059', title:'I\'d Rather Have Jesus', source:'hammond', artist:'FBC Chinese Choir', url:TGM+encodeURIComponent('59 - I\'d Rather Have Jesus - FBC Chinese Choir.mp3'), tags:['jesus','first baptist hammond','vocal'] },
+  { id:'hb060', title:'The Beauty of the Blood', source:'hammond', artist:'Ryan Mitchell & Glory Shrock', url:TGM+encodeURIComponent('60 - The Beauty of the Blood - Ryan Mitchell & Glory Shrock.mp3'), tags:['first baptist hammond','blood'] },
+  { id:'hb061', title:'The Book', source:'hammond', artist:'Joyful Melodies', url:TGM+encodeURIComponent('61 - The Book - Joyful Melodies.mp3'), tags:['first baptist hammond'] },
+  { id:'hb062', title:'Ancient Words', source:'hammond', artist:'The Bicknell Family', url:TGM+encodeURIComponent('62 - Ancient Words - The Bicknell Family.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb063', title:'I Have a Bible', source:'hammond', artist:'Mixed Quintet', url:TGM+encodeURIComponent('63 - I Have a Bible - Mixed Quintet.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb064', title:'Blood of Jesus Be My All', source:'hammond', artist:'Stalnaker Family', url:TGM+encodeURIComponent('64 - Blood of Jesus Be My All - Stalnaker Family.mp3'), tags:['jesus','first baptist hammond','vocal','blood'] },
+  { id:'hb065', title:'I Know My Redeemer Lives', source:'hammond', artist:'High School Quartet', url:TGM+encodeURIComponent('65 - I Know My Redeemer Lives - High School Quartet.mp3'), tags:['vocal','resurrection','first baptist hammond'] },
+  { id:'hb066', title:'All the Way My Saviour Leads Me', source:'hammond', artist:'Hyles-Anderson College Ensemble', url:TGM+encodeURIComponent('66 - All the Way My Saviour Leads Me - Hyles-Anderson College Ensemble.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb067', title:'The Best Gift Is Me', source:'hammond', artist:'FBC Kid\'s Choir', url:TGM+encodeURIComponent('67 - The Best Gift is Me - FBC Kid\'s Choir - Sunday Evening, December 7, 2025.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb068', title:'Your Presence for Christmas', source:'hammond', artist:'Precious Name Singers', url:TGM+encodeURIComponent('68 - Your Presence for Christmas - Precious Name Singers - Sunday Morning, December 7, 2025.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb069', title:'The Gospel Call', source:'hammond', artist:'Hyles-Anderson College Choir & Orchestra', url:TGM+encodeURIComponent('69 - The Gospel Call - Hyles-Anderson College Choir & Orchestra - 2026 Servants\' Conference.mp3'), tags:['vocal','first baptist hammond'] },
 ];
 
 function hymnTags(title) {
@@ -2921,7 +3027,7 @@ function getFiltered() {
   return HYMNS.filter(h => {
     // View / source filter
     let matchSrc = false;
-    if (activeSource === 'all') matchSrc = h.source==='olmstead'||h.source==='knox'||h.source==='telegram';
+    if (activeSource === 'all') matchSrc = h.source==='olmstead'||h.source==='knox'||h.source==='telegram'||h.source==='hammond';
     else if (activeSource === 'favorites') matchSrc = favorites.has(h.id);
     else matchSrc = h.source === activeSource;
 
@@ -3781,6 +3887,7 @@ function tgKnownFilenames() {
 function tgTitleFromFilename(filename) {
   let name = filename.replace(/\.(mp3|m4a|wav|ogg|opus)$/i, '');
   name = name.replace(/\s*\.\.\.\s*$/, '');
+  name = name.replace(/^\d{1,3}\s*[-\.]\s*/, ''); // strip leading track numbers
   name = name.replace(/\s{2,}/g, ' ');
   let artist = '';
   if (name.includes(' - Topic - ')) {
