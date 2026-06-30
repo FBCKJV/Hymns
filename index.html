@@ -535,10 +535,6 @@ header {
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
     Browse
   </button>
-  <button class="nav-btn" data-view="psalms">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h5"/></svg>
-    Psalms
-  </button>
   <button class="nav-btn" data-view="favorites">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
     Favorites
@@ -2786,7 +2782,7 @@ function render() {
     return;
   }
 
-  const isPsalmView = activeView === 'psalms' || activeSource === 'psalms' || activeSource === 'genevan';
+  const isPsalmView = false;
 
   // Group
   let html = '';
@@ -3069,9 +3065,6 @@ document.getElementById('bottom-nav').addEventListener('click', e => {
   if (activeView === 'browse') {
     activeSource = 'all';
     document.querySelectorAll('.tab').forEach(t=>{t.classList.remove('active');if(t.dataset.src==='all')t.classList.add('active');});
-  } else if (activeView === 'psalms') {
-    activeSource = 'psalms';
-    document.querySelectorAll('.tab').forEach(t=>{t.classList.remove('active');if(t.dataset.src==='psalms')t.classList.add('active');});
   } else if (activeView === 'favorites') {
     activeSource = 'favorites';
     document.querySelectorAll('.tab').forEach(t=>{t.classList.remove('active');if(t.dataset.src==='favorites')t.classList.add('active');});
@@ -3261,6 +3254,8 @@ document.getElementById('share-btn').addEventListener('click', function(e) {
 
 render();
 updateFavBtn(null);
+// Re-render after tick to ensure DOM is ready
+setTimeout(function() { render(); }, 0);
 // ── YOUTUBE PANEL ──────────────────────────────────────────────────────────
 (function(){
   var panel=document.getElementById("yt-panel"),
