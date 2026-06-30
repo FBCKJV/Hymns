@@ -390,6 +390,48 @@ header {
   position: relative;
   z-index: 1;
 }
+
+/* ── EXPANDABLE PLAYER ── */
+#now-playing {
+  transition: height .3s cubic-bezier(.4,0,.2,1), padding .3s;
+  cursor: pointer;
+  overflow: hidden;
+}
+#now-playing.collapsed {
+  height: 52px !important;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+#now-playing.collapsed #np-controls,
+#now-playing.collapsed #np-progress-wrap,
+#now-playing.collapsed #np-time {
+  display: none !important;
+}
+#now-playing.collapsed #np-meta {
+  margin: 0;
+}
+#np-expand-hint {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  opacity: 0.5;
+}
+#share-btn {
+  background: none;
+  border: none;
+  color: var(--text-mute);
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  transition: color .15s;
+}
+#share-btn:active { color: var(--gold); }
 </style>
 </head>
 <body>
@@ -451,6 +493,7 @@ header {
         <button class="ctrl-btn" id="lyr-btn" title="Lyrics" style="color:var(--text-mute)">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
       </button>
+        <button id="share-btn" title="Share"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
       <button class="ctrl-btn" id="fav-btn-player" title="Favorite">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
       </button>
@@ -821,6 +864,559 @@ const HYMN_LYRICS = {
     ],
     attr:'Words & Music: Helen H. Lemmel, 1922. Public Domain.'
   },
+'A Shelter in the Time of Storm': { verses:[
+    { label:'Verse 1', text:'The Lord\'s our Rock, in Him we hide,\na shelter in the time of storm;\nsecure whatever ill betide,\na shelter in the time of storm.' },
+    { chorus:true, label:'Chorus', text:'Oh, Jesus is a Rock in a weary land,\na weary land, a weary land;\noh, Jesus is a Rock in a weary land,\na shelter in the time of storm.' },
+    { label:'Verse 2', text:'A shade by day, defense by night,\na shelter in the time of storm;\nno fears alarm, no foes affright,\na shelter in the time of storm.' },
+    { label:'Verse 3', text:'The raging storms may round us beat,\na shelter in the time of storm;\nwe\'ll never leave our safe retreat,\na shelter in the time of storm.' },
+  ], attr:'Words: Vernon J. Charlesworth, 1880. Music: Ira D. Sankey. Public Domain.' },
+
+  'All Glory, Laud and Honor': { verses:[
+    { chorus:true, label:'Chorus', text:'All glory, laud, and honor\nto Thee, Redeemer, King,\nto whom the lips of children\nmade sweet hosannas ring!' },
+    { label:'Verse 1', text:'Thou art the King of Israel,\nThou David\'s royal Son,\nwho in the Lord\'s name comest,\nthe King and blessèd One.' },
+    { label:'Verse 2', text:'The company of angels\nare praising Thee on high;\nand mortal men and all things\ncreated make reply.' },
+    { label:'Verse 3', text:'To Thee before Thy passion\nthey sang their hymns of praise;\nto Thee now high exalted\nour melody we raise.' },
+  ], attr:'Words: St. Theodulph of Orleans, 820. Trans. John M. Neale, 1851. Public Domain.' },
+
+  'Angels from the Realms of Glory': { verses:[
+    { label:'Verse 1', text:'Angels from the realms of glory,\nwing your flight o\'er all the earth;\nye who sang creation\'s story,\nnow proclaim Messiah\'s birth.' },
+    { chorus:true, label:'Chorus', text:'Come and worship, come and worship,\nworship Christ, the newborn King!' },
+    { label:'Verse 2', text:'Shepherds in the field abiding,\nwatching o\'er your flocks by night,\nGod with man is now residing,\nyonder shines the infant light.' },
+    { label:'Verse 3', text:'Sages, leave your contemplations,\nbrighter visions beam afar;\nseek the great Desire of Nations;\nye have seen His natal star.' },
+  ], attr:'Words: James Montgomery, 1816. Public Domain.' },
+
+  'Blessed Redeemer': { verses:[
+    { label:'Verse 1', text:'Up Calvary\'s mountain, one dreadful morn,\nwalked Christ my Savior, weary and worn;\nfacing for sinners death on the cross,\nthat He might save them from endless loss.' },
+    { chorus:true, label:'Chorus', text:'Blessèd Redeemer! Precious Redeemer!\nseems now I see Him on Calvary\'s tree;\nwounded and bleeding, for sinners pleading,\nblind and unheeding — dying for me!' },
+    { label:'Verse 2', text:'"Father, forgive them!" thus did He pray,\neven while His life blood flowed fast away;\npraying for sinners while in such woe —\nno one but Jesus ever loved so.' },
+    { label:'Verse 3', text:'Oh, how I love Him, Savior and Friend,\nhow can my praises ever find end!\nThrough years unnumbered on heaven\'s shore,\nmy tongue shall praise Him forevermore.' },
+  ], attr:'Words: Avis Burgeson Christiansen, 1920. Public Domain.' },
+
+  'Channels Only': { verses:[
+    { label:'Verse 1', text:'How I praise Thee, precious Savior,\nthat Thy love laid hold of me;\nthou hast saved and cleansed and filled me\nthat I might Thy channel be.' },
+    { chorus:true, label:'Chorus', text:'Channels only, blessed Master,\nbut with all Thy wondrous power\nflowing through us, Thou canst use us\nevery day and every hour.' },
+    { label:'Verse 2', text:'Emptied that Thou shouldest fill me,\na clean vessel in Thy hand;\nwith no power but as Thou givest\ngraciously with each command.' },
+    { label:'Verse 3', text:'Witnessing Thy power to save me,\nsetting free from self and sin;\nthou who boughtest to possess me,\nin Thy fullness, Lord, come in.' },
+  ], attr:'Words: Mary E. Maxwell, 1910. Public Domain.' },
+
+  'Christ Is Risen from the Dead': { verses:[
+    { label:'Verse 1', text:'Christ is risen from the dead,\ntrampling over death by death;\ncome awake, come awake,\ncome and rise up from the grave.' },
+    { label:'Verse 2', text:'O death, where is your sting?\nO hell, where is your victory?\nO church, come stand in the light,\nthe glory of God has defeated the night.' },
+  ], attr:'Public Domain.' },
+
+  'Christ the Lord Is Risen Today': { verses:[
+    { label:'Verse 1', text:'Christ the Lord is risen today, Alleluia!\nSons of men and angels say, Alleluia!\nRaise your joys and triumphs high, Alleluia!\nSing, ye heavens, and earth reply, Alleluia!' },
+    { label:'Verse 2', text:'Lives again our glorious King, Alleluia!\nWhere, O death, is now thy sting? Alleluia!\nDying once, He all doth save, Alleluia!\nWhere thy victory, O grave? Alleluia!' },
+    { label:'Verse 3', text:'Love\'s redeeming work is done, Alleluia!\nFought the fight, the battle won, Alleluia!\nDeath in vain forbids Him rise, Alleluia!\nChrist hath opened paradise, Alleluia!' },
+    { label:'Verse 4', text:'Soar we now where Christ hath led, Alleluia!\nFollowing our exalted Head, Alleluia!\nMade like Him, like Him we rise, Alleluia!\nOurs the cross, the grave, the skies, Alleluia!' },
+  ], attr:'Words: Charles Wesley, 1739. Public Domain.' },
+
+  'Come, Thou Long-Expected Jesus': { verses:[
+    { label:'Verse 1', text:'Come, Thou long-expected Jesus,\nborn to set Thy people free;\nfrom our fears and sins release us,\nlet us find our rest in Thee.' },
+    { label:'Verse 2', text:'Israel\'s strength and consolation,\nhope of all the earth Thou art;\ndear desire of every nation,\njoy of every longing heart.' },
+    { label:'Verse 3', text:'Born Thy people to deliver,\nborn a child and yet a King,\nborn to reign in us forever,\nnow Thy gracious kingdom bring.' },
+    { label:'Verse 4', text:'By Thine own eternal Spirit\nrule in all our hearts alone;\nby Thine all-sufficient merit\nraise us to Thy glorious throne.' },
+  ], attr:'Words: Charles Wesley, 1744. Public Domain.' },
+
+  'Did You Think to Pray?': { verses:[
+    { label:'Verse 1', text:'Ere you left your room this morning,\ndid you think to pray?\nIn the name of Christ our Savior,\ndid you sue for loving favor,\nas a shield today?' },
+    { chorus:true, label:'Chorus', text:'O how praying rests the weary!\nPrayer will change the night to day;\nso when life gets dark and dreary,\ndon\'t forget to pray.' },
+    { label:'Verse 2', text:'When your heart was filled with anger,\ndid you think to pray?\nDid you plead for grace, my brother,\nthat you might forgive another\nwho had crossed your way?' },
+    { label:'Verse 3', text:'When sore trials came upon you,\ndid you think to pray?\nWhen your soul was bowed in sorrow,\nbalmèd hope for your tomorrow,\ndid you think to pray?' },
+  ], attr:'Words: Mary A. Pepper Kidder, 1876. Public Domain.' },
+
+  'Dwelling in Beulah Land': { verses:[
+    { label:'Verse 1', text:'Far away the noise of strife upon my ear is falling,\nthen I know the sins of earth beset on every hand;\ndoubt and fear and things of earth in vain to me are calling,\nnone of these shall move me from Beulah Land.' },
+    { chorus:true, label:'Chorus', text:'I\'m living on the mountain, underneath a cloudless sky,\nI\'m drinking at the fountain that never shall run dry;\nO yes! I\'m feasting on the manna from a bountiful supply,\nfor I am dwelling in Beulah Land.' },
+    { label:'Verse 2', text:'Far below the storm of doubt upon the world is beating,\nsons of men in battle long the enemy withstand;\nsafe am I within the castle of God\'s Word retreating,\nnothing then can reach me — \'tis Beulah Land.' },
+  ], attr:'Words & Music: Charles Austin Miles, 1911. Public Domain.' },
+
+  'Fairest Lord Jesus': { verses:[
+    { label:'Verse 1', text:'Fairest Lord Jesus, ruler of all nature,\nO Thou of God and man the Son;\nThee will I cherish, Thee will I honor,\nThou, my soul\'s glory, joy, and crown.' },
+    { label:'Verse 2', text:'Fair are the meadows, fairer still the woodlands,\nrobed in the blooming garb of spring;\nJesus is fairer, Jesus is purer,\nwho makes the woeful heart to sing.' },
+    { label:'Verse 3', text:'Fair is the sunshine, fairer still the moonlight,\nand all the twinkling starry host;\nJesus shines brighter, Jesus shines purer\nthan all the angels heav\'n can boast.' },
+  ], attr:'Words: German, 17th century. Trans. Joseph A. Seiss, 1873. Public Domain.' },
+
+  'Follow On': { verses:[
+    { label:'Verse 1', text:'Down in the valley with my Savior I would go,\nwhere the flowers are blooming and the sweet waters flow;\neverywhere He leads me I would follow, follow on,\nwalking in His footsteps till the crown be won.' },
+    { chorus:true, label:'Chorus', text:'Follow! follow! I would follow Jesus!\nAnywhere, everywhere, I would follow on!\nFollow! follow! I would follow Jesus!\nEverywhere He leads me I would follow on!' },
+    { label:'Verse 2', text:'Down in the valley with my Savior I would go,\nwhere the storms are sweeping and the dark waters flow;\nwith His hand to lead me I will never, never fear,\ndanger cannot fright me if my Lord is near.' },
+  ], attr:'Words: W. O. Cushing, 1880. Public Domain.' },
+
+  'Footsteps of Jesus': { verses:[
+    { label:'Verse 1', text:'Sweetly, Lord, have we heard Thee calling,\n"Come, follow Me!"\nAnd we see where Thy footprints falling\nlead us to Thee.' },
+    { chorus:true, label:'Chorus', text:'Footprints of Jesus, that make the pathway glow;\nwe will follow the steps of Jesus\nwhere\'er they go.' },
+    { label:'Verse 2', text:'Though they lead o\'er the cold, dark mountains,\nseeking His sheep;\nor along by Siloam\'s fountains,\nhelping the weak.' },
+    { label:'Verse 3', text:'If they lead through the temple holy,\npreaching the Word;\nor in homes of the poor and lowly,\nserving the Lord.' },
+  ], attr:'Words: Mary B. C. Slade, 1871. Public Domain.' },
+
+  'Free Waters': { verses:[
+    { label:'Verse 1', text:'There\'s a stream that flows for sinners,\nfree, free, free waters;\nit has cleansed ten thousand winners,\nfree, free, free waters.' },
+    { chorus:true, label:'Chorus', text:'Free waters, free waters,\nfree waters flowing for you;\nfree waters, free waters,\nfree waters flowing for you.' },
+    { label:'Verse 2', text:'Come, ye thirsty, come and welcome,\nfree, free, free waters;\ndrink and you shall hunger never,\nfree, free, free waters.' },
+  ], attr:'Public Domain.' },
+
+  'Glory to His Name': { verses:[
+    { label:'Verse 1', text:'Down at the cross where my Savior died,\ndown where for cleansing from sin I cried,\nthere to my heart was the blood applied;\nglory to His name!' },
+    { chorus:true, label:'Chorus', text:'Glory to His name,\nglory to His name;\nthere to my heart was the blood applied;\nglory to His name!' },
+    { label:'Verse 2', text:'I am so wondrously saved from sin,\nJesus so sweetly abides within;\nthere at the cross where He took me in;\nglory to His name!' },
+    { label:'Verse 3', text:'O precious fountain that saves from sin,\nI am so glad I have entered in;\nthere Jesus saves me and keeps me clean;\nglory to His name!' },
+    { label:'Verse 4', text:'Come to this fountain so rich and sweet;\ncast thy poor soul at the Savior\'s feet;\nplunge in today, and be made complete;\nglory to His name!' },
+  ], attr:'Words & Music: Elisha A. Hoffman, 1878. Public Domain.' },
+
+  'God Will Take Care of You': { verses:[
+    { label:'Verse 1', text:'Be not dismayed whate\'er betide,\nGod will take care of you;\nbeneath His wings of love abide,\nGod will take care of you.' },
+    { chorus:true, label:'Chorus', text:'God will take care of you,\nthrough every day, o\'er all the way;\nHe will take care of you,\nGod will take care of you.' },
+    { label:'Verse 2', text:'Through days of toil when heart doth fail,\nGod will take care of you;\nwhen dangers fierce your path assail,\nGod will take care of you.' },
+    { label:'Verse 3', text:'All you may need He will provide,\nGod will take care of you;\nnothing you ask will be denied,\nGod will take care of you.' },
+    { label:'Verse 4', text:'No matter what may be the test,\nGod will take care of you;\nlean, weary one, upon His breast,\nGod will take care of you.' },
+  ], attr:'Words: Civilla D. Martin, 1904. Music: Walter S. Martin. Public Domain.' },
+
+  'Grace Greater Than Our Sin': { verses:[
+    { label:'Verse 1', text:'Marvelous grace of our loving Lord,\ngrace that exceeds our sin and our guilt,\nyonder on Calvary\'s mount outpoured,\nthere where the blood of the Lamb was spilt.' },
+    { chorus:true, label:'Chorus', text:'Grace, grace, God\'s grace,\ngrace that will pardon and cleanse within;\ngrace, grace, God\'s grace,\ngrace that is greater than all our sin.' },
+    { label:'Verse 2', text:'Sin and despair like the sea waves cold,\nthreaten the soul with infinite loss;\ngrace that is greater, yes, grace untold,\npoints to the refuge, the mighty cross.' },
+    { label:'Verse 3', text:'Dark is the stain that we cannot hide,\nwhat can avail to wash it away?\nlook! there is flowing a crimson tide;\nwhiter than snow you may be today.' },
+  ], attr:'Words: Julia H. Johnston, 1910. Music: Daniel B. Towner. Public Domain.' },
+
+  'Great God of Wonders': { verses:[
+    { label:'Verse 1', text:'Great God of wonders! all Thy ways\nare worthy of Thyself divine;\nand the bright glories of Thy grace\namong Thine other wonders shine.' },
+    { chorus:true, label:'Chorus', text:'Who is a pardoning God like Thee?\nOr who has grace so rich and free?' },
+    { label:'Verse 2', text:'In wonder lost, with trembling joy,\nwe take the pardon of our God;\npardon for crimes of deepest dye,\na pardon bought with Jesus\' blood.' },
+    { label:'Verse 3', text:'O may this strange, this matchless grace,\nthis God-like miracle of love,\nfill the wide earth with grateful praise,\nand all th\' angelic choirs above.' },
+  ], attr:'Words: Samuel Davies, 1769. Public Domain.' },
+
+  'Hail Sovereign Love': { verses:[
+    { label:'Verse 1', text:'Hail, sovereign love, that first began\nthe scheme to rescue fallen man!\nHail, matchless, free, eternal grace,\nthat gave my soul a hiding place!' },
+    { label:'Verse 2', text:'When Satan\'s blind, when hell made war,\nand threaten\'d death in a thousand forms,\nwhen reason staggered at the cross,\nand all seem\'d ruin, all seem\'d loss —' },
+    { label:'Verse 3', text:'Yet God in mercy kept me still,\nand hid me safe beneath His will;\nHe bade me hope, He bade me pray,\nand helped me through that gloomy day.' },
+  ], attr:'Words: Joseph Swain, 1792. Public Domain.' },
+
+  'Hark! Ten Thousand Harps and Voices': { verses:[
+    { label:'Verse 1', text:'Hark! ten thousand harps and voices\nsound the note of praise above;\nJesus reigns, and heav\'n rejoices,\nJesus reigns, the God of love;\nsee, He sits on yonder throne;\nJesus rules the world alone.' },
+    { chorus:true, label:'Chorus', text:'Hallelujah! hallelujah! hallelujah! Amen.' },
+    { label:'Verse 2', text:'King of glory, reign forever,\nThine an everlasting crown;\nnothing from Thy love shall sever\nthose whom Thou hast made Thine own;\nhappy objects of Thy grace,\ndestined to behold Thy face.' },
+  ], attr:'Words: Thomas Kelly, 1806. Public Domain.' },
+
+  'He Hideth My Soul': { verses:[
+    { label:'Verse 1', text:'A wonderful Savior is Jesus my Lord,\na wonderful Savior to me;\nHe hideth my soul in the cleft of the rock,\nwhere rivers of pleasure I see.' },
+    { chorus:true, label:'Chorus', text:'He hideth my soul in the cleft of the rock\nthat shadows a dry, thirsty land;\nHe hideth my life in the depths of His love,\nand covers me there with His hand.' },
+    { label:'Verse 2', text:'A wonderful Savior is Jesus my Lord,\nHe taketh my burden away;\nHe holdeth me up, and I shall not be moved,\nHe giveth me strength as my day.' },
+  ], attr:'Words & Music: Fanny J. Crosby, 1890. Public Domain.' },
+
+  'He Is Able to Deliver Thee': { verses:[
+    { label:'Verse 1', text:'\'Tis the grandest theme through the ages rung;\n\'tis the grandest theme for a mortal tongue;\n\'tis the grandest theme that the world e\'er sung:\nour God is able to deliver thee.' },
+    { chorus:true, label:'Chorus', text:'He is able to deliver thee,\nHe is able to deliver thee;\nthough by sin oppressed,\ngo to Him for rest;\nour God is able to deliver thee.' },
+    { label:'Verse 2', text:'\'Tis the grandest theme in the earth or main;\n\'tis the grandest theme for a mortal strain;\n\'tis the grandest theme: tell the world again:\nour God is able to deliver thee.' },
+  ], attr:'Words & Music: William A. Ogden, 1887. Public Domain.' },
+
+  'He Is Coming Again': { verses:[
+    { label:'Verse 1', text:'Lift up your heads, pilgrims aweary,\nsee day\'s approach now crimson the sky;\nnight shadows flee, and your Belovèd,\nwaited so long, is now drawing nigh.' },
+    { chorus:true, label:'Chorus', text:'He is coming again, He is coming again,\nthe very same Jesus, rejected of men;\nHe is coming again, He is coming again,\nwith power and great glory, He is coming again!' },
+    { label:'Verse 2', text:'Dark was the night, sin warred against us;\nheavy the load of sorrow we bore;\nbut now we see signs of His coming;\nour hearts glow within us, joy running o\'er.' },
+  ], attr:'Words & Music: Mabel Johnston Camp, 1913. Public Domain.' },
+
+  'He Lifted Me': { verses:[
+    { label:'Verse 1', text:'In loving kindness Jesus came,\nmy soul in mercy to reclaim,\nand from the depths of sin and shame\nthrough grace He lifted me.' },
+    { chorus:true, label:'Chorus', text:'From sinking sand He lifted me,\nwith tender hand He lifted me;\nfrom shades of night to plains of light,\noh, praise His name, He lifted me!' },
+    { label:'Verse 2', text:'He called me long before I heard,\nbefore my sinful heart was stirred,\nbut when I took Him at His word,\nforgived, He lifted me.' },
+    { label:'Verse 3', text:'His brow was pierced with many a thorn,\nHis hands by cruel nails were torn,\nwhen from my guilt and grief forlorn\nin love He lifted me.' },
+  ], attr:'Words & Music: Charles H. Gabriel, 1905. Public Domain.' },
+
+  'How Can It Be?': { verses:[
+    { label:'Verse 1', text:'Long my imprisoned spirit lay\nfast bound in sin and nature\'s night;\nthine eye diffused a quick\'ning ray,\nI woke, the dungeon flamed with light.\nMy chains fell off, my heart was free,\nI rose, went forth, and followed Thee.' },
+    { chorus:true, label:'Chorus', text:'Amazing love! How can it be\nthat Thou, my God, shouldst die for me?' },
+    { label:'Verse 2', text:'No condemnation now I dread;\nJesus, and all in Him, is mine!\nAlive in Him, my living Head,\nand clothed in righteousness divine,\nbold I approach th\' eternal throne,\nand claim the crown, through Christ, my own.' },
+  ], attr:'Words: Charles Wesley, 1738. Public Domain.' },
+
+  'How Sweet the Name of Jesus Sounds': { verses:[
+    { label:'Verse 1', text:'How sweet the name of Jesus sounds\nin a believer\'s ear!\nIt soothes his sorrows, heals his wounds,\nand drives away his fear.' },
+    { label:'Verse 2', text:'It makes the wounded spirit whole\nand calms the troubled breast;\n\'tis manna to the hungry soul\nand to the weary rest.' },
+    { label:'Verse 3', text:'Dear name! the rock on which I build,\nmy shield and hiding place,\nmy never-failing treasury filled\nwith boundless stores of grace.' },
+    { label:'Verse 4', text:'Jesus! my Shepherd, Brother, Friend,\nmy Prophet, Priest, and King,\nmy Lord, my Life, my Way, my End,\naccept the praise I bring.' },
+  ], attr:'Words: John Newton, 1779. Public Domain.' },
+
+  'I Know That My Redeemer Liveth': { verses:[
+    { label:'Verse 1', text:'I know that my Redeemer liveth,\nand on the earth again shall stand;\nI know eternal life He giveth,\nthat grace and power are in His hand.' },
+    { chorus:true, label:'Chorus', text:'I know, I know that Jesus liveth,\nand on the earth again shall stand;\nI know, I know that life He giveth,\nthat grace and power are in His hand.' },
+    { label:'Verse 2', text:'I know His promise never faileth,\nthe word He speaks, it cannot die;\nthough cruel death my flesh assaileth,\nyet I shall see Him by and by.' },
+  ], attr:'Words: Jessie B. Pounds, 1893. Public Domain.' },
+
+  'I Will Arise and Go to Jesus': { verses:[
+    { label:'Verse 1', text:'Come, ye sinners, poor and needy,\nweak and wounded, sick and sore;\nJesus ready stands to save you,\nfull of pity, love and power.' },
+    { chorus:true, label:'Chorus', text:'I will arise and go to Jesus,\nHe will embrace me in His arms;\nin the arms of my dear Savior,\noh, there are ten thousand charms.' },
+    { label:'Verse 2', text:'Come, ye thirsty, come, and welcome,\nGod\'s free bounty glorify;\ntrue belief and true repentance,\nevery grace that brings you nigh.' },
+    { label:'Verse 3', text:'Come, ye weary, heavy laden,\nlost and ruined by the fall;\nif you tarry \'till you\'re better,\nyou will never come at all.' },
+  ], attr:'Words: Joseph Hart, 1759. Public Domain.' },
+
+  'I Will Sing the Wondrous Story': { verses:[
+    { label:'Verse 1', text:'I will sing the wondrous story\nof the Christ who died for me,\nhow He left His home in glory\nfor the cross of Calvary.' },
+    { chorus:true, label:'Chorus', text:'Yes, I\'ll sing the wondrous story\nof the Christ who died for me,\nsing it with the saints in glory,\ngathered by the crystal sea.' },
+    { label:'Verse 2', text:'I was lost, but Jesus found me,\nfound the sheep that went astray,\nthrew His loving arms around me,\ndrew me back into His way.' },
+    { label:'Verse 3', text:'I was bruised, but Jesus healed me;\nfaint was I from many a fall;\nsight was gone, and fears possessed me,\nbut He freed me from them all.' },
+  ], attr:'Words: Francis H. Rowley, 1886. Public Domain.' },
+
+  'Jesus, Wonderful Lord': { verses:[
+    { label:'Verse 1', text:'Jesus, wonderful Lord, wonderful Lord,\nhow precious Thou art to me;\nThy love has conquered my heart, conquered my heart,\nfrom sin Thou hast set me free.' },
+    { chorus:true, label:'Chorus', text:'Jesus, wonderful Lord, wonderful Lord,\nno tongue can Thy glory tell;\nThine is the kingdom, the power, and the glory,\nJesus, wonderful Lord.' },
+  ], attr:'Public Domain.' },
+
+  'Joy Unspeakable': { verses:[
+    { label:'Verse 1', text:'I have found His grace is all complete,\nHe supplieth every need;\nwhile I sit and learn at Jesus\'s feet,\nI am free, yes, free indeed.' },
+    { chorus:true, label:'Chorus', text:'It is joy unspeakable and full of glory,\nfull of glory, full of glory;\nit is joy unspeakable and full of glory,\noh, the half has never yet been told.' },
+    { label:'Verse 2', text:'I have found the pleasure I once craved,\nit is joy and peace within;\nwhat a wondrous blessing, I am saved\nfrom the awful gulf of sin.' },
+  ], attr:'Words & Music: Barney E. Warren, 1900. Public Domain.' },
+
+  'Joy to the World': { verses:[
+    { label:'Verse 1', text:'Joy to the world! the Lord is come;\nlet earth receive her King;\nlet every heart prepare Him room,\nand heav\'n and nature sing,\nand heav\'n and nature sing,\nand heav\'n, and heav\'n and nature sing.' },
+    { label:'Verse 2', text:'Joy to the earth! the Savior reigns;\nlet men their songs employ;\nwhile fields and floods, rocks, hills, and plains\nrepeat the sounding joy,\nrepeat the sounding joy,\nrepeat, repeat the sounding joy.' },
+    { label:'Verse 3', text:'No more let sins and sorrows grow,\nnor thorns infest the ground;\nHe comes to make His blessings flow\nfar as the curse is found,\nfar as the curse is found,\nfar as, far as the curse is found.' },
+    { label:'Verse 4', text:'He rules the world with truth and grace,\nand makes the nations prove\nthe glories of His righteousness,\nand wonders of His love,\nand wonders of His love,\nand wonders, wonders of His love.' },
+  ], attr:'Words: Isaac Watts, 1719. Public Domain.' },
+
+  'Joyful, Joyful, We Adore Thee': { verses:[
+    { label:'Verse 1', text:'Joyful, joyful, we adore Thee,\nGod of glory, Lord of love;\nhearts unfold like flowers before Thee,\nopening to the sun above.\nMelt the clouds of sin and sadness;\ndrive the dark of doubt away;\ngiver of immortal gladness,\nfill us with the light of day!' },
+    { label:'Verse 2', text:'All Thy works with joy surround Thee,\nearth and heav\'n reflect Thy rays,\nstars and angels sing around Thee,\ncenter of unbroken praise.\nField and forest, vale and mountain,\nflowery meadow, flashing sea,\nchanting bird and flowing fountain\ncall us to rejoice in Thee.' },
+  ], attr:'Words: Henry van Dyke, 1907. Public Domain.' },
+
+  'Labor On': { verses:[
+    { label:'Verse 1', text:'In the harvest field there is work to do,\nfor the grain is ripe and the reapers few;\nand the Master calls, will you join the band?\nlabor on while \'tis day.' },
+    { chorus:true, label:'Chorus', text:'Labor on! labor on!\nkeep the bright reward in view;\nfor the Master has said He will strengthen you;\nlabor on till the close of day.' },
+    { label:'Verse 2', text:'In the gleaning field there is room for all,\nwho will heed the Master\'s call;\nbring your sheaves to the garner bright,\nlabor on while \'tis day.' },
+  ], attr:'Public Domain.' },
+
+  'Living by Faith': { verses:[
+    { label:'Verse 1', text:'I care not today what the morrow may bring,\nif shadow or sunshine or rain;\nthe Lord I know ruleth o\'er everything,\nand all of my worries are vain.' },
+    { chorus:true, label:'Chorus', text:'Living by faith in Jesus above,\ntrusting, confiding in His great love;\nfrom all harm safe in His sheltering arm,\nI\'m living by faith and feel no alarm.' },
+    { label:'Verse 2', text:'Though tempests may blow and the storm clouds arise,\nobscuring the brightness of life,\nI\'m trusting in Jesus the Rock of my soul;\nHe leadeth me safely through strife.' },
+  ], attr:'Words & Music: James Wells, 1917. Public Domain.' },
+
+  'Living for Jesus': { verses:[
+    { label:'Verse 1', text:'Living for Jesus a life that is true,\nstriving to please Him in all that I do;\nyielding allegiance, glad-hearted and free,\nthis is the pathway of blessing for me.' },
+    { chorus:true, label:'Chorus', text:'O Jesus, Lord and Savior, I give myself to Thee;\nfor Thou, in Thy atonement, didst give Thyself for me;\nI own no other master, my heart shall be Thy throne;\nmy life I give, henceforth to live, O Christ, for Thee alone.' },
+    { label:'Verse 2', text:'Living for Jesus who died in my place,\nbearing on Calvary my sin and disgrace;\nsuch love constrains me to answer His call,\nfollow His leading and give Him my all.' },
+  ], attr:'Words: Thomas O. Chisholm, 1917. Public Domain.' },
+
+  'Majestic Sweetness Sits Enthroned': { verses:[
+    { label:'Verse 1', text:'Majestic sweetness sits enthroned\nupon the Savior\'s brow;\nHis head with radiant glories crowned,\nHis lips with grace o\'erflow.' },
+    { label:'Verse 2', text:'No mortal can with Him compare\namong the sons of men;\nfairer is He than all the fair\nthat fill the heav\'nly train.' },
+    { label:'Verse 3', text:'He saw me plunged in deep distress,\nand flew to my relief;\nfor me He bore the shameful cross\nand carried all my grief.' },
+    { label:'Verse 4', text:'To Him I owe my life and breath\nand all the joys I have;\nHe makes me triumph over death\nand saves me from the grave.' },
+  ], attr:'Words: Samuel Stennett, 1787. Public Domain.' },
+
+  'Moment by Moment': { verses:[
+    { label:'Verse 1', text:'Dying with Jesus, by death reckoned mine;\nliving with Jesus, a new life divine;\nlooking to Jesus till glory doth shine,\nmoment by moment, O Lord, I am Thine.' },
+    { chorus:true, label:'Chorus', text:'Moment by moment I\'m kept in His love;\nmoment by moment I\'ve life from above;\nlooking to Jesus till glory doth shine;\nmoment by moment, O Lord, I am Thine.' },
+    { label:'Verse 2', text:'Never a trial that He is not there,\nnever a burden that He doth not bear,\nnever a sorrow that He doth not share,\nmoment by moment, I\'m under His care.' },
+    { label:'Verse 3', text:'Never a heartache, and never a groan,\nnever a teardrop and never a moan;\nnever a danger but there on the throne,\nmoment by moment He thinks of His own.' },
+  ], attr:'Words: Daniel Webster Whittle, 1893. Public Domain.' },
+
+  'More About Jesus': { verses:[
+    { label:'Verse 1', text:'More about Jesus I would know,\nmore of His grace to others show;\nmore of His saving fullness see,\nmore of His love who died for me.' },
+    { chorus:true, label:'Chorus', text:'More, more about Jesus,\nmore, more about Jesus;\nmore of His saving fullness see,\nmore of His love who died for me.' },
+    { label:'Verse 2', text:'More about Jesus let me learn,\nmore of His holy will discern;\nspirit of God, my teacher be,\nshowing the things of Christ to me.' },
+    { label:'Verse 3', text:'More about Jesus; in His Word,\nholding communion with my Lord;\nhearing His voice in every line,\nmaking each faithful saying mine.' },
+  ], attr:'Words: Eliza E. Hewitt, 1887. Public Domain.' },
+
+  'Must Jesus Bear the Cross Alone?': { verses:[
+    { label:'Verse 1', text:'Must Jesus bear the cross alone,\nand all the world go free?\nNo, there\'s a cross for everyone,\nand there\'s a cross for me.' },
+    { label:'Verse 2', text:'How happy are the saints above,\nwho once went sorrowing here!\nbut now they taste unmingled love,\nand joy without a tear.' },
+    { label:'Verse 3', text:'The consecrated cross I\'ll bear\ntill death shall set me free,\nand then go home my crown to wear,\nfor there\'s a crown for me.' },
+    { label:'Verse 4', text:'Upon the crystal pavement, down\nat Jesus\' piercèd feet,\njoyful I\'ll cast my golden crown\nand His dear name repeat.' },
+  ], attr:'Words: Thomas Shepherd, 1693. Public Domain.' },
+
+  'My Sheep Know My Voice': { verses:[
+    { label:'Verse 1', text:'My sheep hear My voice, and I know them,\nand they follow Me;\nI give them eternal life,\nand they shall never perish.' },
+    { label:'Verse 2', text:'No man is able to pluck them\nout of My Father\'s hand;\nthe Father and I are one,\nand ours is a faithful band.' },
+  ], attr:'Based on John 10:27-30. Public Domain.' },
+
+  'Never Alone': { verses:[
+    { label:'Verse 1', text:'I\'ve seen the lightning flashing,\nI\'ve heard the thunder roll;\nI\'ve felt sin\'s breakers dashing,\ntrying to conquer my soul;\nI\'ve heard the voice of my Savior,\ntelling me still to fight on;\nHe promised never to leave me,\nnever to leave me alone.' },
+    { chorus:true, label:'Chorus', text:'No, never alone,\nno, never alone;\nHe promised never to leave me,\nnever to leave me alone.' },
+    { label:'Verse 2', text:'The world\'s fierce winds are blowing,\ntemptation\'s sharp and keen;\nI feel a peace in knowing\nmy Savior stands between;\nHe stands to shield me from danger\nwhen earthly friends are gone;\nHe promised never to leave me,\nnever to leave me alone.' },
+  ], attr:'Words: Ludie D. Pickett, 1897. Public Domain.' },
+
+  'No, Not One': { verses:[
+    { label:'Verse 1', text:'There\'s not a friend like the lowly Jesus,\nno, not one! no, not one!\nNone else could heal all our soul\'s diseases,\nno, not one! no, not one!' },
+    { chorus:true, label:'Chorus', text:'Jesus knows all about our struggles,\nHe will guide \'till the day is done;\nthere\'s not a friend like the lowly Jesus,\nno, not one! no, not one!' },
+    { label:'Verse 2', text:'No friend like Him is so high and holy,\nno, not one! no, not one!\nand yet no friend is so meek and lowly,\nno, not one! no, not one!' },
+    { label:'Verse 3', text:'There\'s not an hour that He is not near us,\nno, not one! no, not one!\nno night so dark but His love can cheer us,\nno, not one! no, not one!' },
+  ], attr:'Words & Music: Johnson Oatman Jr., 1895. Public Domain.' },
+
+  'Now Thank We All Our God': { verses:[
+    { label:'Verse 1', text:'Now thank we all our God\nwith heart and hands and voices,\nwho wondrous things hath done,\nin whom His world rejoices;\nwho from our mothers\' arms\nhath blessed us on our way\nwith countless gifts of love,\nand still is ours today.' },
+    { label:'Verse 2', text:'O may this bounteous God\nthrough all our life be near us,\nwith ever joyful hearts\nand blessèd peace to cheer us;\nand keep us in His grace,\nand guide us when perplexed,\nand free us from all ills\nin this world and the next.' },
+    { label:'Verse 3', text:'All praise and thanks to God\nthe Father now be given,\nthe Son, and Him who reigns\nwith Them in highest heaven;\nthe one eternal God,\nwhom earth and heaven adore;\nfor thus it was, is now,\nand shall be evermore.' },
+  ], attr:'Words: Martin Rinkart, 1636. Trans. Catherine Winkworth, 1858. Public Domain.' },
+
+  'O Little Town of Bethlehem': { verses:[
+    { label:'Verse 1', text:'O little town of Bethlehem,\nhow still we see thee lie!\nabove thy deep and dreamless sleep\nthe silent stars go by.\nYet in thy dark streets shineth\nthe everlasting Light;\nthe hopes and fears of all the years\nare met in thee tonight.' },
+    { label:'Verse 2', text:'For Christ is born of Mary,\nand gathered all above,\nwhile mortals sleep, the angels keep\ntheir watch of wondering love.\nO morning stars together\nproclaim the holy birth!\nAnd praises sing to God the King,\nand peace to men on earth.' },
+    { label:'Verse 3', text:'O holy Child of Bethlehem,\ndescend to us, we pray;\ncast out our sin and enter in,\nbe born in us today.\nWe hear the Christmas angels\nthe great glad tidings tell;\nO come to us, abide with us,\nour Lord Emmanuel.' },
+  ], attr:'Words: Phillips Brooks, 1868. Public Domain.' },
+
+  'O Sacred Head, Now Wounded': { verses:[
+    { label:'Verse 1', text:'O sacred Head, now wounded,\nwith grief and shame weighed down,\nnow scornfully surrounded\nwith thorns, Thine only crown;\nO sacred Head, what glory,\nwhat bliss till now was Thine!\nYet, though despised and gory,\nI joy to call Thee mine.' },
+    { label:'Verse 2', text:'What Thou, my Lord, hast suffered\nwas all for sinners\' gain;\nmine, mine was the transgression,\nbut Thine the deadly pain.\nLo, here I fall, my Savior!\n\'Tis I deserve Thy place;\nlook on me with Thy favor,\nvouchsafe to me Thy grace.' },
+    { label:'Verse 3', text:'What language shall I borrow\nto thank Thee, dearest Friend,\nfor this Thy dying sorrow,\nThy pity without end?\nO make me Thine forever;\nand should I fainting be,\nLord, let me never, never\noutlive my love to Thee.' },
+  ], attr:'Words: Bernard of Clairvaux, 12th c. Trans. James W. Alexander, 1830. Public Domain.' },
+
+  'O for a Thousand Tongues to Sing': { verses:[
+    { label:'Verse 1', text:'O for a thousand tongues to sing\nmy great Redeemer\'s praise,\nthe glories of my God and King,\nthe triumphs of His grace!' },
+    { label:'Verse 2', text:'My gracious Master and my God,\nassist me to proclaim,\nto spread through all the earth abroad\nthe honors of Thy name.' },
+    { label:'Verse 3', text:'Jesus! the name that charms our fears,\nthat bids our sorrows cease;\n\'tis music in the sinner\'s ears,\n\'tis life, and health, and peace.' },
+    { label:'Verse 4', text:'He breaks the power of canceled sin,\nHe sets the prisoner free;\nHis blood can make the foulest clean;\nHis blood availed for me.' },
+  ], attr:'Words: Charles Wesley, 1739. Public Domain.' },
+
+  'O the Deep, Deep Love of Jesus': { verses:[
+    { label:'Verse 1', text:'O the deep, deep love of Jesus,\nvast, unmeasured, boundless, free!\nRolling as a mighty ocean\nin its fullness over me!\nUnderneath me, all around me,\nis the current of Thy love;\nleading onward, leading homeward,\nto Thy glorious rest above!' },
+    { label:'Verse 2', text:'O the deep, deep love of Jesus,\nspread His praise from shore to shore!\nHow He loveth, ever loveth,\nchangeth never, nevermore!\nHow He watches o\'er His loved ones,\ndied to call them all His own;\nhow for them He intercedeth,\nwatcheth o\'er them from the throne!' },
+    { label:'Verse 3', text:'O the deep, deep love of Jesus,\nlove of every love the best!\n\'Tis an ocean vast of blessing,\n\'tis a haven sweet of rest!\nO the deep, deep love of Jesus,\n\'tis a heav\'n of heav\'ns to me;\nand it lifts me up to glory,\nfor it lifts me up to Thee!' },
+  ], attr:'Words: Samuel Trevor Francis, 1875. Public Domain.' },
+
+  'O to Be Like Thee': { verses:[
+    { label:'Verse 1', text:'O to be like Thee! blessèd Redeemer,\nthis is my constant longing and prayer;\ngladly I\'ll forfeit all of earth\'s treasures,\nJesus, Thy perfect likeness to wear.' },
+    { chorus:true, label:'Chorus', text:'O to be like Thee! O to be like Thee,\nblessèd Redeemer, pure as Thou art;\ncome in Thy sweetness, come in Thy fullness;\nstamp Thine own image deep on my heart.' },
+    { label:'Verse 2', text:'O to be like Thee! full of compassion,\nloving, forgiving, tender and kind,\nhelping the helpless, cheering the fainting,\nseeking the wandering sinner to find.' },
+  ], attr:'Words: Thomas O. Chisholm, 1897. Public Domain.' },
+
+  'Oh, How I Love Jesus': { verses:[
+    { label:'Verse 1', text:'There is a name I love to hear,\nI love to sing its worth;\nit sounds like music in mine ear,\nthe sweetest name on earth.' },
+    { chorus:true, label:'Chorus', text:'Oh, how I love Jesus,\noh, how I love Jesus,\noh, how I love Jesus,\nbecause He first loved me!' },
+    { label:'Verse 2', text:'It tells me of a Savior\'s love,\nwho died to set me free;\nit tells me of His precious blood,\nthe sinner\'s perfect plea.' },
+    { label:'Verse 3', text:'It tells of One whose loving heart\ncan feel my deepest woe;\nwho in each sorrow bears a part\nthat none can bear below.' },
+  ], attr:'Words: Frederick Whitfield, 1855. Public Domain.' },
+
+  'Open My Eyes That I May See': { verses:[
+    { label:'Verse 1', text:'Open my eyes, that I may see\nglimpses of truth Thou hast for me;\nplace in my hands the wonderful key\nthat shall unclasp and set me free.' },
+    { chorus:true, label:'Chorus', text:'Silently now I wait for Thee,\nready my God, Thy will to see;\nopen my eyes, illumine me,\nSpirit divine!' },
+    { label:'Verse 2', text:'Open my ears, that I may hear\nvoices of truth Thou sendest clear;\nand while the wave-notes fall on my ear,\neverything false will disappear.' },
+    { label:'Verse 3', text:'Open my mouth, and let me bear\ngladly the warm truth everywhere;\nopen my heart and let me prepare\nlove with Thy children thus to share.' },
+  ], attr:'Words & Music: Clara H. Scott, 1895. Public Domain.' },
+
+  'Open My Eyes, That I May See': { verses:[
+    { label:'Verse 1', text:'Open my eyes, that I may see\nglimpses of truth Thou hast for me;\nplace in my hands the wonderful key\nthat shall unclasp and set me free.' },
+    { chorus:true, label:'Chorus', text:'Silently now I wait for Thee,\nready my God, Thy will to see;\nopen my eyes, illumine me,\nSpirit divine!' },
+    { label:'Verse 2', text:'Open my ears, that I may hear\nvoices of truth Thou sendest clear;\nand while the wave-notes fall on my ear,\neverything false will disappear.' },
+  ], attr:'Words & Music: Clara H. Scott, 1895. Public Domain.' },
+
+  'Open Wide, Ye Doors': { verses:[
+    { label:'Verse 1', text:'Open wide, ye doors of glory,\nfor the King of kings is near;\nlet the everlasting portals\nopen wide, and He\'ll appear.' },
+    { chorus:true, label:'Chorus', text:'Open wide! Open wide!\nopen wide, ye gates of glory;\nopen wide, open wide,\nlet the King of glory in!' },
+  ], attr:'Public Domain.' },
+
+  'Opened for Me': { verses:[
+    { label:'Verse 1', text:'There is a gate that stands ajar,\nand through its portals gleaming,\na radiance from the cross afar,\nthe Savior\'s love revealing.' },
+    { chorus:true, label:'Chorus', text:'O depth of mercy! can it be\nthat gate was opened wide for me?\nFor me? for me?\nWas opened wide for me?' },
+    { label:'Verse 2', text:'That gate ajar stands free for all\nwho seek through it salvation;\nthe rich and poor, the great and small,\nof every tribe and nation.' },
+  ], attr:'Words: Lydia Baxter, 1858. Public Domain.' },
+
+  'Praise the Lord Who Reigns Above': { verses:[
+    { label:'Verse 1', text:'Praise the Lord who reigns above\nand keeps His court below;\npraise the holy God of love\nand all His greatness show;\npraise Him for His noble deeds,\npraise Him for His matchless pow\'r;\nhim from whom all good proceeds\nlet earth and heav\'n adore.' },
+    { label:'Verse 2', text:'Celebrate th\'Eternal God\nwith harp and psaltery;\ncymbal, organs, pipes, and flutes\nunite the concert be;\njoin voice, and instrument to praise\nthe high and holy name;\nand ev\'ry string and ev\'ry tongue\nthy Maker\'s fame proclaim.' },
+  ], attr:'Words: Charles Wesley, 1743. Public Domain.' },
+
+  'Praise the Savior, Ye Who Know Him': { verses:[
+    { label:'Verse 1', text:'Praise the Savior, ye who know Him!\nWho can tell how much we owe Him?\nGladly let us render to Him\nall we are and have.' },
+    { label:'Verse 2', text:'Jesus is the name that charms us;\nHe for conflict fits and arms us;\nnothing moves and nothing harms us\nwhile we trust in Him.' },
+    { label:'Verse 3', text:'Trust in Him, ye saints, forever;\nHe is faithful, changing never;\nneither force nor guile can sever\nthose He loves from Him.' },
+    { label:'Verse 4', text:'Keep us, Lord, O keep us cleaving\nto Thyself and still believing,\ntill the hour of our receiving\npromised joys with Thee.' },
+  ], attr:'Words: Thomas Kelly, 1806. Public Domain.' },
+
+  'Redeemed (How I Love to Proclaim It)': { verses:[
+    { label:'Verse 1', text:'Redeemed, how I love to proclaim it!\nRedeemed by the blood of the Lamb;\nredeemed through His infinite mercy,\nHis child and forever I am.' },
+    { chorus:true, label:'Chorus', text:'Redeemed, redeemed,\nredeemed by the blood of the Lamb;\nredeemed, redeemed,\nHis child and forever I am.' },
+    { label:'Verse 2', text:'Redeemed and so happy in Jesus,\nno language my rapture can tell;\nI know that the light of His presence\nwith me doth continually dwell.' },
+    { label:'Verse 3', text:'I think of my blessèd Redeemer,\nI think of Him all the day long;\nI sing, for I cannot be silent;\nHis love is the theme of my song.' },
+  ], attr:'Words: Fanny J. Crosby, 1882. Public Domain.' },
+
+  'Redeemed (Sweet Is the Song)': { verses:[
+    { label:'Verse 1', text:'Sweet is the song I love to sing\nof God\'s redeeming grace;\nhow Jesus died for sinners vile\nto save our ruined race.' },
+    { chorus:true, label:'Chorus', text:'Redeemed! O blessed thought!\nRedeemed by the blood;\nO how I love to sing\nthe song of redeeming love.' },
+    { label:'Verse 2', text:'I was a wanderer far away,\nlost in the night of sin;\nbut Jesus sought and found His sheep\nand drew me safely in.' },
+  ], attr:'Public Domain.' },
+
+  'Rejoice, Ye Pure in Heart': { verses:[
+    { label:'Verse 1', text:'Rejoice, ye pure in heart,\nrejoice, give thanks, and sing;\nyour festal banner wave on high,\nthe cross of Christ your King.' },
+    { chorus:true, label:'Chorus', text:'Rejoice! Rejoice!\nRejoice, give thanks, and sing!' },
+    { label:'Verse 2', text:'Bright youth and snow-crowned age,\nstrong men and maidens meek,\nraise high your free, exulting song,\nGod\'s wondrous praises speak.' },
+    { label:'Verse 3', text:'With voice as full and strong\nas ocean\'s surging praise,\nsend forth the hymns our fathers loved,\nthe psalms of ancient days.' },
+  ], attr:'Words: Edward H. Plumptre, 1865. Public Domain.' },
+
+  'Rejoice, the Lord Is King': { verses:[
+    { label:'Verse 1', text:'Rejoice, the Lord is King!\nYour Lord and King adore;\nmortals, give thanks and sing,\nand triumph evermore.' },
+    { chorus:true, label:'Chorus', text:'Lift up your heart, lift up your voice!\nRejoice, again I say, rejoice!' },
+    { label:'Verse 2', text:'The Lord, our Savior, reigns,\nthe God of truth and love;\nwhen He had purged our stains,\nHe took His seat above.' },
+    { label:'Verse 3', text:'His kingdom cannot fail,\nHe rules o\'er earth and heav\'n;\nthe keys of death and hell\nare to our Jesus giv\'n.' },
+    { label:'Verse 4', text:'Rejoice in glorious hope!\nJesus, the Judge, shall come\nand take His servants up\nto their eternal home.' },
+  ], attr:'Words: Charles Wesley, 1746. Public Domain.' },
+
+  'Revive Us Again': { verses:[
+    { label:'Verse 1', text:'We praise Thee, O God, for the Son of Thy love,\nfor Jesus who died and is now gone above.' },
+    { chorus:true, label:'Chorus', text:'Hallelujah! Thine the glory,\nhallelujah! amen;\nhallelujah! Thine the glory,\nrevive us again.' },
+    { label:'Verse 2', text:'We praise Thee, O God, for Thy Spirit of light,\nwho hath shown us our Savior and scattered our night.' },
+    { label:'Verse 3', text:'All glory and praise to the Lamb that was slain,\nwho hath borne all our sins and hath cleansed every stain.' },
+    { label:'Verse 4', text:'Revive us again; fill each heart with Thy love;\nmay each soul be rekindled with fire from above.' },
+  ], attr:'Words: William P. Mackay, 1863. Public Domain.' },
+
+  'Saved by Grace': { verses:[
+    { label:'Verse 1', text:'Some day the silver cord will break,\nand I no more as now shall sing;\nbut O the joy when I shall wake\nwithin the palace of the King!' },
+    { chorus:true, label:'Chorus', text:'And I shall see Him face to face,\nand tell the story — saved by grace;\nand I shall see Him face to face,\nand tell the story — saved by grace.' },
+    { label:'Verse 2', text:'Some day my earthly house will fall;\nI cannot tell how soon \'twill be;\nbut this I know — my All in All\nhas now a place in heav\'n for me.' },
+    { label:'Verse 3', text:'Some day, when fades the golden sun\nbeneath the rosy-tinted west,\nmy blessèd Lord will say, "Well done!"\nand I shall enter into rest.' },
+  ], attr:'Words: Fanny J. Crosby, 1891. Public Domain.' },
+
+  'Saved by the Blood': { verses:[
+    { label:'Verse 1', text:'Saved by the blood of the Crucified One!\nNow ransomed from sin and a new work begun,\nsung by the angels and joining their song,\nglorious the theme we\'ll forever prolong!' },
+    { chorus:true, label:'Chorus', text:'Saved, saved, saved by the blood of the Crucified One;\nglory, I\'m saved! Glory, I\'m saved!\nMy sins are all pardoned, my guilt is all gone!\nGlory, I\'m saved! Glory, I\'m saved!\nSaved by the blood of the Crucified One!' },
+    { label:'Verse 2', text:'Saved by the blood of the Crucified One!\nthe angels rejoicing because it is done;\na child of the Father, joint-heir with the Son,\nsaved by the blood of the Crucified One!' },
+  ], attr:'Words & Music: S. J. Henderson, 1902. Public Domain.' },
+
+  'Saved, Saved': { verses:[
+    { label:'Verse 1', text:'Dear friend in the past I was seeking\nfor pleasures that could not be found;\nbut now in my Savior abiding\nmy joys in Him now do abound.' },
+    { chorus:true, label:'Chorus', text:'Saved by His power divine,\nsaved to new life sublime!\nLife now is sweet and my joy is complete,\nfor I\'m saved, saved, saved!' },
+    { label:'Verse 2', text:'He saves me from every temptation,\nHe helps me from day unto day;\nHe lifts me above every mountain,\nHe keeps me along the right way.' },
+  ], attr:'Words & Music: Jack P. Scholfield, 1911. Public Domain.' },
+
+  'Send the Light': { verses:[
+    { label:'Verse 1', text:'There\'s a call comes ringing o\'er the restless wave,\n"Send the light! Send the light!"\nThere are souls to rescue, there are souls to save,\nsend the light! Send the light!' },
+    { chorus:true, label:'Chorus', text:'Send the light, the blessèd Gospel light;\nlet it shine from shore to shore!\nSend the light, the blessèd Gospel light;\nlet it shine forevermore!' },
+    { label:'Verse 2', text:'We have heard the Macedonian call today,\n"Send the light! Send the light!"\nAnd a golden off\'ring at the cross we lay,\nsend the light! Send the light!' },
+    { label:'Verse 3', text:'Let us not grow weary in the work of love,\n"Send the light! Send the light!"\nLet us gather jewels for a crown above,\nsend the light! Send the light!' },
+  ], attr:'Words & Music: Charles H. Gabriel, 1890. Public Domain.' },
+
+  'Since Jesus Came Into My Heart': { verses:[
+    { label:'Verse 1', text:'What a wonderful change in my life has been wrought\nsince Jesus came into my heart!\nI have light in my soul for which long I had sought,\nsince Jesus came into my heart!' },
+    { chorus:true, label:'Chorus', text:'Since Jesus came into my heart,\nsince Jesus came into my heart,\nfloods of joy o\'er my soul\nlike the sea billows roll,\nsince Jesus came into my heart.' },
+    { label:'Verse 2', text:'I have ceased from my wandering and going astray,\nsince Jesus came into my heart!\nAnd my sins, which were many, are all washed away,\nsince Jesus came into my heart!' },
+    { label:'Verse 3', text:'I shall go there to dwell in that city, I know,\nsince Jesus came into my heart!\nAnd I\'m happy, so happy, as onward I go,\nsince Jesus came into my heart!' },
+  ], attr:'Words: Rufus H. McDaniel, 1914. Public Domain.' },
+
+  'Sing Praise to God Who Reigns Above': { verses:[
+    { label:'Verse 1', text:'Sing praise to God who reigns above,\nthe God of all creation,\nthe God of power, the God of love,\nthe God of our salvation;\nwith healing balm my soul He fills,\nand every faithless murmur stills:\nto God all praise and glory!' },
+    { label:'Verse 2', text:'What God\'s almighty power hath made,\nHis gracious mercy keepeth;\nby morning glow or evening shade\nHis watchful eye ne\'er sleepeth;\nwithin the kingdom of His might,\nlo, all is just and all is right:\nto God all praise and glory!' },
+    { label:'Verse 3', text:'Let all who name Christ\'s holy name\ngive God all praise and glory;\nlet all who own His power proclaim\naloud the wondrous story!\nCast each false idol from his throne,\nthe Lord is God, and He alone:\nto God all praise and glory!' },
+  ], attr:'Words: Johann J. Schutz, 1675. Trans. Frances E. Cox, 1864. Public Domain.' },
+
+  'Softly Now the Light of Day': { verses:[
+    { label:'Verse 1', text:'Softly now the light of day\nfades upon my sight away;\nfree from care, from labor free,\nLord, I would commune with Thee.' },
+    { label:'Verse 2', text:'Thou, whose all-pervading eye\nnaught escapes, without, within,\npardon each infirmity,\nopen fault, and secret sin.' },
+    { label:'Verse 3', text:'Soon for me the light of day\nshall forever pass away;\nthen, from sin and sorrow free,\ntake me, Lord, to dwell with Thee.' },
+  ], attr:'Words: George W. Doane, 1824. Public Domain.' },
+
+  'Sooner or Later': { verses:[
+    { label:'Verse 1', text:'Sooner or later, yes, sooner or later,\nwe all must appear before God;\nsooner or later, we\'ll meet our Creator,\nwe\'ll stand on the banks of the river.' },
+    { label:'Verse 2', text:'Children of God, let us onward be pressing,\nholding the banner of truth;\nfilled with His Spirit and filled with His blessing,\nuntil we shall come unto glory.' },
+  ], attr:'Public Domain.' },
+
+  'Take Time to Be Holy': { verses:[
+    { label:'Verse 1', text:'Take time to be holy, speak oft with thy Lord;\nabide in Him always, and feed on His Word.\nMake friends of God\'s children, help those who are weak,\nforgetting in nothing His blessing to seek.' },
+    { label:'Verse 2', text:'Take time to be holy, the world rushes on;\nspend much time in secret with Jesus alone.\nBy looking to Jesus, like Him thou shalt be;\nthy friends in thy conduct His likeness shall see.' },
+    { label:'Verse 3', text:'Take time to be holy, let Him be thy Guide,\nand run not before Him, whatever betide.\nIn joy or in sorrow, still follow the Lord,\nand, looking to Jesus, still trust in His Word.' },
+    { label:'Verse 4', text:'Take time to be holy, be calm in thy soul,\neach thought and each motive beneath His control.\nThus led by His Spirit to fountains of love,\nthou soon shalt be fitted for service above.' },
+  ], attr:'Words: William D. Longstaff, 1882. Public Domain.' },
+
+  'Take the Name of Jesus with You': { verses:[
+    { label:'Verse 1', text:'Take the name of Jesus with you,\nchild of sorrow and of woe;\nit will joy and comfort give you,\ntake it then, where\'er you go.' },
+    { chorus:true, label:'Chorus', text:'Precious name, O how sweet!\nHope of earth and joy of heav\'n;\nprecious name, O how sweet!\nHope of earth and joy of heav\'n.' },
+    { label:'Verse 2', text:'Take the name of Jesus ever,\nas a shield from every snare;\nif temptations round you gather,\nbreathe that holy name in prayer.' },
+    { label:'Verse 3', text:'O the precious name of Jesus!\nhow it thrills our souls with joy,\nwhen His loving arms receive us,\nand His songs our tongues employ.' },
+  ], attr:'Words: Lydia Odell Baxter, 1870. Public Domain.' },
+
+  'Tell It to Jesus': { verses:[
+    { label:'Verse 1', text:'Are you weary, are you heavy-hearted?\nTell it to Jesus, tell it to Jesus;\nare you grieving over joys departed?\nTell it to Jesus alone.' },
+    { chorus:true, label:'Chorus', text:'Tell it to Jesus, tell it to Jesus,\nHe is a friend that\'s well known;\nyou have no other such a friend or brother,\ntell it to Jesus alone.' },
+    { label:'Verse 2', text:'Do the tears flow down your cheeks unbidden?\nTell it to Jesus, tell it to Jesus;\nhave you sins that to men\'s eyes are hidden?\nTell it to Jesus alone.' },
+    { label:'Verse 3', text:'Do you fear the gath\'ring clouds of sorrow?\nTell it to Jesus, tell it to Jesus;\nare you anxious what shall be tomorrow?\nTell it to Jesus alone.' },
+  ], attr:'Words: Jeremiah E. Rankin, 1880. Public Domain.' },
+
+  'The Day of Resurrection': { verses:[
+    { label:'Verse 1', text:'The day of resurrection!\nearth, tell it out abroad;\nthe Passover of gladness,\nthe Passover of God.\nFrom death to life eternal,\nfrom earth unto the sky,\nour Christ hath brought us over\nwith hymns of victory.' },
+    { label:'Verse 2', text:'Our hearts be pure from evil,\nthat we may see aright\nthe Lord in rays eternal\nof resurrection light;\nand listening to His accents,\nmay hear, so calm and plain,\nHis own "All hail!" and, hearing,\nmay raise the victor strain.' },
+  ], attr:'Words: St. John of Damascus, 8th c. Trans. John M. Neale, 1862. Public Domain.' },
+
+  'The Great Physician': { verses:[
+    { label:'Verse 1', text:'The great Physician now is near,\nthe sympathizing Jesus;\nHe speaks the drooping heart to cheer,\noh, hear the voice of Jesus.' },
+    { chorus:true, label:'Chorus', text:'Sweetest note in seraph song,\nsweetest name on mortal tongue;\nsweetest carol ever sung,\nJesus, blessèd Jesus.' },
+    { label:'Verse 2', text:'Your many sins are all forgiven,\noh, hear the voice of Jesus;\ngo on your way in peace to heaven\nand wear a crown with Jesus.' },
+    { label:'Verse 3', text:'All glory to the dying Lamb!\nI now believe in Jesus;\nI love the blessèd Savior\'s name,\nI love the name of Jesus.' },
+  ], attr:'Words: William Hunter, 1859. Public Domain.' },
+
+  'The Name of Jesus': { verses:[
+    { label:'Verse 1', text:'The name of Jesus is so sweet,\nI love its music to repeat;\nit makes my joys full and complete,\nthe precious name of Jesus.' },
+    { chorus:true, label:'Chorus', text:'"Jesus," oh, how sweet the name!\n"Jesus," every day the same;\n"Jesus," let all saints proclaim\nits worthy praise forever.' },
+    { label:'Verse 2', text:'I love the name of Him whose heart\nknows all my griefs and bears a part;\nwho bids all anxious fears depart —\nI love the name of Jesus.' },
+    { label:'Verse 3', text:'That name I fondly love to hear,\nit never fails my heart to cheer;\nits music dries the falling tear;\nexalt the name of Jesus.' },
+  ], attr:'Words: W. C. Martin, 1900. Public Domain.' },
+
+  'There Is a Fountain': { verses:[
+    { label:'Verse 1', text:'There is a fountain filled with blood\ndrawn from Emmanuel\'s veins;\nand sinners plunged beneath that flood\nlose all their guilty stains.' },
+    { label:'Verse 2', text:'The dying thief rejoiced to see\nthat fountain in his day;\nand there may I, though vile as he,\nwash all my sins away.' },
+    { label:'Verse 3', text:'Dear dying Lamb, Thy precious blood\nshall never lose its power\ntill all the ransomed church of God\nbe saved to sin no more.' },
+    { label:'Verse 4', text:'E\'er since by faith I saw the stream\nThy flowing wounds supply,\nredeeming love has been my theme\nand shall be till I die.' },
+  ], attr:'Words: William Cowper, 1772. Public Domain.' },
+
+  'There Shall Be Showers of Blessing': { verses:[
+    { label:'Verse 1', text:'There shall be showers of blessing:\nthis is the promise of love;\nthere shall be seasons refreshing,\nsent from the Savior above.' },
+    { chorus:true, label:'Chorus', text:'Showers of blessing,\nshowers of blessing we need;\nmercy drops round us are falling,\nbut for the showers we plead.' },
+    { label:'Verse 2', text:'There shall be showers of blessing,\nprecious reviving again;\nover the hills and the valleys,\nsound of abundance of rain.' },
+    { label:'Verse 3', text:'There shall be showers of blessing;\nsend them upon us, O Lord;\ngrant to us now a refreshing,\ncome, and now honor Thy Word.' },
+  ], attr:'Words: Daniel Webster Whittle, 1883. Public Domain.' },
+
+  'We Magnify Our Father God': { verses:[
+    { label:'Verse 1', text:'We magnify our Father God,\nthe God of every grace;\nwho gave His Son to be our Priest,\nto take the sinner\'s place.' },
+    { label:'Verse 2', text:'We magnify the Savior\'s name,\nwho bore our guilt and shame;\nwho died, who lives, who intercedes\nand pleads His Father\'s claim.' },
+  ], attr:'Public Domain.' },
+
+  'What If It Were Today?': { verses:[
+    { label:'Verse 1', text:'Jesus is coming to earth again,\nwhat if it were today?\nComing in power and love to reign,\nwhat if it were today?\nComing to claim His chosen Bride,\nall the redeemed and purified,\nover this whole earth scattered wide,\nwhat if it were today?' },
+    { chorus:true, label:'Chorus', text:'Glory, glory! Joy to my heart \'twill bring;\nglory, glory! when we shall crown Him King;\nglory, glory! haste to prepare the way;\nglory, glory! Jesus will come someday.' },
+    { label:'Verse 2', text:'Satan\'s dominion will then be o\'er,\nwhat if it were today?\nSorrow and sighing shall be no more,\nwhat if it were today?' },
+  ], attr:'Words & Music: Lelia N. Morris, 1912. Public Domain.' },
+
+  'What a Gathering': { verses:[
+    { label:'Verse 1', text:'What a gathering, what a gathering,\nwhat a gathering of the ransomed in the summer land of love!\nWhat a gathering, what a gathering,\nof the ransomed in that happy home above!' },
+    { label:'Verse 2', text:'There will be a joyful meeting\nwith the many gone before;\nand the sorrows all forgotten\nby the sea of glass and more.' },
+  ], attr:'Public Domain.' },
+
+  'What a Wonderful Savior': { verses:[
+    { label:'Verse 1', text:'Christ has for sin atonement made,\nwhat a wonderful Savior!\nwe are redeemed! the price is paid!\nwhat a wonderful Savior!' },
+    { chorus:true, label:'Chorus', text:'What a wonderful Savior is Jesus, my Jesus!\nWhat a wonderful Savior is Jesus, my Lord!' },
+    { label:'Verse 2', text:'I praise Him for the cleansing blood,\nwhat a wonderful Savior!\nthat reconciled my soul to God;\nwhat a wonderful Savior!' },
+    { label:'Verse 3', text:'He cleansed my heart from all its sin,\nwhat a wonderful Savior!\nand now He reigns and rules therein;\nwhat a wonderful Savior!' },
+  ], attr:'Words & Music: Elisha A. Hoffman, 1891. Public Domain.' },
+
+  'When the Roll Is Called Up Yonder': { verses:[
+    { label:'Verse 1', text:'When the trumpet of the Lord shall sound,\nand time shall be no more,\nand the morning breaks, eternal, bright and fair;\nwhen the saved of earth shall gather\nover on the other shore,\nand the roll is called up yonder, I\'ll be there!' },
+    { chorus:true, label:'Chorus', text:'When the roll is called up yonder,\nwhen the roll is called up yonder,\nwhen the roll is called up yonder,\nwhen the roll is called up yonder, I\'ll be there!' },
+    { label:'Verse 2', text:'On that bright and cloudless morning\nwhen the dead in Christ shall rise,\nand the glory of His resurrection share;\nwhen His chosen ones shall gather\nto their home beyond the skies,\nand the roll is called up yonder, I\'ll be there!' },
+    { label:'Verse 3', text:'Let us labor for the Master\nfrom the dawn till setting sun,\nlet us talk of all His wondrous love and care;\nthen when all of life is over,\nand our work on earth is done,\nand the roll is called up yonder, I\'ll be there!' },
+  ], attr:'Words & Music: James M. Black, 1893. Public Domain.' },
+
+  'Wonderful Grace of Jesus': { verses:[
+    { label:'Verse 1', text:'Wonderful grace of Jesus,\ngreater than all my sin;\nhow shall my tongue describe it,\nwhere shall its praise begin?\nTaking away my burden,\nsetting my spirit free;\nfor the wonderful grace of Jesus reaches me.' },
+    { chorus:true, label:'Chorus', text:'Wonderful the matchless grace of Jesus,\ndeeper than the mighty rolling sea;\nwonderful grace, all sufficient for me, for even me;\nbroader than the scope of my transgressions,\ngreater far than all my sin and shame;\nO magnify the precious name of Jesus,\npraise His name!' },
+    { label:'Verse 2', text:'Wonderful grace of Jesus,\nreaching to all the lost;\nby it I have been pardoned,\nsaved to the uttermost;\nchains have been torn asunder,\ngiving me liberty;\nfor the wonderful grace of Jesus reaches me.' },
+  ], attr:'Words & Music: Haldor Lillenas, 1918. Public Domain.' },
+
+  'Wonderful Story of Love': { verses:[
+    { label:'Verse 1', text:'Tell me the story of Jesus,\nwrite on my heart every word;\ntell me the story most precious,\nsweetest that ever was heard.' },
+    { chorus:true, label:'Chorus', text:'Wonderful story of love!\ntell it to me again;\nwonderful story of love!\nwake the immortal strain.' },
+    { label:'Verse 2', text:'Fasting alone in the desert,\ntell of the days that are past;\nhow for our sins He was tempted,\nyet was triumphant at last.' },
+  ], attr:'Words: Fanny J. Crosby, 1880. Public Domain.' },
+
+  'Wonderful Words of Life': { verses:[
+    { label:'Verse 1', text:'Sing them over again to me,\nwonderful words of life;\nlet me more of their beauty see,\nwonderful words of life.\nWords of life and beauty,\nteach me faith and duty.' },
+    { chorus:true, label:'Chorus', text:'Beautiful words, wonderful words,\nwonderful words of life.\nBeautiful words, wonderful words,\nwonderful words of life.' },
+    { label:'Verse 2', text:'Christ, the blessèd One, gives to all\nwonderful words of life;\nsinner, list to the loving call,\nwonderful words of life.\nAll so freely given,\nwooing us to heaven.' },
+  ], attr:'Words & Music: Philip P. Bliss, 1874. Public Domain.' },
+
+  'Wounded for Me': { verses:[
+    { label:'Verse 1', text:'Wounded for me, wounded for me,\nthere on the cross He was wounded for me;\ngone my transgressions, and now I am free,\nall because Jesus was wounded for me.' },
+    { label:'Verse 2', text:'Dying for me, dying for me,\nthere on the cross He was dying for me;\nnow in His death my redemption I see,\nall because Jesus was dying for me.' },
+    { label:'Verse 3', text:'Risen for me, risen for me,\nup from the grave He has risen for me;\nnow evermore from death\'s sting I am free,\nall because Jesus has risen for me.' },
+    { label:'Verse 4', text:'Living for me, living for me,\nup in the skies He is living for me;\ndaily He\'s pleading and praying for me,\nall because Jesus is living for me.' },
+  ], attr:'Words: W. G. Ovens & Gladys W. Roberts, 1927. Public Domain.' }
 };
 
 // ── FULL HYMN LIST ─────────────────────────────────────────────
@@ -1028,6 +1624,7 @@ const HYMNS = [
 
 
   // TELEGRAM — IFB Specials, Quartets & Choirs (via R2)
+  { id:'tg000', title:'Victory in Jesus (Congregational)', source:'telegram', artist:'Faith Baptist Church', url:TGM+encodeURIComponent('Victory_In_Jesus_Congregational.mp3'), tags:['salvation','jesus','victory'] },
   { id:'tg001', title:'A Beautiful Life', source:'telegram', artist:'', url:TGM+encodeURIComponent('A-Beautiful-Life.m4a'), tags:[] },
   { id:'tg002', title:'Hallelujah, We Shall Rise', source:'telegram', artist:'Ambassador Baptist College', url:TGM+encodeURIComponent('Ambassador Baptist College - Topic - Hallelujah, We Shall Ris....m4a'), tags:['resurrection','vocal'] },
   { id:'tg003', title:'Softly and Tenderly', source:'telegram', artist:'Ambassador Baptist College', url:TGM+encodeURIComponent('Ambassador Baptist College - Topic - Softly and Tenderly.m4a'), tags:['vocal'] },
@@ -1739,6 +2336,39 @@ playNext = function() {
   _origPlayNext();
 };
 
+
+// ── EXPANDABLE PLAYER ────────────────────────────────────────────────────
+var npEl = document.getElementById('now-playing');
+var playerCollapsed = false;
+
+npEl.addEventListener('click', function(e) {
+  // Don't collapse when clicking buttons/controls
+  if (e.target.closest('button') || e.target.closest('input')) return;
+  playerCollapsed = !playerCollapsed;
+  npEl.classList.toggle('collapsed', playerCollapsed);
+});
+
+// Share button
+document.getElementById('share-btn').addEventListener('click', function(e) {
+  e.stopPropagation();
+  var h = filteredList[currentIdx];
+  if (!h) return;
+  var data = {
+    title: h.title + ' \u2014 FBC Hymns',
+    text: h.title + (h.artist ? ' (' + h.artist + ')' : ''),
+    url: window.location.href
+  };
+  if (navigator.share) {
+    navigator.share(data).catch(function(){});
+  } else {
+    navigator.clipboard.writeText(h.title + ' - fbckjv.app/Hymns/').then(function() {
+      toast('\ud83d\udd17 Link copied');
+    }).catch(function() {
+      toast(h.title);
+    });
+  }
+});
+
 render();
 updateFavBtn(null);
 // ── YOUTUBE PANEL ──────────────────────────────────────────────────────────
@@ -1770,6 +2400,9 @@ updateFavBtn(null);
     document.body.style.overflow="hidden";
   };
   function closePanel(){
+    // Stop YT video by clearing the iframe
+    fw.innerHTML='';
+    loaded=false;
     panel.classList.remove("open");
     document.body.style.overflow="";
     document.querySelectorAll(".nav-btn").forEach(function(b){b.classList.remove("active");});
