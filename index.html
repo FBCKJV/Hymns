@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#2200cc">
 <meta name="description" content="Hymns &amp; Songs — Faith Baptist Church of Plymouth County · KJV">
@@ -2886,12 +2887,12 @@ const HYMNS = [
   { id:'tg172', title:'Worthy Is the Lamb', source:'telegram', artist:'', url:TGM+encodeURIComponent('Worthy-Is-the-Lamb.m4a'), tags:['jesus'] },
   { id:'tg173', title:'The Last Blood', source:'telegram', artist:'Zachary Mills', url:TGM+encodeURIComponent('Zachary Mills - The Last Blood.m4a'), tags:['cross','blood'] },
   // FIRST BAPTIST HAMMOND — Choir Specials & Service Music
-  { id:'hb001', title:'What A Friend We Have in Jesus', source:'hammond', artist:'Precious Name Singers', url:TGM+encodeURIComponent('01 - What A Friend We Have in Jesus | Precious Name Singers.mp3'), tags:['jesus','first baptist hammond','vocal'] },
+  { id:'hb001', title:'What A Friend We Have in Jesus', source:'hammond', artist:'Precious Name Singers', url:TGM+encodeURIComponent('01 - What A Friend We Have in Jesus - Precious Name Singers.mp3'), tags:['jesus','first baptist hammond','vocal'] },
   { id:'hb002', title:'His Mercy is More', source:'hammond', artist:'FBC Adult Choir', url:TGM+encodeURIComponent('02 - His Mercy is More | FBC Adult Choir.mp3'), tags:['vocal','first baptist hammond','grace'] },
-  { id:'hb003', title:'The River of Life', source:'hammond', artist:'The Bicknell Family', url:TGM+encodeURIComponent('03 - The River of Life | The Bicknell Family.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb003', title:'The River of Life', source:'hammond', artist:'The Bicknell Family', url:TGM+encodeURIComponent('03 - The River of Life - The Bicknell Family.mp3'), tags:['vocal','first baptist hammond'] },
   { id:'hb004', title:'I Have Prayed for Thee', source:'hammond', artist:'FBC Teen Ensemble', url:TGM+encodeURIComponent('04 - I Have Prayed for Thee | FBC Teen Ensemble.mp3'), tags:['vocal','first baptist hammond'] },
   { id:'hb005', title:'I Am Blessed', source:'hammond', artist:'Precious Name Singers', url:TGM+encodeURIComponent('05 - I Am Blessed - Precious Name Singers.mp3'), tags:['vocal','first baptist hammond'] },
-  { id:'hb006', title:'I Wish I Could Have Been There', source:'hammond', artist:'Grace & Truth with Calvin Allen', url:TGM+encodeURIComponent('06 - I Wish I Could Have Been There | Grace & Truth with Calvin Allen.mp3'), tags:['first baptist hammond'] },
+  { id:'hb006', title:'I Wish I Could Have Been There', source:'hammond', artist:'Grace & Truth with Calvin Allen', url:TGM+encodeURIComponent('06 - I Wish I Could Have Been There - Grace & Truth with Calvin Allen.mp3'), tags:['first baptist hammond'] },
   { id:'hb007', title:'We Believe', source:'hammond', artist:'Bicknell & Mitchell Families', url:TGM+encodeURIComponent('07 - We Believe | Bicknell & Mitchell Families.mp3'), tags:['first baptist hammond'] },
   { id:'hb008', title:'Thy Spirit Is Good', source:'hammond', artist:'Theme Song 2022', url:TGM+encodeURIComponent('08 - Thy Spirit is Good - Theme Song 2022.mp3'), tags:['first baptist hammond'] },
   { id:'hb009', title:'FBC "A" Teen Choir (Service Music)', source:'hammond', artist:'Sunday Evening, January 30, 2022', url:TGM+encodeURIComponent('09 - FBC "A" Teen Choir - Sunday Evening, January 30, 2022.mp3'), tags:['first baptist hammond'] },
@@ -2903,7 +2904,7 @@ const HYMNS = [
   { id:'hb015', title:'I Want to Be that Man', source:'hammond', artist:'Men\'s Ensemble', url:TGM+encodeURIComponent('15 - I Want to Be that Man - Men\'s Ensemble.mp3'), tags:['vocal','first baptist hammond'] },
   { id:'hb016', title:'My Name Is "I Am"', source:'hammond', artist:'Mixed Quartet', url:TGM+encodeURIComponent('16 - My Name is "I Am" - Mixed Quartet.mp3'), tags:['vocal','first baptist hammond'] },
   { id:'hb017', title:'One Day I Will (Trio)', source:'hammond', artist:'Deb Wilson, Maria Rivera, Jack Mitchell', url:TGM+encodeURIComponent('17 - One Day I Will - Deb Wilson, Maria Rivera, Jack Mitchell - Sunday Morning, September 25, 2022.mp3'), tags:['first baptist hammond'] },
-  { id:'hb018', title:'Alpha and Omega', source:'hammond', artist:'FBC "A" Teen Choir', url:TGM+encodeURIComponent('18 - Alpha and Omega | FBC "A" Teen Choir.mp3'), tags:['vocal','first baptist hammond'] },
+  { id:'hb018', title:'Alpha and Omega', source:'hammond', artist:'FBC "A" Teen Choir', url:TGM+encodeURIComponent('18 - Alpha and Omega - FBC A Teen Choir.mp3'), tags:['vocal','first baptist hammond'] },
   { id:'hb019', title:'Psalm 16', source:'hammond', artist:'FBC Junior High Girls Ensemble', url:TGM+encodeURIComponent('19 - Psalm 16 - FBC Junior High Girls Ensemble.mp3'), tags:['vocal','first baptist hammond'] },
   { id:'hb020', title:'Almighty, Unchangeable God', source:'hammond', artist:'Hyles-Anderson College Concert Choir', url:TGM+encodeURIComponent('20 - Almighty, Unchangeable God - Hyles-Anderson College Concert Choir.mp3'), tags:['vocal','first baptist hammond'] },
   { id:'hb021', title:'Crucified for Me', source:'hammond', artist:'FBC Adult Choir', url:TGM+encodeURIComponent('21 - Crucified for Me - FBC Adult Choir.mp3'), tags:['vocal','first baptist hammond'] },
@@ -3908,6 +3909,8 @@ function tgTitleFromFilename(filename) {
   }
   if (name.includes('-') && !name.includes(' ')) name = name.replace(/-/g, ' ');
   name = name.replace(/\s+/g, ' ').trim();
+  // Normalize pipe separator in filename to dash for URL building
+  filename = filename.replace(/ \| /g, ' - ');
   return { title: name || filename, artist };
 }
 
