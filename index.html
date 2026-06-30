@@ -393,12 +393,13 @@ header {
 
 /* ── EXPANDABLE PLAYER ── */
 #now-playing {
-  transition: height .3s cubic-bezier(.4,0,.2,1), padding .3s;
+  transition: max-height .35s cubic-bezier(.4,0,.2,1), padding .35s;
   cursor: pointer;
   overflow: hidden;
+  max-height: 200px;
 }
 #now-playing.collapsed {
-  height: 52px !important;
+  max-height: 56px;
   padding-top: 6px !important;
   padding-bottom: 6px !important;
 }
@@ -409,6 +410,17 @@ header {
 }
 #now-playing.collapsed #np-meta {
   margin: 0;
+}
+#np-expand-hint {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  opacity: 0.4;
+  pointer-events: none;
 }
 #np-expand-hint {
   position: absolute;
@@ -3227,14 +3239,17 @@ npEl.addEventListener('click', function(e) {
 document.getElementById('share-btn').addEventListener('click', function(e) {
   e.stopPropagation();
   var h = filteredList[currentIdx];
-  if (!h) return;
   var data = {
     title: h.title + ' \u2014 FBC Hymns',
     text: h.title + (h.artist ? ' (' + h.artist + ')' : ''),
     url: window.location.href
   };
+  // Android Chrome requires navigator.share called directly in click handler
+  var shareUrl = 'https://fbckjv.app/Hymns/';
+  var shareTitle = h.title + ' — FBC Hymns & Spiritual Songs';
+  var shareText = h.title + (h.artist ? ' · ' + h.artist : '') + ' — fbckjv.app/Hymns/';
   if (navigator.share) {
-    navigator.share(data).catch(function(){});
+    navigator.share({ title: shareTitle, text: shareText, url: shareUrl }).catch(function(){});
   } else {
     navigator.clipboard.writeText(h.title + ' - fbckjv.app/Hymns/').then(function() {
       toast('\ud83d\udd17 Link copied');
