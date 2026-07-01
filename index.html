@@ -3130,6 +3130,15 @@ function loadAndPlay(idx) {
   const h = filteredList[idx];
   const src = SOURCES[h.source];
 
+  // Update mediaSession metadata BEFORE loading so OS knows what's next
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: h.title,
+      artist: (h.artist || src.label),
+      album: 'FBC Hymns & Spiritual Songs',
+    });
+    navigator.mediaSession.playbackState = 'playing';
+  }
   audio.src = h.url;
   audio.load();
   audio.play().catch(()=>{ setPlaying(false); });
