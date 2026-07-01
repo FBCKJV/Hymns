@@ -825,39 +825,32 @@ header {
     <div class="sheet-handle"></div>
     <div class="sheet-header" style="position:relative">
       <div class="sheet-title">About the Archives</div>
-      <div class="sheet-sub">All recordings are public domain or freely licensed for ministry use</div>
+      <div class="sheet-sub">Version: ifb-hymns-v33 &nbsp;&middot;&nbsp; All recordings freely licensed for ministry use</div>
       <button class="close-sheet" id="close-info">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
     </div>
     <div class="info-source">
+      <h3>🎼 Olmstead Baptist Church (61 hymns)</h3>
+      <p>Classic congregational hymns recorded live. Public domain, freely available for ministry use.</p>
+    </div>
+    <div class="info-source">
+      <h3>🎵 Bible Baptist DeLand (38 hymns)</h3>
+      <p>Piano arrangements of beloved hymns and gospel standards.</p>
+    </div>
+    <div class="info-source">
+      <h3>🎙️ IFB Specials &amp; Choir (174 recordings)</h3>
+      <p>Quartets, choirs, soloists, and ensembles from Independent Fundamental Baptist churches across America. Growing regularly.</p>
+    </div>
+    <div class="info-source">
+      <h3>🎤 First Baptist Hammond (69 recordings)</h3>
+      <p>Choir specials and service music from First Baptist Church of Hammond, Indiana.</p>
+    </div>
+    <div class="info-source" style="display:none"><!-- REPLACED -->
       <h3>🎼 Olmstead Baptist Church Hymnal</h3>
       <p>Live congregational singing recordings in the public domain. All 150+ hymns freely reproducible. Hosted at <a href="http://baptistarchive.com" target="_blank">baptistarchive.com</a> and <a href="http://olmsteadbaptistchurch.org/hymnal.htm" target="_blank">olmsteadbaptistchurch.org</a>.</p>
     </div>
-    <div class="info-source">
-      <h3>🎹 Small Church Music</h3>
-      <p>Founded in 2006 by Rev. Clyde McLennan (1941–2022), an ordained Baptist pastor from Australia. Nearly 15,000 public-domain MP3s — pipe organ, piano, small band — recorded as a free gift to congregations worldwide. See <a href="https://www.smallchurchmusic.com" target="_blank">smallchurchmusic.com</a>.</p>
-    </div>
-    <div class="info-source">
-      <h3>🎵 Bible Baptist Church DeLand — Piano Project</h3>
-      <p>Live piano recordings from congregational singing at THE BIBLE Baptist Church of DeLand, FL (Pastor James W. Knox). Great Hymns of the Faith, IFB. See <a href="https://jameswknox.org/piano-project/" target="_blank">jameswknox.org</a>.</p>
-    </div>
-    <div class="info-source">
-      <h3>📖 Sung Psalms — Scottish Metrical Psalter (1650)</h3>
-      <p>Acappella psalm singing from Reformed and Free Church congregations. Over 700 recordings at <a href="https://thepsalmssung.org" target="_blank">ThePsalmsSung.org</a>. Recordings used with permission of the Free Church of Scotland.</p>
-    </div>
-    <div class="info-source">
-      <h3>🎶 Genevan Psalter</h3>
-      <p>The historic 1562 Genevan tunes (Bourgeois/Marot/Beza) sung by Reformed congregations. These tunes have accompanied metrical Psalm singing since the Reformation.</p>
-    </div>
-    <div class="info-source">
-      <h3>📻 Internet Archive — Baptist Music</h3>
-      <p>Public domain Baptist and gospel hymn recordings from the Internet Archive's open collections at <a href="https://archive.org/details/BaptistMusic" target="_blank">archive.org</a>.</p>
-    </div>
-    <div class="info-source" style="border:none">
-      <h3>ℹ️ About This App</h3>
-      <p>FBC Hymns &amp; Songs — companion to the FBC KJV Bible App (<a href="https://fbckjv.app" target="_blank">fbckjv.app</a>). Favorites and listening history are stored locally on your device. Audio streams directly from the source archives.</p>
-    </div>
+
   </div>
 </div>
 
@@ -3264,6 +3257,33 @@ audio.addEventListener('timeupdate', () => {
 });
 audio.addEventListener('loadedmetadata', () => { durT.textContent = fmt(audio.duration); });
 audio.addEventListener('ended', playNext);
+
+// Silent Web Audio keepalive — only active during the gap between tracks
+// Starts when a track ends, stops the moment the next one begins playing
+var _audioCtx = null;
+var _silentSrc = null;
+function startKeepalive() {
+  try {
+    if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (_audioCtx.state === 'suspended') _audioCtx.resume();
+    if (_silentSrc) { try { _silentSrc.stop(); } catch(e){} }
+    var buf = _audioCtx.createBuffer(1, _audioCtx.sampleRate, _audioCtx.sampleRate);
+    _silentSrc = _audioCtx.createBufferSource();
+    _silentSrc.buffer = buf; _silentSrc.loop = true;
+    var gain = _audioCtx.createGain();
+    gain.gain.value = 0.001;
+    _silentSrc.connect(gain); gain.connect(_audioCtx.destination);
+    _silentSrc.start();
+  } catch(e) {}
+}
+function stopKeepalive() {
+  try {
+    if (_silentSrc) { _silentSrc.stop(); _silentSrc = null; }
+    if (_audioCtx) _audioCtx.suspend();
+  } catch(e) {}
+}
+audio.addEventListener('ended', startKeepalive);
+audio.addEventListener('play', stopKeepalive);
 audio.addEventListener('play',  () => { setPlaying(true);  render(); });
 audio.addEventListener('pause', () => { setPlaying(false); render(); });
 audio.addEventListener('error', () => { setTimeout(playNext, 1200); });
@@ -3447,10 +3467,15 @@ function updateMediaSession() {
 audio.addEventListener('play', updateMediaSession);
 
 // ── AUTOPLAY TOGGLE ──────────────────────────────────────────────────────────
-let autoPlay = false; // off by default
+let autoPlay = localStorage.getItem('sh_autoplay') === '1';
 const autoBtn = document.getElementById('auto-btn');
+// Restore autoPlay button state on load
+autoBtn.classList.toggle('on', autoPlay);
+autoBtn.style.color = autoPlay ? 'var(--gold)' : 'var(--text-mute)';
+autoBtn.title = autoPlay ? 'Autoplay: On' : 'Autoplay: Off';
 autoBtn.addEventListener('click', () => {
   autoPlay = !autoPlay;
+  localStorage.setItem('sh_autoplay', autoPlay ? '1' : '0');
   autoBtn.classList.toggle('on', autoPlay);
   autoBtn.title = 'Autoplay: ' + (autoPlay ? 'On' : 'Off');
   autoBtn.style.color = autoPlay ? 'var(--gold)' : 'var(--text-mute)';
@@ -3464,11 +3489,11 @@ audio.addEventListener('ended', () => { if (autoPlay) playNext(); });
 // ══════════════════════════════════════════════════════════════════
 
 // -- SHUFFLE ---------------------------------------------------------------
-var shuffleOn = false;
+var shuffleOn = localStorage.getItem('sh_shuffle') === '1';
 var shuffleQueue = [];
 var shuffleBtn = document.getElementById('shuffle-btn');
 if (shuffleBtn) shuffleBtn.addEventListener('click', function() {
-  shuffleOn = !shuffleOn;
+  shuffleOn = !shuffleOn; localStorage.setItem('sh_shuffle', shuffleOn ? '1' : '0');
   shuffleBtn.classList.toggle('active', shuffleOn);
   shuffleBtn.title = shuffleOn ? 'Shuffle: On' : 'Shuffle: Off';
   if (shuffleOn) buildShuffleQueue();
