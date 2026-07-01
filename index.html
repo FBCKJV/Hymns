@@ -825,7 +825,7 @@ header {
     <div class="sheet-handle"></div>
     <div class="sheet-header" style="position:relative">
       <div class="sheet-title">About the Archives</div>
-      <div class="sheet-sub">Version: ifb-hymns-v33 &nbsp;&middot;&nbsp; All recordings freely licensed for ministry use</div>
+      <div class="sheet-sub">Version: <span id="app-version">loading…</span> &nbsp;&middot;&nbsp; All recordings freely licensed for ministry use</div>
       <button class="close-sheet" id="close-info">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
@@ -3284,8 +3284,8 @@ function stopKeepalive() {
 }
 audio.addEventListener('ended', startKeepalive);
 audio.addEventListener('play', stopKeepalive);
-audio.addEventListener('play',  () => { setPlaying(true);  render(); });
-audio.addEventListener('pause', () => { setPlaying(false); render(); });
+audio.addEventListener('play',  () => { setPlaying(true);  render(); requestWakeLock(); });
+audio.addEventListener('pause', () => { setPlaying(false); render(); releaseWakeLock(); });
 audio.addEventListener('error', () => { setTimeout(playNext, 1200); });
 
 // Scrubbing
@@ -3444,7 +3444,13 @@ window.addEventListener('appinstalled', () => {
 // SERVICE WORKER REGISTRATION
 // ══════════════════════════════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/Hymns/sw.js', { scope: '/Hymns/' }).catch(()=>{});
+  navigator.serviceWorker.register('/Hymns/sw.js', { scope: '/Hymns/' }).then(function() {
+    caches.keys().then(function(keys) {
+      var v = keys.find(function(k){ return k.startsWith('ifb-hymns-v'); });
+      var el = document.getElementById('app-version');
+      if (el && v) el.textContent = v;
+    });
+  }).catch(function(){});
 }
 
 // Media Session API (lock screen controls)
@@ -3453,7 +3459,25 @@ if ('mediaSession' in navigator) {
   navigator.mediaSession.setActionHandler('pause',    togglePlay);
   navigator.mediaSession.setActionHandler('nexttrack', playNext);
   navigator.mediaSession.setActionHandler('previoustrack', playPrev);
+  navigator.mediaSession.setActionHandler('stop', function() { audio.pause(); setPlaying(false); });
 }
+
+// Wake Lock — prevents Android from killing JS execution between tracks
+var _wakeLock = null;
+function requestWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  if (_wakeLock) return;
+  navigator.wakeLock.request('screen').then(function(wl) {
+    _wakeLock = wl;
+    _wakeLock.addEventListener('release', function() { _wakeLock = null; });
+  }).catch(function(){});
+}
+function releaseWakeLock() {
+  if (_wakeLock) { _wakeLock.release().catch(function(){}); _wakeLock = null; }
+}
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'visible' && isPlaying) requestWakeLock();
+});
 
 function updateMediaSession() {
   if (!('mediaSession' in navigator) || currentIdx < 0) return;
