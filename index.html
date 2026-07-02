@@ -405,13 +405,7 @@ header {
   cursor: pointer;
   overflow: hidden;
 }
-#player-bar.collapsed {
-  height: 44px !important;
-}
-#player-bar.collapsed .controls > *:not(#play-btn),
-#player-bar.collapsed .progress-row {
-  display: none !important;
-}
+/* .collapsed rules removed — feature conflicted with expand-to-sheet tap */
 #np-expand-hint {
   position: absolute;
   top: 5px;
@@ -650,6 +644,7 @@ header {
   <button class="tab" data-src="knox">Bible Baptist DeLand</button>
   <button class="tab" data-src="telegram">🎙️ IFB Specials</button>
   <button class="tab" data-src="hammond">🎤 First Baptist Hammond</button>
+  <button class="tab" data-src="psalms">📜 Sung Psalms</button>
   <button class="tab fav-tab" data-src="favorites">★ Favorites</button>
 </div>
 
@@ -874,6 +869,11 @@ header {
       <h3>🎤 First Baptist Hammond (69 recordings)</h3>
       <p>Choir specials and service music from First Baptist Church of Hammond, Indiana.</p>
     </div>
+    <div class="info-source">
+      <h3>📜 Sung Psalms &mdash; Sing the KJV</h3>
+      <p>Verbatim Scripture set to music, word-for-word from the King James Version. Shared with gracious permission from the ministry at <a href="https://singthekjv.app" target="_blank" rel="noopener">singthekjv.app</a>, which freely offers Psalms, hymns, and Scripture songs to the body of Christ.</p>
+      <p style="margin-top:6px;font-size:11px"><a href="https://singthekjv.app/about" target="_blank" rel="noopener">Learn more about this ministry</a> &nbsp;&middot;&nbsp; <a href="https://singthekjv.app/donate" target="_blank" rel="noopener" id="stk-donate-link">Support their work</a></p>
+    </div>
     <div class="info-source" style="display:none"><!-- REPLACED -->
       <h3>🎼 Olmstead Baptist Church Hymnal</h3>
       <p>Live congregational singing recordings in the public domain. All 150+ hymns freely reproducible. Hosted at <a href="http://baptistarchive.com" target="_blank">baptistarchive.com</a> and <a href="http://olmsteadbaptistchurch.org/hymnal.htm" target="_blank">olmsteadbaptistchurch.org</a>.</p>
@@ -933,6 +933,7 @@ const OBC  = 'https://audio.fbckjv.app/hymns/olmstead/';
 const SCM  = 'https://www.smallchurchmusic.com/mp3/';
 const BBC  = 'https://bbc-media-files.s3.us-east-2.amazonaws.com/uploads/pianoproject/';
 const TGM  = 'https://audio.fbckjv.app/telegram/';
+const PSU  = 'https://audio.fbckjv.app/Psalms/';
 const ARC  = 'https://archive.org/download/BaptistMusic/';
 
 const SOURCES = {
@@ -940,6 +941,7 @@ const SOURCES = {
   telegram: { label:'IFB Specials & Choir', badge:'badge-telegram', cls:'source-telegram', icon:'🎙️' },
   knox:     { label:'Bible Baptist DeLand',  badge:'badge-knox',     cls:'source-knox',     icon:'🎵' },
   hammond:  { label:'First Baptist Hammond', badge:'badge-hammond',  cls:'source-hammond',  icon:'🎤' },
+  psalms:   { label:'Sing the KJV',          badge:'badge-psalms',   cls:'source-psalms',   icon:'📜' },
 };
 
 // ── PSALM LYRICS (Scottish Metrical Psalter 1650) ────────────────
@@ -2995,7 +2997,7 @@ function hymnTags(title) {
 }
 
 // Sort alphabetically
-HYMNS.sort((a,b) => a.title.localeCompare(b.title));
+HYMNS.sort((a,b) => a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' }));
 
 // ══════════════════════════════════════════════════════════════════
 // STATE
@@ -3049,7 +3051,7 @@ function getFiltered() {
   return HYMNS.filter(h => {
     // View / source filter
     let matchSrc = false;
-    if (activeSource === 'all') matchSrc = h.source==='olmstead'||h.source==='knox'||h.source==='telegram'||h.source==='hammond';
+    if (activeSource === 'all') matchSrc = h.source==='olmstead'||h.source==='knox'||h.source==='telegram'||h.source==='hammond'||h.source==='psalms';
     else if (activeSource === 'favorites') matchSrc = favorites.has(h.id);
     else matchSrc = h.source === activeSource;
 
@@ -3615,15 +3617,7 @@ playNext = function() {
 
 
 // -- EXPANDABLE PLAYER ----------------------------------------------------
-var npEl = document.getElementById('player-bar');
-var playerCollapsed = false;
-if (npEl) {
-  npEl.addEventListener('click', function(e) {
-    if (e.target.closest('button') || e.target.closest('input')) return;
-    playerCollapsed = !playerCollapsed;
-    npEl.classList.toggle('collapsed', playerCollapsed);
-  });
-}
+// (legacy collapsed-bar toggle removed — conflicted with the expanded Now Playing sheet)
 
 // Share button
 var shareBtnEl = document.getElementById('share-btn');
@@ -3652,6 +3646,8 @@ if (shareBtnEl) shareBtnEl.addEventListener('click', function(e) {
 
 render();
 updateFavBtn(null);
+var _pbGuard = document.getElementById('player-bar');
+if (_pbGuard) _pbGuard.classList.remove('collapsed');
 
 // ── DAY / NIGHT MODE ───────────────────────────────────────────────────────
 (function() {
@@ -4122,8 +4118,97 @@ async function loadDynamicTelegramSongs() {
   }
 }
 
+// ── DYNAMIC SUNG PSALMS LOADER ──────────────────────────────────────────────
+// Fetches the live file listing from the Psalms/ folder on R2 via the same
+// Cloudflare Worker, and auto-adds new uploads as they appear.
+const PS_LIST_URL = 'https://telegram-list.fbckjv.app/?prefix=Psalms/';
+const PS_CACHE_KEY = 'sh_psalms_dynamic_v1';
+const PS_CACHE_MS = 5 * 60 * 1000;
+
+function psKnownFilenames() {
+  const known = new Set();
+  HYMNS.forEach(h => {
+    if (h.source !== 'psalms') return;
+    const m = h.url.match(/Psalms\/([^?]+)/);
+    if (m) known.add(decodeURIComponent(m[1]));
+  });
+  return known;
+}
+
+// Filenames look like: "0023 Psalm 23 1-6 song.mp3" or "0119 Psalm 119 1-88 song.mp3"
+// We want just "Psalm 23" as the title, stripping the leading catalog number,
+// the verse range, and the trailing "song" label.
+function psTitleFromFilename(filename) {
+  let name = filename.replace(/\.(mp3|m4a|wav|ogg|opus)$/i, '');
+  name = name.replace(/^\d{3,4}\s+/, '');           // strip leading 4-digit catalog number
+  const verseMatch = name.match(/^(Psalm\s+\d+)\s+(\d+(?:-\d+)?)\s+song\d*\s*$/i);
+  if (verseMatch) {
+    return { title: verseMatch[1].replace(/^psalm/i, 'Psalm'), verses: verseMatch[2] };
+  }
+  // Fallback: strip trailing " song" and any trailing verse-range-looking numbers
+  name = name.replace(/\s+song\d*\s*$/i, '');
+  name = name.replace(/\s+\d+(-\d+)?\s*$/, '');
+  name = name.replace(/^psalm/i, 'Psalm');
+  return { title: name.trim() || filename, verses: '' };
+}
+
+async function loadDynamicPsalmSongs() {
+  try {
+    let data;
+    const cached = localStorage.getItem(PS_CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Date.now() - parsed.fetchedAt < PS_CACHE_MS) data = parsed.data;
+    }
+    if (!data) {
+      const res = await fetch(PS_LIST_URL, { cache: 'no-store' });
+      if (!res.ok) return;
+      data = await res.json();
+      localStorage.setItem(PS_CACHE_KEY, JSON.stringify({ fetchedAt: Date.now(), data }));
+    }
+
+    const known = psKnownFilenames();
+    // Count how many files share the same base title so we can disambiguate
+    // split psalms (e.g. Psalm 119 spread across multiple files) with the verse range.
+    const titleCounts = {};
+    (data.files || []).forEach(f => {
+      const { title } = psTitleFromFilename(f.filename);
+      titleCounts[title] = (titleCounts[title] || 0) + 1;
+    });
+
+    let added = 0;
+    let nextId = 9000;
+    (data.files || []).forEach(f => {
+      if (known.has(f.filename)) return;
+      const { title, verses } = psTitleFromFilename(f.filename);
+      const displayTitle = (titleCounts[title] > 1 && verses) ? (title + ' (vv. ' + verses + ')') : title;
+      HYMNS.push({
+        id: 'psnew' + (nextId++),
+        title: displayTitle,
+        source: 'psalms',
+        artist: 'Sing the KJV',
+        url: PSU + encodeURIComponent(f.filename),
+        tags: ['psalm', 'scripture song'],
+      });
+      added++;
+    });
+
+    if (added > 0) {
+      HYMNS.sort((a, b) => {
+        // Natural sort so Psalm 2 comes before Psalm 10
+        return a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' });
+      });
+      render();
+      console.log('Loaded ' + added + ' Sung Psalm track(s) from R2');
+    }
+  } catch (err) {
+    console.warn('Dynamic Psalms load skipped:', err);
+  }
+}
+
 // Kick off after initial render so the static list shows immediately
 loadDynamicTelegramSongs();
+loadDynamicPsalmSongs();
 
 // Re-render after tick to ensure DOM is ready
 setTimeout(function() { render(); }, 0);
