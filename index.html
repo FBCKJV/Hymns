@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#2200cc">
+<meta name="theme-color" content="#0b0f1a" id="theme-color-meta">
 <meta name="description" content="Hymns &amp; Songs — Faith Baptist Church of Plymouth County · KJV">
 <link rel="manifest" href="/Hymns/manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="/Hymns/icons/icon-32.png">
@@ -39,6 +39,21 @@
   --safe-top:  env(safe-area-inset-top, 0px);
   --nav-h:     56px;
   --player-h:  108px;
+}
+/* ── DAY MODE ── */
+body.light {
+  --bg:        #f5f1e8;
+  --surface:   #fdfbf5;
+  --card:      #ffffff;
+  --card2:     #efe9db;
+  --border:    #d9d0bc;
+  --gold:      #8a6a1f;
+  --gold-dim:  #b3934f;
+  --gold-glow: rgba(138,106,31,0.10);
+  --amber:     #9a7415;
+  --text:      #26221a;
+  --text-dim:  #5f574a;
+  --text-mute: #97907e;
 }
 * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
 html,body { height:100%; background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; overflow:hidden; }
@@ -201,10 +216,19 @@ header {
 .np-art.psalm { background:linear-gradient(135deg,#0d1a2a,#0e1530); }
 .np-info { flex:1; min-width:0; }
 .np-title { font-family:'Merriweather',serif; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.np-source { font-size:10px; color:var(--text-mute); margin-top:2px; }
-.controls { display:flex; align-items:center; gap:8px; }
+.np-source { font-size:10px; color:var(--text-mute); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.controls { display:flex; align-items:center; gap:2px; flex-shrink:0; }
+/* On phones, share & shuffle live in the expanded player — declutter the mini bar */
+@media (max-width: 520px) {
+  #player-bar #share-btn, #player-bar #shuffle-btn { display:none; }
+}
+#auto-btn {
+  border:1px solid var(--border) !important; border-radius:9px !important;
+  padding:3px 6px !important; width:auto !important; font-size:9px !important;
+}
+#auto-btn.on { border-color:var(--gold) !important; color:var(--gold) !important; }
 .ctrl-btn {
-  background:none; border:none; color:var(--text-dim); padding:6px; display:flex;
+  background:none; border:none; color:var(--text-dim); padding:5px; display:flex;
   align-items:center; justify-content:center; border-radius:50%; transition:color .15s;
 }
 #play-btn {
@@ -591,7 +615,11 @@ header {
       <div class="app-title">FBC Hymns &amp; Spiritual Songs</div>
       <div class="app-sub">Faith Baptist Church · Plymouth County · KJV</div>
     </div>
-    <button id="tips-btn" style="margin-left:auto;background:none;border:none;color:var(--text-mute);padding:6px;display:flex;align-items:center;border-radius:50%" aria-label="Tips and Help">
+    <button id="theme-btn" aria-label="Toggle day / night mode" style="margin-left:auto;background:none;border:none;color:var(--text-mute);padding:6px;display:flex;align-items:center;border-radius:50%">
+      <svg id="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      <svg id="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+    <button id="tips-btn" style="background:none;border:none;color:var(--text-mute);padding:6px;display:flex;align-items:center;border-radius:50%" aria-label="Tips and Help">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 2-3 4M12 17h.01"/></svg>
     </button>
     <button id="info-btn" style="background:none;border:none;color:var(--text-mute);padding:6px;display:flex;align-items:center;border-radius:50%" aria-label="About">
@@ -3615,6 +3643,29 @@ if (shareBtnEl) shareBtnEl.addEventListener('click', function(e) {
 
 render();
 updateFavBtn(null);
+
+// ── DAY / NIGHT MODE ───────────────────────────────────────────────────────
+(function() {
+  var themeBtn = document.getElementById('theme-btn');
+  var moonIco = document.getElementById('theme-icon-moon');
+  var sunIco  = document.getElementById('theme-icon-sun');
+  var metaEl  = document.getElementById('theme-color-meta');
+  function applyTheme(mode) {
+    var light = mode === 'light';
+    document.body.classList.toggle('light', light);
+    if (moonIco) moonIco.style.display = light ? 'none' : '';
+    if (sunIco)  sunIco.style.display  = light ? '' : 'none';
+    if (metaEl)  metaEl.setAttribute('content', light ? '#f5f1e8' : '#0b0f1a');
+  }
+  var saved = localStorage.getItem('sh_theme') || 'dark';
+  applyTheme(saved);
+  if (themeBtn) themeBtn.addEventListener('click', function() {
+    var next = document.body.classList.contains('light') ? 'dark' : 'light';
+    localStorage.setItem('sh_theme', next);
+    applyTheme(next);
+  });
+})();
+
 
 // Prefill player bar with last-played hymn (does NOT autoplay)
 try {

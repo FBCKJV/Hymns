@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ifb-hymns-v38';
+const CACHE_NAME = 'ifb-hymns-v39';
 const SHELL = ['/Hymns/','/Hymns/index.html','/Hymns/manifest.json','/Hymns/icons/icon-192.png','/Hymns/icons/icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
