@@ -3123,15 +3123,10 @@ function loadAndPlay(idx) {
   const h = filteredList[idx];
   const src = SOURCES[h.source];
 
-  // Update mediaSession metadata BEFORE loading so OS knows what's next
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: h.title,
-      artist: (h.artist || src.label),
-      album: 'FBC Hymns & Spiritual Songs',
-    });
-    navigator.mediaSession.playbackState = 'playing';
-  }
+  // Update mediaSession BEFORE loading so OS knows what's next (single source of truth)
+  updateMediaSession();
+  if ('mediaSession' in navigator) { try { navigator.mediaSession.playbackState = 'playing'; } catch(e){} }
+  if (window._lastBlobUrl) { try { URL.revokeObjectURL(window._lastBlobUrl); } catch(e){} window._lastBlobUrl = null; }
   audio.src = h.url;
   audio.load();
   audio.play().catch(()=>{ setPlaying(false); });
@@ -3250,43 +3245,48 @@ function fmt(s) {
   return `${m}:${ss}`;
 }
 
+// ── AUDIO EVENT LISTENERS (consolidated — one handler per event) ──────────
+let _lastPosUpdate = 0;
 audio.addEventListener('timeupdate', () => {
-  const p = audio.duration ? (audio.currentTime/audio.duration)*100 : 0;
+  const p = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
   progFill.style.width = p + '%';
   curT.textContent = fmt(audio.currentTime);
+  progFillLarge.style.width = p + '%';
+  curTLarge.textContent = fmt(audio.currentTime);
+  const now = Date.now();
+  if (now - _lastPosUpdate > 4000) { _lastPosUpdate = now; updatePositionState(); }
 });
-audio.addEventListener('loadedmetadata', () => { durT.textContent = fmt(audio.duration); });
-audio.addEventListener('ended', playNext);
-
-// Silent Web Audio keepalive — only active during the gap between tracks
-// Starts when a track ends, stops the moment the next one begins playing
-var _audioCtx = null;
-var _silentSrc = null;
-function startKeepalive() {
-  try {
-    if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (_audioCtx.state === 'suspended') _audioCtx.resume();
-    if (_silentSrc) { try { _silentSrc.stop(); } catch(e){} }
-    var buf = _audioCtx.createBuffer(1, _audioCtx.sampleRate, _audioCtx.sampleRate);
-    _silentSrc = _audioCtx.createBufferSource();
-    _silentSrc.buffer = buf; _silentSrc.loop = true;
-    var gain = _audioCtx.createGain();
-    gain.gain.value = 0.001;
-    _silentSrc.connect(gain); gain.connect(_audioCtx.destination);
-    _silentSrc.start();
-  } catch(e) {}
-}
-function stopKeepalive() {
-  try {
-    if (_silentSrc) { _silentSrc.stop(); _silentSrc = null; }
-    if (_audioCtx) _audioCtx.suspend();
-  } catch(e) {}
-}
-audio.addEventListener('ended', startKeepalive);
-audio.addEventListener('play', stopKeepalive);
-audio.addEventListener('play',  () => { setPlaying(true);  render(); requestWakeLock(); });
-audio.addEventListener('pause', () => { setPlaying(false); render(); releaseWakeLock(); });
-audio.addEventListener('error', () => { setTimeout(playNext, 1200); });
+audio.addEventListener('loadedmetadata', () => {
+  durT.textContent = fmt(audio.duration);
+  durTLarge.textContent = fmt(audio.duration);
+  updatePositionState();
+});
+audio.addEventListener('ended', () => {
+  if (autoPlay) playNext();
+});
+audio.addEventListener('play', () => {
+  setPlaying(true);
+  render();
+  updateNowPlayingButtons();
+  updateMediaSession();
+  requestWakeLock();
+  if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+});
+audio.addEventListener('pause', () => {
+  setPlaying(false);
+  render();
+  updateNowPlayingButtons();
+  releaseWakeLock();
+  if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+});
+let _consecErrors = 0;
+audio.addEventListener('playing', () => { _consecErrors = 0; });
+audio.addEventListener('error', () => {
+  if (!audio.src || audio.src === location.href) return; // no real source loaded
+  _consecErrors++;
+  if (_consecErrors >= 3) { toast('Playback unavailable — check your connection'); setPlaying(false); return; }
+  setTimeout(() => { if (autoPlay) playNext(); }, 1200);
+});
 
 // Scrubbing
 let scrubbing = false;
@@ -3446,9 +3446,10 @@ window.addEventListener('appinstalled', () => {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/Hymns/sw.js', { scope: '/Hymns/' }).then(function() {
     caches.keys().then(function(keys) {
-      var v = keys.find(function(k){ return k.startsWith('ifb-hymns-v'); });
+      var vs = keys.filter(function(k){ return /^ifb-hymns-v\d+$/.test(k); });
+      vs.sort(function(a,b){ return parseInt(b.slice(11)) - parseInt(a.slice(11)); });
       var el = document.getElementById('app-version');
-      if (el && v) el.textContent = v;
+      if (el && vs.length) el.textContent = vs[0];
     });
   }).catch(function(){});
 }
@@ -3460,6 +3461,34 @@ if ('mediaSession' in navigator) {
   navigator.mediaSession.setActionHandler('nexttrack', playNext);
   navigator.mediaSession.setActionHandler('previoustrack', playPrev);
   navigator.mediaSession.setActionHandler('stop', function() { audio.pause(); setPlaying(false); });
+  try {
+    navigator.mediaSession.setActionHandler('seekto', function(d) {
+      if (d.fastSeek && 'fastSeek' in audio) { audio.fastSeek(d.seekTime); return; }
+      audio.currentTime = d.seekTime;
+      updatePositionState();
+    });
+    navigator.mediaSession.setActionHandler('seekbackward', function(d) {
+      audio.currentTime = Math.max(0, audio.currentTime - (d.seekOffset || 10));
+      updatePositionState();
+    });
+    navigator.mediaSession.setActionHandler('seekforward', function(d) {
+      audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + (d.seekOffset || 10));
+      updatePositionState();
+    });
+  } catch(e) {} // older browsers may not support seek actions
+}
+
+// Lock-screen progress bar — tells the OS current position/duration
+function updatePositionState() {
+  if (!('mediaSession' in navigator) || !('setPositionState' in navigator.mediaSession)) return;
+  if (!audio.duration || !isFinite(audio.duration)) return;
+  try {
+    navigator.mediaSession.setPositionState({
+      duration: audio.duration,
+      playbackRate: audio.playbackRate,
+      position: Math.min(audio.currentTime, audio.duration)
+    });
+  } catch(e) {}
 }
 
 // Wake Lock — prevents Android from killing JS execution between tracks
@@ -3480,15 +3509,18 @@ document.addEventListener('visibilitychange', function() {
 });
 
 function updateMediaSession() {
-  if (!('mediaSession' in navigator) || currentIdx < 0) return;
+  if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined' || currentIdx < 0) return;
   const h = filteredList[currentIdx];
   navigator.mediaSession.metadata = new MediaMetadata({
     title: h.title,
-    artist: SOURCES[h.source].label,
-    album: 'Sacred Hymnody',
+    artist: (h.artist || SOURCES[h.source].label),
+    album: 'FBC Hymns & Spiritual Songs',
+    artwork: [
+      { src: '/Hymns/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { src: '/Hymns/icons/icon-512.png', sizes: '512x512', type: 'image/png' }
+    ]
   });
 }
-audio.addEventListener('play', updateMediaSession);
 
 // ── AUTOPLAY TOGGLE ──────────────────────────────────────────────────────────
 let autoPlay = localStorage.getItem('sh_autoplay') === '1';
@@ -3504,9 +3536,6 @@ autoBtn.addEventListener('click', () => {
   autoBtn.title = 'Autoplay: ' + (autoPlay ? 'On' : 'Off');
   autoBtn.style.color = autoPlay ? 'var(--gold)' : 'var(--text-mute)';
 });
-// Hook into ended event — only advance if autoplay is on
-audio.removeEventListener('ended', playNext);
-audio.addEventListener('ended', () => { if (autoPlay) playNext(); });
 
 // ══════════════════════════════════════════════════════════════════
 // INIT
@@ -3516,6 +3545,10 @@ audio.addEventListener('ended', () => { if (autoPlay) playNext(); });
 var shuffleOn = localStorage.getItem('sh_shuffle') === '1';
 var shuffleQueue = [];
 var shuffleBtn = document.getElementById('shuffle-btn');
+if (shuffleBtn) {
+  shuffleBtn.classList.toggle('active', shuffleOn);
+  shuffleBtn.title = shuffleOn ? 'Shuffle: On' : 'Shuffle: Off';
+}
 if (shuffleBtn) shuffleBtn.addEventListener('click', function() {
   shuffleOn = !shuffleOn; localStorage.setItem('sh_shuffle', shuffleOn ? '1' : '0');
   shuffleBtn.classList.toggle('active', shuffleOn);
@@ -3582,6 +3615,25 @@ if (shareBtnEl) shareBtnEl.addEventListener('click', function(e) {
 
 render();
 updateFavBtn(null);
+
+// Prefill player bar with last-played hymn (does NOT autoplay)
+try {
+  const lastRaw = localStorage.getItem('sh_last');
+  if (lastRaw) {
+    const last = JSON.parse(lastRaw);
+    const li = filteredList.findIndex(h => h.id === last.id);
+    if (li >= 0) {
+      currentIdx = li;
+      const lh = filteredList[li];
+      const lsrc = SOURCES[lh.source];
+      npTitle.textContent = lh.title;
+      npSource.textContent = (lh.artist || lsrc.label) + (lh.tune ? ' · ' + lh.tune : '');
+      npArt.textContent = lsrc.icon;
+      updateFavBtn(lh.id);
+      render();
+    }
+  }
+} catch(e) {}
 
 // -- OFFLINE DOWNLOADS (state initialized earlier, near favorites) --------
 function saveDlIndex() {
@@ -3759,6 +3811,8 @@ loadAndPlay = function(idx) {
       if (blobUrl) {
         currentIdx = idx;
         var src = SOURCES[h.source];
+        if (window._lastBlobUrl) { try { URL.revokeObjectURL(window._lastBlobUrl); } catch(e){} }
+        window._lastBlobUrl = blobUrl;
         audio.src = blobUrl;
         audio.load();
         audio.play().catch(function(){ setPlaying(false); });
@@ -3818,7 +3872,7 @@ var npAutoLarge = document.getElementById('np-auto-large');
 var npShuffleLarge = document.getElementById('np-shuffle-large');
 
 function openNowPlaying() {
-  if (currentIdx < 0) return;
+  if (!npPanel || currentIdx < 0) return;
   syncNowPlayingSheet();
   npPanel.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -3907,16 +3961,7 @@ if (progWrapLarge) {
   });
 }
 
-audio.addEventListener('timeupdate', function() {
-  var p = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
-  progFillLarge.style.width = p + '%';
-  curTLarge.textContent = fmt(audio.currentTime);
-});
-audio.addEventListener('loadedmetadata', function() {
-  durTLarge.textContent = fmt(audio.duration);
-});
-audio.addEventListener('play', updateNowPlayingButtons);
-audio.addEventListener('pause', updateNowPlayingButtons);
+
 
 var _origLoadAndPlay = loadAndPlay;
 loadAndPlay = function(idx) {
