@@ -3338,7 +3338,23 @@ document.getElementById('prev-btn').addEventListener('click', playPrev);
 document.getElementById('lyr-btn').addEventListener('click', openLyrics);
 document.getElementById('close-lyrics').addEventListener('click', closeLyrics);
 document.getElementById('lyrics-backdrop').addEventListener('click', closeLyrics);
-document.getElementById('info-btn').addEventListener('click', ()=>infoPanel.classList.add('open'));
+function refreshAppVersion() {
+  if (!('caches' in window)) return;
+  caches.keys().then(function(keys) {
+    var vs = keys.filter(function(k){ return /^ifb-hymns-v\d+$/.test(k); });
+    vs.sort(function(a,b){ return parseInt(b.slice(11)) - parseInt(a.slice(11)); });
+    var el = document.getElementById('app-version');
+    if (el && vs.length) el.textContent = vs[0];
+  }).catch(function(){});
+}
+// Also refresh when a new SW takes control mid-session
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('controllerchange', refreshAppVersion);
+}
+document.getElementById('info-btn').addEventListener('click', function() {
+  refreshAppVersion();
+  infoPanel.classList.add('open');
+});
 document.getElementById('close-info').addEventListener('click', ()=>infoPanel.classList.remove('open'));
 document.getElementById('info-backdrop').addEventListener('click', ()=>infoPanel.classList.remove('open'));
 
@@ -3472,14 +3488,7 @@ window.addEventListener('appinstalled', () => {
 // SERVICE WORKER REGISTRATION
 // ══════════════════════════════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/Hymns/sw.js', { scope: '/Hymns/' }).then(function() {
-    caches.keys().then(function(keys) {
-      var vs = keys.filter(function(k){ return /^ifb-hymns-v\d+$/.test(k); });
-      vs.sort(function(a,b){ return parseInt(b.slice(11)) - parseInt(a.slice(11)); });
-      var el = document.getElementById('app-version');
-      if (el && vs.length) el.textContent = vs[0];
-    });
-  }).catch(function(){});
+  navigator.serviceWorker.register('/Hymns/sw.js', { scope: '/Hymns/' }).then(refreshAppVersion).catch(function(){});
 }
 
 // Media Session API (lock screen controls)
