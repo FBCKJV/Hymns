@@ -3186,6 +3186,7 @@ function loadAndPlay(idx) {
   currentIdx = idx;
   const h = filteredList[idx];
   currentHymn = h;
+  if (typeof shuffleOn !== 'undefined' && shuffleOn) shufflePlayed.add(h.id);
   const src = SOURCES[h.source];
 
   // Update mediaSession BEFORE loading so OS knows what's next (single source of truth)
@@ -3219,7 +3220,11 @@ function setPlaying(val) {
 }
 
 function togglePlay() {
-  if (!currentHymn) { if (filteredList.length) loadAndPlay(0); return; }
+  if (!currentHymn) {
+    if (!filteredList.length) return;
+    loadAndPlay(shuffleOn ? pickShuffleNextIdx() : 0);
+    return;
+  }
   if (audio.paused) { audio.play(); setPlaying(true); }
   else { audio.pause(); setPlaying(false); }
   render();
@@ -3627,8 +3632,14 @@ autoBtn.addEventListener('click', () => {
 // ══════════════════════════════════════════════════════════════════
 
 // -- SHUFFLE ---------------------------------------------------------------
+// Picks against the *live* filteredList every time, keyed by song id rather
+// than list position — a stale positional queue built for one tab's list
+// silently breaks (or worse, points at the wrong song) the moment the user
+// switches tabs/search while a shuffle round is still in progress, which
+// kills autoplay with no indication. See git history for the bug this
+// replaced.
 var shuffleOn = localStorage.getItem('sh_shuffle') === '1';
-var shuffleQueue = [];
+var shufflePlayed = new Set(); // ids already played in the current shuffle round
 var shuffleBtn = document.getElementById('shuffle-btn');
 if (shuffleBtn) {
   shuffleBtn.classList.toggle('active', shuffleOn);
@@ -3638,24 +3649,26 @@ if (shuffleBtn) shuffleBtn.addEventListener('click', function() {
   shuffleOn = !shuffleOn; localStorage.setItem('sh_shuffle', shuffleOn ? '1' : '0');
   shuffleBtn.classList.toggle('active', shuffleOn);
   shuffleBtn.title = shuffleOn ? 'Shuffle: On' : 'Shuffle: Off';
-  if (shuffleOn) buildShuffleQueue();
+  shufflePlayed.clear();
+  if (currentHymn) shufflePlayed.add(currentHymn.id);
   toast(shuffleOn ? '🔀 Shuffle on' : 'Shuffle off');
 });
-function buildShuffleQueue() {
-  shuffleQueue = filteredList.map(function(_,i){return i;});
-  for (var i = shuffleQueue.length-1; i > 0; i--) {
-    var j = Math.floor(Math.random()*(i+1));
-    var tmp = shuffleQueue[i]; shuffleQueue[i]=shuffleQueue[j]; shuffleQueue[j]=tmp;
-  }
+// Picks a random not-yet-played song from whatever list is on screen right
+// now, returning its index in that same list. Reshuffles (starts a fresh
+// round) once everything currently visible has been played.
+function pickShuffleNextIdx() {
+  var pool = filteredList.filter(function(h){ return !shufflePlayed.has(h.id); });
+  if (!pool.length) { shufflePlayed.clear(); pool = filteredList.slice(); }
+  if (!pool.length) return -1;
+  var pick = pool[Math.floor(Math.random() * pool.length)];
+  shufflePlayed.add(pick.id);
+  return filteredList.indexOf(pick);
 }
 var _origPlayNext = playNext;
 playNext = function() {
   if (shuffleOn && autoPlay) {
-    if (!shuffleQueue.length) buildShuffleQueue();
-    var ci = shuffleQueue.indexOf(currentIdx);
-    if (ci >= 0) shuffleQueue.splice(ci,1);
-    if (!shuffleQueue.length) buildShuffleQueue();
-    loadAndPlay(shuffleQueue.shift());
+    var idx = pickShuffleNextIdx();
+    if (idx >= 0) loadAndPlay(idx);
     return;
   }
   _origPlayNext();
@@ -3911,6 +3924,7 @@ loadAndPlay = function(idx) {
       if (blobUrl) {
         currentIdx = idx;
         currentHymn = h;
+        if (shuffleOn) shufflePlayed.add(h.id);
         var src = SOURCES[h.source];
         if (window._lastBlobUrl) { try { URL.revokeObjectURL(window._lastBlobUrl); } catch(e){} }
         window._lastBlobUrl = blobUrl;
