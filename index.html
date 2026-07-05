@@ -645,6 +645,7 @@ header {
   <button class="tab" data-src="telegram">🎙️ IFB Specials</button>
   <button class="tab" data-src="hammond">🎤 First Baptist Hammond</button>
   <button class="tab" data-src="psalms">📜 Sung Psalms</button>
+  <button class="tab" data-src="history">🕐 History</button>
   <button class="tab fav-tab" data-src="favorites">★ Favorites</button>
 </div>
 
@@ -3009,6 +3010,15 @@ let activeSource = 'all';
 let searchQuery  = '';
 let activeView   = 'browse'; // browse | psalms | favorites
 let favorites    = new Set(JSON.parse(localStorage.getItem('sh_favs') || '[]'));
+var playHistory = [];
+try { playHistory = JSON.parse(localStorage.getItem('sh_history_v1') || '[]'); } catch(e) { playHistory = []; }
+function recordHistory(id) {
+  if (!id) return;
+  playHistory = playHistory.filter(function(e){ return e.id !== id; });
+  playHistory.unshift({ id: id, ts: Date.now() });
+  if (playHistory.length > 50) playHistory = playHistory.slice(0, 50);
+  try { localStorage.setItem('sh_history_v1', JSON.stringify(playHistory)); } catch(e) {}
+}
 
 // Offline downloads state (must init before first render())
 var DL_CACHE_NAME = 'ifb-hymns-downloads-v1';
@@ -3053,6 +3063,7 @@ function getFiltered() {
     let matchSrc = false;
     if (activeSource === 'all') matchSrc = h.source==='olmstead'||h.source==='knox'||h.source==='telegram'||h.source==='hammond'||h.source==='psalms';
     else if (activeSource === 'favorites') matchSrc = favorites.has(h.id);
+    else if (activeSource === 'history') matchSrc = playHistory.some(function(e){ return e.id === h.id; });
     else matchSrc = h.source === activeSource;
 
     // Nav view override
@@ -3076,10 +3087,18 @@ function getFiltered() {
 function render() {
   filteredList = getFiltered();
 
+  if (activeSource === 'history') {
+    const order = {};
+    playHistory.forEach((e, i) => { order[e.id] = i; });
+    filteredList = filteredList.slice().sort((a, b) => (order[a.id] ?? 0) - (order[b.id] ?? 0));
+  }
+
   if (filteredList.length === 0) {
     const msg = activeSource === 'favorites' || activeView === 'favorites'
       ? '<p>No favorites yet.<br>Tap the ♡ heart on any hymn<br>to save it here.</p>'
-      : '<p>No results found.<br>Try a different title, psalm number, or topic.</p>';
+      : activeSource === 'history'
+        ? '<p>No listening history yet.<br>Songs you play will appear here.</p>'
+        : '<p>No results found.<br>Try a different title, psalm number, or topic.</p>';
     listInner.innerHTML = `<div class="empty">
       <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
         <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
@@ -3087,10 +3106,10 @@ function render() {
     return;
   }
 
-  // Group
   let html = '';
-  {
-    // Group by first letter
+  if (activeSource === 'history') {
+    filteredList.forEach((h, i) => { html += hymnRow(h, i); });
+  } else {
     const groups = {};
     filteredList.forEach((h, i) => {
       const letter = (h.title.startsWith("'") ? h.title[1] : h.title[0]).toUpperCase();
@@ -3296,6 +3315,7 @@ audio.addEventListener('ended', () => {
 });
 audio.addEventListener('play', () => {
   setPlaying(true);
+  if (currentIdx >= 0 && filteredList[currentIdx]) recordHistory(filteredList[currentIdx].id);
   render();
   updateNowPlayingButtons();
   updateMediaSession();
@@ -3624,25 +3644,21 @@ var shareBtnEl = document.getElementById('share-btn');
 if (shareBtnEl) shareBtnEl.addEventListener('click', function(e) {
   e.stopPropagation();
   var h = filteredList[currentIdx];
-  var data = {
-    title: h.title + ' \u2014 FBC Hymns',
-    text: h.title + (h.artist ? ' (' + h.artist + ')' : ''),
-    url: window.location.href
-  };
   // Android Chrome requires navigator.share called directly in click handler
-  var shareUrl = 'https://fbckjv.app/Hymns/';
+  var shareUrl = 'https://fbckjv.app/Hymns/?song=' + encodeURIComponent(h.id);
   var shareTitle = h.title + ' — FBC Hymns & Spiritual Songs';
-  var shareText = h.title + (h.artist ? ' · ' + h.artist : '') + ' — fbckjv.app/Hymns/';
+  var shareText = h.title + (h.artist ? ' · ' + h.artist : '') + ' — tap to listen:';
   if (navigator.share) {
     navigator.share({ title: shareTitle, text: shareText, url: shareUrl }).catch(function(){});
   } else {
-    navigator.clipboard.writeText(h.title + ' - fbckjv.app/Hymns/').then(function() {
-      toast('\ud83d\udd17 Link copied');
+    navigator.clipboard.writeText(shareText + ' ' + shareUrl).then(function() {
+      toast('🔗 Link copied');
     }).catch(function() {
       toast(h.title);
     });
   }
 });
+
 
 render();
 updateFavBtn(null);
@@ -4206,9 +4222,32 @@ async function loadDynamicPsalmSongs() {
   }
 }
 
+function resolveSharedSongLink() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var songId = params.get('song');
+    if (!songId) return;
+    var target = HYMNS.find(function(h){ return h.id === songId; });
+    if (!target) { toast('That song link is no longer available'); return; }
+    activeSource = 'all';
+    document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+    var allTab = document.querySelector('.tab[data-src="all"]');
+    if (allTab) allTab.classList.add('active');
+    render();
+    var idx = filteredList.findIndex(function(h){ return h.id === songId; });
+    if (idx >= 0) {
+      loadAndPlay(idx);
+      openNowPlaying();
+    }
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState({}, '', window.location.origin + window.location.pathname);
+    }
+  } catch (e) {}
+}
+
 // Kick off after initial render so the static list shows immediately
-loadDynamicTelegramSongs();
-loadDynamicPsalmSongs();
+var _dynLoadersDone = Promise.all([loadDynamicTelegramSongs(), loadDynamicPsalmSongs()]);
+_dynLoadersDone.then(resolveSharedSongLink).catch(resolveSharedSongLink);
 
 // Re-render after tick to ensure DOM is ready
 setTimeout(function() { render(); }, 0);
