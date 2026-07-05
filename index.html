@@ -3004,6 +3004,7 @@ HYMNS.sort((a,b) => a.title.localeCompare(b.title, undefined, { numeric: true, s
 // STATE
 // ══════════════════════════════════════════════════════════════════
 let currentIdx   = -1;
+let currentHymn  = null; // the actually loaded/playing song — survives tab/search/nav changes that reset currentIdx
 let filteredList = [];
 let isPlaying    = false;
 let activeSource = 'all';
@@ -3016,7 +3017,7 @@ function recordHistory(id) {
   if (!id) return;
   playHistory = playHistory.filter(function(e){ return e.id !== id; });
   playHistory.unshift({ id: id, ts: Date.now() });
-  if (playHistory.length > 50) playHistory = playHistory.slice(0, 50);
+  if (playHistory.length > 30) playHistory = playHistory.slice(0, 30);
   try { localStorage.setItem('sh_history_v1', JSON.stringify(playHistory)); } catch(e) {}
 }
 
@@ -3170,6 +3171,7 @@ function loadAndPlay(idx) {
   if (idx < 0 || idx >= filteredList.length) return;
   currentIdx = idx;
   const h = filteredList[idx];
+  currentHymn = h;
   const src = SOURCES[h.source];
 
   // Update mediaSession BEFORE loading so OS knows what's next (single source of truth)
@@ -3203,19 +3205,29 @@ function setPlaying(val) {
 }
 
 function togglePlay() {
-  if (currentIdx < 0) { if (filteredList.length) loadAndPlay(0); return; }
+  if (!currentHymn) { if (filteredList.length) loadAndPlay(0); return; }
   if (audio.paused) { audio.play(); setPlaying(true); }
   else { audio.pause(); setPlaying(false); }
   render();
 }
 
+// Resync currentIdx to wherever currentHymn sits in the active filtered list
+// (tab/search changes reset currentIdx without stopping playback).
+function resyncCurrentIdx() {
+  if (currentIdx < 0 && currentHymn) {
+    currentIdx = filteredList.findIndex(function(x){ return x.id === currentHymn.id; });
+  }
+}
+
 function playNext() {
+  resyncCurrentIdx();
   const next = (currentIdx + 1) % (filteredList.length || 1);
   loadAndPlay(next);
 }
 
 function playPrev() {
   if (audio.currentTime > 3) { audio.currentTime = 0; return; }
+  resyncCurrentIdx();
   const prev = (currentIdx - 1 + filteredList.length) % (filteredList.length || 1);
   loadAndPlay(prev);
 }
@@ -3244,8 +3256,8 @@ function updateFavBtn(id) {
 // LYRICS PANEL
 // ══════════════════════════════════════════════════════════════════
 function openLyrics() {
-  if (currentIdx < 0) return;
-  const h = filteredList[currentIdx];
+  if (!currentHymn) return;
+  const h = currentHymn;
   lyrTitle.textContent = h.title;
   lyrSub.textContent = SOURCES[h.source].label + (h.tune ? ' · Tune: ' + h.tune : '');
 
@@ -3315,7 +3327,7 @@ audio.addEventListener('ended', () => {
 });
 audio.addEventListener('play', () => {
   setPlaying(true);
-  if (currentIdx >= 0 && filteredList[currentIdx]) recordHistory(filteredList[currentIdx].id);
+  if (currentHymn) recordHistory(currentHymn.id);
   render();
   updateNowPlayingButtons();
   updateMediaSession();
@@ -3381,8 +3393,8 @@ document.getElementById('close-info').addEventListener('click', ()=>infoPanel.cl
 document.getElementById('info-backdrop').addEventListener('click', ()=>infoPanel.classList.remove('open'));
 
 favBtnP.addEventListener('click', () => {
-  if (currentIdx < 0) return;
-  toggleFav(filteredList[currentIdx].id);
+  if (!currentHymn) return;
+  toggleFav(currentHymn.id);
 });
 
 // Hymn list delegation
@@ -3458,7 +3470,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft'  || e.key === 'p') playPrev();
   if (e.key === ' ') { e.preventDefault(); togglePlay(); }
   if (e.key === 'l') openLyrics();
-  if (e.key === 'f' && currentIdx>=0) toggleFav(filteredList[currentIdx].id);
+  if (e.key === 'f' && currentHymn) toggleFav(currentHymn.id);
 });
 
 // ══════════════════════════════════════════════════════════════════
@@ -3568,8 +3580,8 @@ document.addEventListener('visibilitychange', function() {
 });
 
 function updateMediaSession() {
-  if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined' || currentIdx < 0) return;
-  const h = filteredList[currentIdx];
+  if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined' || !currentHymn) return;
+  const h = currentHymn;
   navigator.mediaSession.metadata = new MediaMetadata({
     title: h.title,
     artist: (h.artist || SOURCES[h.source].label),
@@ -3643,9 +3655,11 @@ playNext = function() {
 var shareBtnEl = document.getElementById('share-btn');
 if (shareBtnEl) shareBtnEl.addEventListener('click', function(e) {
   e.stopPropagation();
-  var h = filteredList[currentIdx];
+  var h = currentHymn;
+  if (!h) return;
   // Android Chrome requires navigator.share called directly in click handler
-  var shareUrl = 'https://fbckjv.app/Hymns/?song=' + encodeURIComponent(h.id);
+  // Build from the page's own origin/path so the link works wherever this app is actually hosted.
+  var shareUrl = window.location.origin + window.location.pathname + '?song=' + encodeURIComponent(h.id);
   var shareTitle = h.title + ' — FBC Hymns & Spiritual Songs';
   var shareText = h.title + (h.artist ? ' · ' + h.artist : '') + ' — tap to listen:';
   if (navigator.share) {
@@ -3849,8 +3863,8 @@ document.addEventListener('click', function(e) {
 var npDownloadLarge = document.getElementById('np-download-large');
 var npDlLabelLarge = document.getElementById('np-dl-label-large');
 function syncLargeDownloadButton() {
-  if (currentIdx < 0 || !filteredList[currentIdx]) return;
-  var h = filteredList[currentIdx];
+  if (!currentHymn) return;
+  var h = currentHymn;
   var downloaded = isDownloaded(h.id);
   var inProgress = !!dlInProgress[h.id];
   npDownloadLarge.classList.toggle('active', downloaded);
@@ -3858,8 +3872,8 @@ function syncLargeDownloadButton() {
 }
 if (npDownloadLarge) {
   npDownloadLarge.addEventListener('click', function() {
-    if (currentIdx < 0 || !filteredList[currentIdx]) return;
-    var h = filteredList[currentIdx];
+    if (!currentHymn) return;
+    var h = currentHymn;
     if (isDownloaded(h.id)) {
       removeDownload(h.id).then(syncLargeDownloadButton);
     } else {
@@ -3882,6 +3896,7 @@ loadAndPlay = function(idx) {
     getOfflineUrl(h.url).then(function(blobUrl) {
       if (blobUrl) {
         currentIdx = idx;
+        currentHymn = h;
         var src = SOURCES[h.source];
         if (window._lastBlobUrl) { try { URL.revokeObjectURL(window._lastBlobUrl); } catch(e){} }
         window._lastBlobUrl = blobUrl;
@@ -3944,7 +3959,7 @@ var npAutoLarge = document.getElementById('np-auto-large');
 var npShuffleLarge = document.getElementById('np-shuffle-large');
 
 function openNowPlaying() {
-  if (!npPanel || currentIdx < 0) return;
+  if (!npPanel || !currentHymn) return;
   syncNowPlayingSheet();
   npPanel.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -3955,8 +3970,8 @@ function closeNowPlaying() {
 }
 
 function syncNowPlayingSheet() {
-  if (currentIdx < 0 || !filteredList[currentIdx]) return;
-  var h = filteredList[currentIdx];
+  if (!currentHymn) return;
+  var h = currentHymn;
   var src = SOURCES[h.source];
   npTitleLarge.textContent = h.title;
   npSubLarge.textContent = (h.artist || src.label) + (h.tune ? ' \u00b7 ' + h.tune : '');
@@ -3981,8 +3996,8 @@ function syncNowPlayingSheet() {
 }
 
 function updateNowPlayingButtons() {
-  if (currentIdx < 0 || !filteredList[currentIdx]) return;
-  var h = filteredList[currentIdx];
+  if (!currentHymn) return;
+  var h = currentHymn;
   npPlayIconLarge.style.display = isPlaying ? 'none' : '';
   npPauseIconLarge.style.display = isPlaying ? '' : 'none';
   var isFav = favorites.has(h.id);
@@ -4007,7 +4022,7 @@ document.getElementById('np-play-large').addEventListener('click', function() { 
 document.getElementById('np-prev-large').addEventListener('click', function() { playPrev(); });
 document.getElementById('np-next-large').addEventListener('click', function() { playNext(); });
 document.getElementById('np-fav-large').addEventListener('click', function() {
-  if (currentIdx >= 0 && filteredList[currentIdx]) toggleFav(filteredList[currentIdx].id);
+  if (currentHymn) toggleFav(currentHymn.id);
   updateNowPlayingButtons();
 });
 document.getElementById('np-auto-large').addEventListener('click', function() {
