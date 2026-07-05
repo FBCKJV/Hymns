@@ -622,7 +622,7 @@ header {
   </div>
   <div class="search-wrap">
     <svg class="si" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
-    <input id="search" type="search" placeholder="Search hymns, psalms, topics…" autocomplete="off" autocorrect="off" spellcheck="false">
+    <input id="search" type="search" placeholder="Search title, artist, lyric, topic…" autocomplete="off" autocorrect="off" spellcheck="false">
     <button id="search-clear"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
   </div>
   <svg class="header-staff" viewBox="0 0 110 44">
@@ -3058,7 +3058,23 @@ const offlineBadge=document.getElementById('offline-badge');
 // ══════════════════════════════════════════════════════════════════
 // FILTERING
 // ══════════════════════════════════════════════════════════════════
+// Searchable text per hymn: title, artist, tune, tags, and lyrics (when we have
+// them). Cached on the hymn object since lyric text is the expensive part and
+// this can be looked up on every keystroke.
+function hymnSearchText(h) {
+  if (h._searchText !== undefined) return h._searchText;
+  const parts = [h.title, h.artist || '', h.tune || ''];
+  if (h.tags && h.tags.length) parts.push(h.tags.join(' '));
+  const lyr = HYMN_LYRICS[h.title];
+  if (lyr && lyr.verses) lyr.verses.forEach(v => parts.push(v.text));
+  h._searchText = parts.join(' • ').toLowerCase();
+  return h._searchText;
+}
+
 function getFiltered() {
+  const q = searchQuery.toLowerCase().trim();
+  const words = q ? q.split(/\s+/).filter(Boolean) : [];
+
   return HYMNS.filter(h => {
     // View / source filter
     let matchSrc = false;
@@ -3068,15 +3084,13 @@ function getFiltered() {
     else matchSrc = h.source === activeSource;
 
     // Nav view override
-    
+
     if (activeView === 'favorites') matchSrc = favorites.has(h.id);
 
-    const q = searchQuery.toLowerCase().trim();
-    const matchSearch = !q ||
-      h.title.toLowerCase().includes(q) ||
-      (h.tags && h.tags.some(t => t.includes(q))) ||
-      (h.tune && h.tune.toLowerCase().includes(q)) ||
-      false;
+    // Every search word must appear somewhere in the hymn's title, artist,
+    // tune, tags, or lyrics — order-independent, so word order in the query
+    // doesn't have to match the title.
+    const matchSearch = !words.length || words.every(w => hymnSearchText(h).includes(w));
 
     return matchSrc && matchSearch;
   });
@@ -3099,7 +3113,7 @@ function render() {
       ? '<p>No favorites yet.<br>Tap the ♡ heart on any hymn<br>to save it here.</p>'
       : activeSource === 'history'
         ? '<p>No listening history yet.<br>Songs you play will appear here.</p>'
-        : '<p>No results found.<br>Try a different title, psalm number, or topic.</p>';
+        : '<p>No results found.<br>Try a title, artist, lyric phrase, or topic.</p>';
     listInner.innerHTML = `<div class="empty">
       <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
         <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
