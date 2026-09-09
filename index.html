@@ -3113,7 +3113,11 @@ function render() {
       ? '<p>No favorites yet.<br>Tap the ♡ heart on any hymn<br>to save it here.</p>'
       : activeSource === 'history'
         ? '<p>No listening history yet.<br>Songs you play will appear here.</p>'
-        : '<p>No results found.<br>Try a title, artist, lyric phrase, or topic.</p>';
+        : (activeSource === 'psalms' && !searchQuery && psalmsLoadState !== 'ok')
+          ? (psalmsLoadState === 'failed'
+              ? '<p>Couldn’t load Sung Psalms right now.<br>Check your connection and <span id="psalms-retry-btn" style="text-decoration:underline;cursor:pointer">try again</span>.</p>'
+              : '<p>Loading Sung Psalms…</p>')
+          : '<p>No results found.<br>Try a title, artist, lyric phrase, or topic.</p>';
     listInner.innerHTML = `<div class="empty">
       <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
         <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
@@ -3419,6 +3423,12 @@ favBtnP.addEventListener('click', () => {
 // Hymn list delegation
 listInner.addEventListener('click', e => {
   if (e.target.closest('.dl-btn')) return; // let it bubble to the document-level download handler
+  if (e.target.closest('#psalms-retry-btn')) {
+    psalmsLoadState = 'pending';
+    render();
+    loadDynamicPsalmSongs();
+    return;
+  }
   const star = e.target.closest('.fav-star');
   if (star) { e.stopPropagation(); toggleFav(star.dataset.id); return; }
   const item = e.target.closest('.hymn-item');
@@ -4135,18 +4145,27 @@ function tgTitleFromFilename(filename) {
 async function loadDynamicTelegramSongs() {
   try {
     let data;
+    let parsedCache = null;
     const cached = localStorage.getItem(TG_CACHE_KEY);
     if (cached) {
-      const parsed = JSON.parse(cached);
-      if (Date.now() - parsed.fetchedAt < TG_CACHE_MS) {
-        data = parsed.data;
-      }
+      try { parsedCache = JSON.parse(cached); } catch(e) {}
+    }
+    if (parsedCache && Date.now() - parsedCache.fetchedAt < TG_CACHE_MS) {
+      data = parsedCache.data;
     }
     if (!data) {
-      const res = await fetch(TG_LIST_URL, { cache: 'no-store' });
-      if (!res.ok) return;
-      data = await res.json();
-      localStorage.setItem(TG_CACHE_KEY, JSON.stringify({ fetchedAt: Date.now(), data }));
+      try {
+        const res = await fetch(TG_LIST_URL, { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        data = await res.json();
+        localStorage.setItem(TG_CACHE_KEY, JSON.stringify({ fetchedAt: Date.now(), data }));
+      } catch (fetchErr) {
+        // Live fetch failed — fall back to the last known-good listing (still
+        // just supplementing the curated static list below) rather than
+        // silently skipping newly-uploaded specials for the rest of the session.
+        if (parsedCache && parsedCache.data) data = parsedCache.data;
+        else throw fetchErr;
+      }
     }
 
     const known = tgKnownFilenames();
@@ -4180,9 +4199,13 @@ async function loadDynamicTelegramSongs() {
 // ── DYNAMIC SUNG PSALMS LOADER ──────────────────────────────────────────────
 // Fetches the live file listing from the Psalms/ folder on R2 via the same
 // Cloudflare Worker, and auto-adds new uploads as they appear.
+// There is no static fallback list for this tab (unlike IFB Specials), so a
+// Worker/R2 hiccup means an empty tab unless we're resilient about it — see
+// psalmsLoadState and the stale-cache fallback in loadDynamicPsalmSongs.
 const PS_LIST_URL = 'https://telegram-list.fbckjv.app/?prefix=Psalms/';
 const PS_CACHE_KEY = 'sh_psalms_dynamic_v1';
 const PS_CACHE_MS = 5 * 60 * 1000;
+var psalmsLoadState = 'pending'; // 'pending' | 'ok' | 'failed' — drives the Psalms tab's empty-state message
 
 function psKnownFilenames() {
   const known = new Set();
@@ -4214,16 +4237,33 @@ function psTitleFromFilename(filename) {
 async function loadDynamicPsalmSongs() {
   try {
     let data;
+    let usedStale = false;
+    let parsedCache = null;
     const cached = localStorage.getItem(PS_CACHE_KEY);
     if (cached) {
-      const parsed = JSON.parse(cached);
-      if (Date.now() - parsed.fetchedAt < PS_CACHE_MS) data = parsed.data;
+      try { parsedCache = JSON.parse(cached); } catch(e) {}
+    }
+    if (parsedCache && Date.now() - parsedCache.fetchedAt < PS_CACHE_MS) {
+      data = parsedCache.data;
     }
     if (!data) {
-      const res = await fetch(PS_LIST_URL, { cache: 'no-store' });
-      if (!res.ok) return;
-      data = await res.json();
-      localStorage.setItem(PS_CACHE_KEY, JSON.stringify({ fetchedAt: Date.now(), data }));
+      try {
+        const res = await fetch(PS_LIST_URL, { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        data = await res.json();
+        localStorage.setItem(PS_CACHE_KEY, JSON.stringify({ fetchedAt: Date.now(), data }));
+      } catch (fetchErr) {
+        // Live fetch failed (Worker hiccup, network blip, R2 issue, etc.) —
+        // fall back to the last known-good listing rather than leaving the
+        // tab empty, even if that listing is stale. There's no static
+        // fallback for Psalms like there is for IFB Specials.
+        if (parsedCache && parsedCache.data) {
+          data = parsedCache.data;
+          usedStale = true;
+        } else {
+          throw fetchErr;
+        }
+      }
     }
 
     const known = psKnownFilenames();
@@ -4257,11 +4297,14 @@ async function loadDynamicPsalmSongs() {
         // Natural sort so Psalm 2 comes before Psalm 10
         return a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' });
       });
-      render();
-      console.log('Loaded ' + added + ' Sung Psalm track(s) from R2');
+      console.log('Loaded ' + added + ' Sung Psalm track(s) from R2' + (usedStale ? ' (stale cache)' : ''));
     }
+    psalmsLoadState = 'ok';
+    render(); // unconditional — clears a "Loading…"/failed empty-state even when added === 0
   } catch (err) {
+    psalmsLoadState = 'failed';
     console.warn('Dynamic Psalms load skipped:', err);
+    render();
   }
 }
 
