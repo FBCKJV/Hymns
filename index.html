@@ -834,6 +834,7 @@ header {
 
       <div class="tips-section-lbl">Lyrics &amp; Search</div>
       <div class="tip-row"><span class="tip-ico">&#9834;</span><span class="tip-txt">Tap the <strong>lyrics icon</strong> in the player to follow along verse by verse while a hymn plays. Every Sung Psalm shows its verses straight from the King James Bible. Newer songs still under copyright show only their recording.</span></div>
+      <div class="tip-row"><span class="tip-ico">&#127911;</span><span class="tip-txt">In the <strong>FBC KJV Bible app</strong>, the <strong>&#127911; Sung</strong> button under a Psalm&rsquo;s title opens that Psalm here, sung word for word from the King James Bible.</span></div>
       <div class="tip-row"><span class="tip-ico">&#128214;</span><span class="tip-txt">Under the words, tap a <strong>&#128214; Scripture</strong> button to open the verses behind the hymn in the FBC KJV Bible app &mdash; the music keeps playing while you read.</span></div>
       <div class="tip-row"><span class="tip-ico">&#128269;</span><span class="tip-txt">Use the <strong>search bar</strong> to find hymns by title or theme &mdash; try searching "grace," "comfort," or "heaven."</span></div>
 
@@ -4663,9 +4664,32 @@ async function loadDynamicPsalmSongs() {
   }
 }
 
+// A link from the KJV Bible app: ?psalm=23 opens Psalm 23, sung (the first part
+// of it, when a long Psalm is recorded in parts), on the Sung Psalms tab
+function resolvePsalmLink(n) {
+  var parts = HYMNS.filter(function(h){ return h.source === 'psalms' && h.psalm && h.psalm.ch === n; })
+    .sort(function(a, b){ return a.psalm.from - b.psalm.from; });
+  if (window.history && window.history.replaceState) {
+    window.history.replaceState(null, '', window.location.origin + window.location.pathname);
+  }
+  if (!parts.length) {
+    if (psalmsLoadState === 'failed') { toast('Couldn’t load the Sung Psalms — check your connection'); }
+    else toast('No recording of Psalm ' + n + ' yet');
+    if (psalmsLoadState === 'failed') { activeSource = 'psalms'; document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t.dataset.src === 'psalms'); }); render(); }
+    return;
+  }
+  activeSource = 'psalms';
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t.dataset.src === 'psalms'); });
+  render();
+  var idx = filteredList.indexOf(parts[0]);
+  if (idx >= 0) { loadAndPlay(idx); openNowPlaying(); }
+}
+
 function resolveSharedSongLink() {
   try {
     var params = new URLSearchParams(window.location.search);
+    var psalmNo = parseInt(params.get('psalm'), 10);
+    if (psalmNo >= 1 && psalmNo <= 150) { resolvePsalmLink(psalmNo); return; }
     var songId = params.get('song');
     if (!songId) return;
     if (LEGACY_IDS[songId]) songId = LEGACY_IDS[songId];
