@@ -620,7 +620,16 @@ header {
 #np-lyrics-large .chorus-text { font-size: 14px; line-height:1.65; color: var(--text); white-space:pre-line; }
 #np-lyrics-large .chorus-text { color: var(--text-dim); font-style: italic; }
 #np-lyrics-large .no-lyrics-large { text-align:center; color:var(--text-mute); font-size:13px; padding: 24px 10px; }
-#np-attr-large { font-size:10.5px; color:var(--text-mute); text-align:center; padding-top:10px; opacity:.7; }
+/* Scripture behind the song → opens the KJV Bible app */
+.scripture-row { margin:4px 0 18px; }
+.scripture-lbl { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-dim); margin-bottom:8px; font-weight:600; }
+.scripture-chips { display:flex; flex-wrap:wrap; gap:8px; }
+.sc-chip { display:inline-flex; align-items:center; gap:6px; min-height:40px; padding:8px 14px; border-radius:20px;
+  border:1px solid var(--gold-dim); background:var(--gold-glow); color:var(--gold); font-size:14px; font-weight:500; text-decoration:none; }
+.sc-chip:active { transform:scale(.97); }
+#np-lyrics-large .scripture-row { margin-top:14px; }
+#np-lyrics-large .psalm-ref { margin-top:2px; }
+#np-attr-large, #np-lyrics-large .np-attr { font-size:10.5px; color:var(--text-mute); text-align:center; padding-top:10px; opacity:.7; }
 </style>
 </head>
 <body>
@@ -824,7 +833,8 @@ header {
       <div class="tip-row"><span class="tip-ico">A</span><span class="tip-txt">Turn on <strong>AUTO</strong> to automatically continue to the next hymn when one finishes &mdash; great for hands-free listening during devotions.</span></div>
 
       <div class="tips-section-lbl">Lyrics &amp; Search</div>
-      <div class="tip-row"><span class="tip-ico">&#9834;</span><span class="tip-txt">Tap the <strong>lyrics icon</strong> in the player to follow along verse by verse while a hymn plays. Not every recording has lyrics yet &mdash; more are added regularly.</span></div>
+      <div class="tip-row"><span class="tip-ico">&#9834;</span><span class="tip-txt">Tap the <strong>lyrics icon</strong> in the player to follow along verse by verse while a hymn plays. Every Sung Psalm shows its verses straight from the King James Bible. Newer songs still under copyright show only their recording.</span></div>
+      <div class="tip-row"><span class="tip-ico">&#128214;</span><span class="tip-txt">Under the words, tap a <strong>&#128214; Scripture</strong> button to open the verses behind the hymn in the FBC KJV Bible app &mdash; the music keeps playing while you read.</span></div>
       <div class="tip-row"><span class="tip-ico">&#128269;</span><span class="tip-txt">Use the <strong>search bar</strong> to find hymns by title or theme &mdash; try searching "grace," "comfort," or "heaven."</span></div>
 
       <div class="tips-section-lbl">Favorites &amp; Downloads</div>
@@ -2651,7 +2661,97 @@ const HYMN_LYRICS = {
     { label:'Verse 1', text:'All the way my Savior leads me;\nwhat have I to ask beside?\nCan I doubt His tender mercy,\nwho through life has been my guide?\nHeav\'nly peace, divinest comfort,\nhere by faith in Him to dwell!\nFor I know, whate\'er befall me,\nJesus doeth all things well.' },
     { label:'Verse 2', text:'All the way my Savior leads me;\ncheers each winding path I tread,\ngives me grace for every trial,\nfeeds me with the living bread.\nThough my weary steps may falter\nand my soul athirst may be,\ngushing from the Rock before me,\nlo! a spring of joy I see.' },
     { label:'Verse 3', text:'All the way my Savior leads me;\noh, the fullness of His love!\nPerfect rest to me is promised\nin my Father\'s house above.\nWhen my spirit, clothed immortal,\nwings its flight to realms of day,\nthis my song through endless ages:\nJesus led me all the way.' },
-  ], attr:'Words: Fanny J. Crosby, 1875. Music: Robert Lowry. Public Domain.' }
+  ], attr:'Words: Fanny J. Crosby, 1875. Music: Robert Lowry. Public Domain.' },
+  // ── More public-domain hymns (words written before 1929) ──
+  'My Faith Looks Up to Thee': {
+    verses:[
+      { label:'Verse 1', text:'My faith looks up to Thee,\nThou Lamb of Calvary,\nSaviour divine!\nNow hear me while I pray,\ntake all my guilt away,\nO let me from this day\nbe wholly Thine!' },
+      { label:'Verse 2', text:'May Thy rich grace impart\nstrength to my fainting heart,\nmy zeal inspire!\nAs Thou hast died for me,\nO may my love to Thee\npure, warm, and changeless be,\na living fire!' },
+      { label:'Verse 3', text:'While life\'s dark maze I tread,\nand griefs around me spread,\nbe Thou my guide;\nbid darkness turn to day,\nwipe sorrow\'s tears away,\nnor let me ever stray\nfrom Thee aside.' },
+      { label:'Verse 4', text:'When ends life\'s transient dream,\nwhen death\'s cold, sullen stream\nshall o\'er me roll;\nblest Saviour, then in love,\nfear and distrust remove;\nO bear me safe above,\na ransomed soul!' },
+    ],
+    attr:'Words: Ray Palmer, 1830. Tune: Olivet (Lowell Mason). Public Domain.'
+  },
+  'My Savior\'s Love': {
+    verses:[
+      { label:'Verse 1', text:'I stand amazed in the presence\nof Jesus the Nazarene,\nand wonder how He could love me,\na sinner, condemned, unclean.' },
+      { chorus:true, label:'Chorus', text:'How marvelous! how wonderful!\nand my song shall ever be:\nhow marvelous! how wonderful!\nis my Saviour\'s love for me!' },
+      { label:'Verse 2', text:'For me it was in the garden\nHe prayed, "Not My will, but Thine."\nHe had no tears for His own griefs,\nbut sweat drops of blood for mine.' },
+      { label:'Verse 3', text:'In pity angels beheld Him,\nand came from the world of light\nto comfort Him in the sorrows\nHe bore for my soul that night.' },
+      { label:'Verse 4', text:'He took my sins and my sorrows,\nHe made them His very own;\nHe bore the burden to Calv\'ry,\nand suffered and died alone.' },
+      { label:'Verse 5', text:'When with the ransomed in glory\nHis face I at last shall see,\n\'twill be my joy through the ages\nto sing of His love for me.' },
+    ],
+    attr:'Words and music: Charles H. Gabriel, 1905. Public Domain.'
+  },
+  'On Jordan\'s Stormy Banks': {
+    verses:[
+      { label:'Verse 1', text:'On Jordan\'s stormy banks I stand,\nand cast a wishful eye\nto Canaan\'s fair and happy land,\nwhere my possessions lie.' },
+      { chorus:true, label:'Chorus', text:'I am bound for the promised land,\nI am bound for the promised land;\nO who will come and go with me?\nI am bound for the promised land.' },
+      { label:'Verse 2', text:'O the transporting, rapt\'rous scene\nthat rises to my sight!\nSweet fields arrayed in living green,\nand rivers of delight!' },
+      { label:'Verse 3', text:'All o\'er those wide extended plains\nshines one eternal day;\nthere God the Son forever reigns,\nand scatters night away.' },
+      { label:'Verse 4', text:'No chilling winds or poisonous breath\ncan reach that healthful shore;\nsickness and sorrow, pain and death,\nare felt and feared no more.' },
+      { label:'Verse 5', text:'When shall I reach that happy place,\nand be forever blest?\nWhen shall I see my Father\'s face,\nand in His bosom rest?' },
+    ],
+    attr:'Words: Samuel Stennett, 1787. Public Domain.'
+  },
+  'Child of the King': {
+    verses:[
+      { label:'Verse 1', text:'My Father is rich in houses and lands,\nHe holdeth the wealth of the world in His hands!\nOf rubies and diamonds, of silver and gold,\nHis coffers are full, He has riches untold.' },
+      { chorus:true, label:'Chorus', text:'I\'m a child of the King,\na child of the King:\nwith Jesus my Saviour,\nI\'m a child of the King.' },
+      { label:'Verse 2', text:'My Father\'s own Son, the Saviour of men,\nonce wandered on earth as the poorest of them;\nbut now He is pleading our pardon on high,\nthat we may be His when He comes by and by.' },
+      { label:'Verse 3', text:'I once was an outcast stranger on earth,\na sinner by choice, an alien by birth;\nbut I\'ve been adopted, my name\'s written down,\nan heir to a mansion, a robe and a crown.' },
+      { label:'Verse 4', text:'A tent or a cottage, why should I care?\nThey\'re building a palace for me over there;\nthough exiled from home, yet still may I sing:\nall glory to God, I\'m a child of the King.' },
+    ],
+    attr:'Words: Hattie E. Buell, 1877. Public Domain.'
+  },
+  'Precious Memories': {
+    verses:[
+      { label:'Verse 1', text:'Precious mem\'ries, unseen angels,\nsent from somewhere to my soul;\nhow they linger, ever near me,\nand the sacred past unfold.' },
+      { chorus:true, label:'Chorus', text:'Precious mem\'ries, how they linger,\nhow they ever flood my soul;\nin the stillness of the midnight,\nprecious, sacred scenes unfold.' },
+      { label:'Verse 2', text:'Precious father, loving mother,\nfly across the lonely years;\nand old home scenes of my childhood\nin fond memory appears.' },
+      { label:'Verse 3', text:'In the stillness of the midnight,\nechoes from the past I hear;\nold-time singing, gladness bringing,\nfrom that lovely land somewhere.' },
+      { label:'Verse 4', text:'As I travel on life\'s pathway,\nknow not what the years may hold;\nas I ponder, hope grows fonder,\nprecious mem\'ries flood my soul.' },
+    ],
+    attr:'Words and music: J. B. F. Wright, 1925. Public Domain.'
+  },
+  'Constantly Abiding': {
+    verses:[
+      { label:'Verse 1', text:'There\'s a peace in my heart that the world never gave,\na peace it cannot take away;\nthough the trials of life may surround like a cloud,\nI\'ve a peace that has come there to stay!' },
+      { chorus:true, label:'Chorus', text:'Constantly abiding, Jesus is mine;\nconstantly abiding, rapture divine;\nHe never leaves me lonely, whispers, O so kind:\n"I will never leave thee," Jesus is mine.' },
+      { label:'Verse 2', text:'All the world seemed to sing of a Saviour and King,\nwhen peace sweetly came to my heart;\ntroubles all fled away and my night turned to day,\nblessed Jesus, how glorious Thou art!' },
+      { label:'Verse 3', text:'This treasure I have in a temple of clay,\nwhile here on His footstool I roam;\nbut He\'s coming to take me some glorious day,\nover there to my heavenly home!' },
+    ],
+    attr:'Words and music: Anne S. Murphy, 1908. Public Domain.'
+  },
+  'I\'d Rather Have Jesus': {
+    verses:[
+      { label:'Verse 1', text:'I\'d rather have Jesus than silver or gold;\nI\'d rather be His than have riches untold;\nI\'d rather have Jesus than houses or lands;\nI\'d rather be led by His nail-pierced hand' },
+      { chorus:true, label:'Chorus', text:'than to be the king of a vast domain\nor be held in sin\'s dread sway;\nI\'d rather have Jesus than anything\nthis world affords today.' },
+      { label:'Verse 2', text:'I\'d rather have Jesus than men\'s applause;\nI\'d rather be faithful to His dear cause;\nI\'d rather have Jesus than worldwide fame;\nI\'d rather be true to His holy name' },
+      { label:'Verse 3', text:'He\'s fairer than lilies of rarest bloom;\nHe\'s sweeter than honey from out the comb;\nHe\'s all that my hungering spirit needs;\nI\'d rather have Jesus and let Him lead' },
+    ],
+    attr:'Words: Rhea F. Miller, 1922 (public domain). Music: George Beverly Shea.'
+  },
+  'Must I Go and Empty Handed': {
+    verses:[
+      { label:'Verse 1', text:'"Must I go, and empty-handed,"\nthus my dear Redeemer meet?\nNot one day of service give Him,\nlay no trophy at His feet?' },
+      { chorus:true, label:'Chorus', text:'"Must I go, and empty-handed?"\nMust I meet my Saviour so?\nNot one soul with which to greet Him,\nmust I empty-handed go?' },
+      { label:'Verse 2', text:'Not at death I shrink nor falter,\nfor my Saviour saves me now;\nbut to meet Him empty-handed,\nthought of that now clouds my brow.' },
+      { label:'Verse 3', text:'O the years in sinning wasted,\ncould I but recall them now,\nI would give them to my Saviour,\nto His will I\'d gladly bow.' },
+      { label:'Verse 4', text:'O ye saints, arouse, be earnest,\nup and work while yet \'tis day;\nere the night of death o\'ertake thee,\nstrive for souls while still you may.' },
+    ],
+    attr:'Words: Charles C. Luther, 1877. Music: George C. Stebbins. Public Domain.'
+  },
+  'My Saviour First of All': {
+    verses:[
+      { label:'Verse 1', text:'When my lifework is ended, and I cross the swelling tide,\nwhen the bright and glorious morning I shall see;\nI shall know my Redeemer when I reach the other side,\nand His smile will be the first to welcome me.' },
+      { chorus:true, label:'Chorus', text:'I shall know Him, I shall know Him,\nand redeemed by His side I shall stand;\nI shall know Him, I shall know Him\nby the print of the nails in His hand.' },
+      { label:'Verse 2', text:'O the soul-thrilling rapture when I view His blessed face,\nand the luster of His kindly beaming eye;\nhow my full heart will praise Him for the mercy, love and grace\nthat prepare for me a mansion in the sky.' },
+      { label:'Verse 3', text:'O the dear ones in glory, how they beckon me to come,\nand our parting at the river I recall;\nto the sweet vales of Eden they will sing my welcome home;\nbut I long to meet my Saviour first of all.' },
+      { label:'Verse 4', text:'Through the gates to the city in a robe of spotless white,\nHe will lead me where no tears will ever fall;\nin the glad song of ages I shall mingle with delight;\nbut I long to meet my Saviour first of all.' },
+    ],
+    attr:'Words: Fanny J. Crosby, 1891. Music: John R. Sweney. Public Domain.'
+  },
 };
 
 // ── FULL HYMN LIST ─────────────────────────────────────────────
@@ -3105,7 +3205,7 @@ function hymnSearchText(h) {
   if (h._searchText !== undefined) return h._searchText;
   const parts = [h.title, h.artist || '', h.tune || ''];
   if (h.tags && h.tags.length) parts.push(h.tags.join(' '));
-  const lyr = HYMN_LYRICS[h.title];
+  const lyr = lyricsFor(h);
   if (lyr && lyr.verses) lyr.verses.forEach(v => parts.push(v.text));
   h._searchText = parts.join(' • ').toLowerCase();
   return h._searchText;
@@ -3360,25 +3460,7 @@ function openLyrics() {
   lyrTitle.textContent = h.title;
   lyrSub.textContent = SOURCES[h.source].label + (h.tune ? ' · Tune: ' + h.tune : '');
 
-  // Try to find lyrics
-  const lyrData = HYMN_LYRICS[h.title] || null;
-
-  if (!lyrData) {
-    lyrBody.innerHTML = `<div class="no-lyrics">Lyrics not yet available for this hymn.<br><br>
-      <small style="opacity:.5">Tap the title to sing along — all these hymns are public domain!</small></div>`;
-  } else {
-    let html = '';
-    if (lyrData.ref) html += `<div class="psalm-ref">${esc(lyrData.ref)}</div>`;
-    lyrData.verses.forEach(v => {
-      if (v.chorus) {
-        html += `<div class="verse"><div class="chorus-label">${v.label}</div><div class="chorus-text">${esc(v.text)}</div></div>`;
-      } else {
-        html += `<div class="verse"><div class="verse-label">${v.label}</div><div class="verse-text">${esc(v.text)}</div></div>`;
-      }
-    });
-    if (lyrData.attr) html += `<div class="lyrics-attr">${esc(lyrData.attr)}</div>`;
-    lyrBody.innerHTML = html;
-  }
+  renderLyricsInto(lyrBody, h, 'no-lyrics', 'lyrics-attr');
 
   lyricsPanel.classList.add('open');
   sheetOpened('lyrics');
@@ -4126,21 +4208,7 @@ function syncNowPlayingSheet() {
   npTitleLarge.textContent = h.title;
   npSubLarge.textContent = (h.artist || src.label) + (h.tune ? ' \u00b7 ' + h.tune : '');
 
-  var lyrData = (typeof HYMN_LYRICS !== 'undefined' && HYMN_LYRICS[h.title]) || null;
-  if (!lyrData) {
-    npLyricsLarge.innerHTML = '<div class="no-lyrics-large">Lyrics not yet available for this song.<br><br><small style="opacity:.5">Enjoy listening \u2014 tap Share to send this hymn to someone.</small></div>';
-  } else {
-    var html = '';
-    lyrData.verses.forEach(function(v) {
-      if (v.chorus) {
-        html += '<div class="verse"><div class="chorus-label">' + esc(v.label) + '</div><div class="chorus-text">' + esc(v.text) + '</div></div>';
-      } else {
-        html += '<div class="verse"><div class="verse-label">' + esc(v.label) + '</div><div class="verse-text">' + esc(v.text) + '</div></div>';
-      }
-    });
-    if (lyrData.attr) html += '<div id="np-attr-large">' + esc(lyrData.attr) + '</div>';
-    npLyricsLarge.innerHTML = html;
-  }
+  renderLyricsInto(npLyricsLarge, h, 'no-lyrics-large', 'np-attr');
 
   updateNowPlayingButtons();
 }
@@ -4248,6 +4316,135 @@ function rekeyDownloadsByUrl() {
   });
   if (changed) { saveDlIndex(); renderDownloadsList(); }
 }
+
+// ══════════════════════════════════════════════════════════════════
+// WORDS & SCRIPTURE — shared with the FBC KJV Bible app
+// ══════════════════════════════════════════════════════════════════
+// Both apps live on fbckjv.app, so this app reads the Bible app's hymn words
+// (hymns.json: proofread public-domain texts with the Scriptures behind each
+// hymn) and its Psalms text, and every 📖 button opens the Bible app at the
+// verse. Where a song's words come from, in order:
+//   1. this app's own lyrics, by exact title, then by title ignoring
+//      capitals, punctuation, "Saviour/Savior" and "(Live)"-style notes;
+//   2. the Bible app's hymns, matched the same way;
+//   3. for a Sung Psalm, the verses it sings, word for word from the KJV.
+const KJV_APP = 'https://fbckjv.app/KJVBible/';
+function lyrNorm(t) {
+  return String(t).toLowerCase().replace(/\s*\([^)]*\)/g, '').replace(/saviour/g, 'savior')
+    .replace(/&/g, 'and').replace(/[^a-z0-9]/g, '');
+}
+let _lyrIndex = null;
+function ownLyricsByNorm(n) {
+  if (!_lyrIndex) {
+    _lyrIndex = {};
+    Object.keys(HYMN_LYRICS).forEach(k => { const kn = lyrNorm(k); if (!_lyrIndex[kn]) _lyrIndex[kn] = HYMN_LYRICS[k]; });
+  }
+  return _lyrIndex[n] || null;
+}
+
+var KJV_HYMNS = {}; // normalized title → { refs: [[label, jumpRef]…], lyr: {verses, attr} }
+function loadKjvHymns() {
+  return fetch(KJV_APP + 'hymns.json').then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(d => {
+      (d.h || []).forEach(([t, author, year, sec, refs, stanzas, chorus]) => {
+        const verses = [];
+        (stanzas || []).forEach((st, i) => {
+          verses.push({ label: 'Verse ' + (i + 1), text: st.join('\n') });
+          if (i === 0 && chorus && chorus.length) verses.push({ chorus: true, label: 'Chorus', text: chorus.join('\n') });
+        });
+        KJV_HYMNS[lyrNorm(t)] = { refs: refs || [], lyr: { verses, attr: 'Words: ' + author + ', ' + year + '. Public Domain.' } };
+      });
+      HYMNS.forEach(h => { h._searchText = undefined; }); // search now covers these words too
+      if (searchQuery) render();
+      if (currentHymn && npPanel.classList.contains('open')) syncNowPlayingSheet();
+    })
+    .catch(e => console.warn('Bible app hymns not loaded:', e));
+}
+
+function lyricsFor(h) {
+  if (!h) return null;
+  if (HYMN_LYRICS[h.title]) return HYMN_LYRICS[h.title];
+  const n = lyrNorm(h.title);
+  return ownLyricsByNorm(n) || (KJV_HYMNS[n] && KJV_HYMNS[n].lyr) || null;
+}
+
+// "Psalm 23" + "1-6" → { ch:23, from:1, to:6 }; no range means the whole psalm
+function psalmRange(title, verses) {
+  const m = String(title).match(/^Psalm\s+(\d+)\b/i);
+  if (!m) return null;
+  const v = String(verses || '').match(/^(\d+)(?:-(\d+))?$/);
+  return { ch: +m[1], from: v ? +v[1] : 0, to: v ? +(v[2] || v[1]) : 0 };
+}
+function psalmOf(h) { return h.psalm || psalmRange(h.title, ''); }
+
+// The Scriptures to offer under a song's words
+function scriptureFor(h) {
+  const k = KJV_HYMNS[lyrNorm(h.title)];
+  if (k && k.refs.length) return { lbl: 'Scripture behind this hymn', refs: k.refs };
+  const p = psalmOf(h);
+  if (p && p.ch >= 1 && p.ch <= 150) {
+    const range = p.from ? ':' + p.from + (p.to > p.from ? '–' + p.to : '') : '';
+    return { lbl: 'Read it in the King James Bible', refs: [['Psalm ' + p.ch + range, 'Psalms ' + p.ch + ':' + (p.from || 1)]] };
+  }
+  return null;
+}
+function kjvLink(jumpRef) { return KJV_APP + '#' + encodeURI(jumpRef.replace(/ /g, '+')); }
+function scriptureHTML(h) {
+  const s = scriptureFor(h);
+  if (!s) return '';
+  return '<div class="scripture-row"><div class="scripture-lbl">' + esc(s.lbl) + '</div><div class="scripture-chips">' +
+    s.refs.map(([label, r]) => '<a class="sc-chip" href="' + esc(kjvLink(r)) + '" target="_blank" rel="noopener">📖 ' + esc(label) + '</a>').join('') +
+    '</div></div>';
+}
+
+// Sung Psalms are the KJV word for word, so their words are the verses themselves
+let _psalmsBook = null;
+function psalmLyrics(h) {
+  const p = h.source === 'psalms' && psalmOf(h);
+  if (!p) return Promise.resolve(null);
+  _psalmsBook = _psalmsBook || fetch(KJV_APP + 'bible/Psalms.json').then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .catch(e => { _psalmsBook = null; throw e; });
+  return _psalmsBook.then(book => {
+    const ch = book.chapters[p.ch - 1];
+    if (!ch) return null;
+    const vs = ch.verses.filter(v => !p.from || (+v.verse >= p.from && +v.verse <= p.to));
+    if (!vs.length) return null;
+    return {
+      ref: 'Sung word for word from the King James Bible',
+      verses: vs.map(v => ({ label: 'Verse ' + v.verse, text: v.text })),
+      attr: 'Words: the Authorized King James Version (1611). Music shared by Sing the KJV.',
+    };
+  }).catch(() => null);
+}
+
+function versesHTML(lyr, attrCls) {
+  let html = lyr.ref ? '<div class="psalm-ref">' + esc(lyr.ref) + '</div>' : '';
+  lyr.verses.forEach(v => {
+    const k = v.chorus ? 'chorus' : 'verse';
+    html += '<div class="verse"><div class="' + k + '-label">' + esc(v.label) + '</div><div class="' + k + '-text">' + esc(v.text) + '</div></div>';
+  });
+  if (lyr.attr) html += '<div class="' + attrCls + '">' + esc(lyr.attr) + '</div>';
+  return html;
+}
+function noLyricsHTML(cls) {
+  return '<div class="' + cls + '">The words for this song aren’t shown yet.<br><br><small style="opacity:.7">Many newer songs are still under copyright, so only their recordings are here.</small></div>';
+}
+// Fills a lyrics area (the Lyrics sheet or the full player) for song h
+function renderLyricsInto(el, h, emptyCls, attrCls) {
+  const lyr = lyricsFor(h);
+  const scripture = scriptureHTML(h);
+  if (lyr) { el.innerHTML = scripture + versesHTML(lyr, attrCls); return; }
+  if (h.source === 'psalms' && psalmOf(h)) {
+    el.innerHTML = scripture + '<div class="' + emptyCls + '">Opening the Psalm…</div>';
+    psalmLyrics(h).then(l => {
+      if (currentHymn !== h) return; // moved on to another song
+      el.innerHTML = scripture + (l ? versesHTML(l, attrCls) : '<div class="' + emptyCls + '">Couldn’t open the words right now — tap the button above to read this Psalm.</div>');
+    });
+    return;
+  }
+  el.innerHTML = scripture + noLyricsHTML(emptyCls);
+}
+loadKjvHymns();
 
 // -- DYNAMIC TELEGRAM SPECIALS LOADER --------------------------------------
 // Fetches the live file listing from the Cloudflare Worker and auto-adds
@@ -4442,6 +4639,7 @@ async function loadDynamicPsalmSongs() {
         title: displayTitle,
         source: 'psalms',
         artist: 'Sing the KJV',
+        psalm: psalmRange(title, verses),
         url: PSU + encodeURIComponent(f.filename),
         tags: ['psalm', 'scripture song'],
       });
