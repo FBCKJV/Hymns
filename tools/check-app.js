@@ -53,6 +53,20 @@ const PSALM_FILES = ['0001 Psalm 1 1-6 song.mp3', '0023 Psalm 23 1-6 song.mp3', 
 const PSALM_FILES_NEW = ['0001 Psalm 1 1-6 song.mp3', '0019 Psalm 19 1-14 song.mp3', '0023 Psalm 23 1-6 song.mp3', '0091 Psalm 91 1-16 song.mp3'];
 const TG_FILES = ['Brand New Special - Test Quartet.mp3'];
 
+// The Bible app's data: from a KJVBible checkout next to this one, or a small stand-in
+const KJV_DIR = path.join(ROOT, '..', 'KJVBible');
+const KJV_FILES = {};
+if (fs.existsSync(path.join(KJV_DIR, 'hymns.json'))) {
+  KJV_FILES['hymns.json'] = fs.readFileSync(path.join(KJV_DIR, 'hymns.json'));
+  KJV_FILES['bible/Psalms.json'] = fs.readFileSync(path.join(KJV_DIR, 'bible', 'Psalms.json'));
+} else {
+  KJV_FILES['hymns.json'] = JSON.stringify({ h: [['Leaning on the Everlasting Arms', 'Elisha A. Hoffman', 1887, 'Assurance and Trust',
+    [['Deuteronomy 33:27', 'Deuteronomy 33:27']], [['What a fellowship, what a joy divine,', 'Leaning on the everlasting arms;']], ['Leaning, leaning,']]] });
+  const chapters = Array.from({ length: 150 }, (_, i) => ({ chapter: String(i + 1), verses: [{ verse: '1', text: 'Verse one of Psalm ' + (i + 1) + '.' }] }));
+  chapters[22].verses = [{ verse: '1', text: 'The LORD is my shepherd; I shall not want.' }, { verse: '2', text: 'He maketh me to lie down in green pastures.' }];
+  KJV_FILES['bible/Psalms.json'] = JSON.stringify({ book: 'Psalms', chapters });
+}
+
 const server = http.createServer((req, res) => {
   let p = decodeURIComponent(req.url.split('?')[0]).replace(/^\/Hymns/, '');
   if (p === '/' || p === '') p = '/index.html';
@@ -74,6 +88,11 @@ async function newPage(browser, { seed = {}, psalmFiles = PSALM_FILES, badAudio 
     if (/\.(mp3|m4a|wav|ogg)(\?|$)/i.test(url)) {
       if (badAudio && decodeURIComponent(url).includes(badAudio)) return route.fulfill({ status: 404, body: '' });
       return route.fulfill({ status: 200, contentType: 'audio/wav', headers: { 'Access-Control-Allow-Origin': '*' }, body: WAV });
+    }
+    if (url.startsWith('https://fbckjv.app/KJVBible/')) { // the Bible app's hymns and Psalms
+      const rel = decodeURIComponent(new URL(url).pathname.replace('/KJVBible/', ''));
+      const body = KJV_FILES[rel];
+      return body ? route.fulfill({ status: 200, contentType: 'application/json', body }) : route.fulfill({ status: 404, body: '' });
     }
     return route.abort(); // fonts, YouTube, etc.
   });
@@ -184,6 +203,41 @@ const isOpen = (page, id) => page.$eval(id, el => el.classList.contains('open'))
   await page.waitForFunction(() => document.getElementById('toast').classList.contains('show'), null, { timeout: 5000 }).catch(() => {});
   ok(/Couldn’t play/.test(await toastText(page)), 'a failed song shows a message');
   ok(await page.evaluate(() => !document.getElementById('play-btn').classList.contains('loading') && !isPlaying), 'and the play button goes back to Play');
+  await page.context().close();
+
+  // ── Words and Scripture ──
+  console.log('Words and Scripture');
+  page = await newPage(browser);
+  await page.waitForFunction(() => Object.keys(KJV_HYMNS).length > 0, null, { timeout: 5000 }).catch(() => {});
+  const words = async title => {
+    await page.evaluate(t => { playHymn(HYMNS.find(h => h.title === t)); openLyrics(); }, title);
+    await page.waitForFunction(() => !/Opening the Psalm/.test(document.getElementById('lyr-body').textContent), null, { timeout: 5000 }).catch(() => {});
+    const r = await page.$eval('#lyr-body', el => ({ text: el.textContent, chips: [...el.querySelectorAll('.sc-chip')].map(a => [a.textContent.trim(), a.href]) }));
+    await page.evaluate(() => closeSheet('lyrics')); await page.waitForTimeout(250);
+    return r;
+  };
+  let w = await words('Leaning on the Everlasting Arms');
+  ok(/What a fellowship/.test(w.text), 'words come from the Bible app’s hymns');
+  ok(w.chips.some(([t, href]) => /Deuteronomy 33:27/.test(t) && href === 'https://fbckjv.app/KJVBible/#Deuteronomy+33:27'), '📖 Deuteronomy 33:27 opens the Bible app at the verse');
+  w = await words('What A Friend We Have in Jesus');
+  ok(/What a friend we have in Jesus/i.test(w.text), 'words found when only the capitals differ');
+  w = await words('Victory in Jesus (Congregational)');
+  ok(/victory/i.test(w.text) && !/aren’t shown/.test(w.text), 'words found past a "(Congregational)" note');
+  w = await words('My Savior\'s Love');
+  ok(/I stand amazed/.test(w.text), 'a newly added public-domain hymn has its words');
+  w = await words('Psalm 23');
+  ok(/The LORD is my shepherd/.test(w.text), 'a Sung Psalm shows its verses from the KJV');
+  ok(w.chips.some(([t, href]) => /Psalm 23/.test(t) && /#Psalms\+23:1$/.test(href)), 'and a 📖 button to read it in the Bible app');
+  w = await words('Ain\'t God Good');
+  ok(/aren’t shown yet/.test(w.text), 'a song without words says so plainly');
+  await page.evaluate(() => { closeSheet('np'); });
+  await page.fill('#search', 'everlasting arms'); await page.waitForTimeout(400);
+  ok(await page.$$eval('.hymn-title', els => els.some(e => e.textContent === 'Leaning on the Everlasting Arms')), 'search finds words from the Bible app’s hymns');
+  if (SHOTS) {
+    await page.evaluate(() => { playHymn(HYMNS.find(h => h.title === 'Psalm 23')); openNowPlaying(); });
+    await page.waitForTimeout(800);
+    await page.screenshot({ path: path.join(require('os').tmpdir(), 'hymns-psalm.png') });
+  }
   await page.context().close();
 
   // ── Removing a download asks first ──
