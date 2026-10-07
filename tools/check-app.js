@@ -76,7 +76,7 @@ const server = http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': type }); res.end(fs.readFileSync(f));
 });
 
-async function newPage(browser, { seed = {}, psalmFiles = PSALM_FILES, badAudio = null } = {}) {
+async function newPage(browser, { seed = {}, psalmFiles = PSALM_FILES, badAudio = null, query = '' } = {}) {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, serviceWorkers: 'block' });
   await ctx.route('**/*', route => {
     const url = route.request().url();
@@ -104,7 +104,7 @@ async function newPage(browser, { seed = {}, psalmFiles = PSALM_FILES, badAudio 
   const page = await ctx.newPage();
   page.errors = [];
   page.on('pageerror', e => page.errors.push(e.message));
-  await page.goto('http://localhost:8766/Hymns/');
+  await page.goto('http://localhost:8766/Hymns/' + query);
   await page.waitForFunction(() => typeof psalmsLoadState !== 'undefined' && psalmsLoadState === 'ok', null, { timeout: 8000 }).catch(() => {});
   await page.waitForTimeout(300);
   return page;
@@ -238,6 +238,20 @@ const isOpen = (page, id) => page.$eval(id, el => el.classList.contains('open'))
     await page.waitForTimeout(800);
     await page.screenshot({ path: path.join(require('os').tmpdir(), 'hymns-psalm.png') });
   }
+  await page.context().close();
+
+  // ── A link from the Bible app: ?psalm=23 ──
+  console.log('Psalm links');
+  page = await newPage(browser, { psalmFiles: PSALM_FILES, query: '?psalm=23' });
+  await page.waitForTimeout(600);
+  ok(await page.evaluate(() => currentHymn && currentHymn.title === 'Psalm 23'), '?psalm=23 loads Psalm 23');
+  ok(await page.evaluate(() => activeSource === 'psalms'), 'and shows the Sung Psalms tab');
+  ok(await isOpen(page, '#now-playing-panel'), 'with the full player open');
+  ok(!page.url().includes('psalm='), 'and the link is cleared from the address');
+  await page.context().close();
+  page = await newPage(browser, { psalmFiles: PSALM_FILES, query: '?psalm=19' });
+  await page.waitForTimeout(600);
+  ok(/No recording of Psalm 19/.test(await toastText(page)), 'a Psalm with no recording says so');
   await page.context().close();
 
   // ── Removing a download asks first ──
