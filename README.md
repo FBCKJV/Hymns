@@ -41,3 +41,11 @@ All audio streams directly from these public archives:
 - `thepsalmssung.org` — Scottish Metrical Psalter sung recordings
 
 All are public domain or freely licensed for ministry use.
+
+### Checking before a push
+
+```
+node tools/check-app.js
+```
+
+Checks the script parses, then opens the app in a phone-sized browser (with the song listings and audio faked) and walks the everyday journeys: playing, resuming the last song, Back closing sheets, a song that won't load, removing a download, and Psalms/Specials keeping their ids when new files are uploaded. Needs Playwright (`npm i -g playwright`).

@@ -86,6 +86,7 @@ header {
   outline:none; transition:border-color .2s;
 }
 #search::placeholder { color:var(--text-mute); }
+#search::-webkit-search-cancel-button { -webkit-appearance:none; appearance:none; display:none; }
 #search:focus { border-color:var(--gold-dim); }
 #search-clear {
   position:absolute; right:10px; top:50%; transform:translateY(-50%);
@@ -320,6 +321,22 @@ header {
 #info-panel.open { pointer-events:all; }
 #info-panel.open #info-backdrop { opacity:1; pointer-events:all; }
 #info-panel.open #info-sheet { transform:translateY(0); }
+/* Confirm sheet (asks before anything is removed) */
+#confirm-panel { position:fixed; inset:0; z-index:450; pointer-events:none; }
+#confirm-backdrop { position:absolute; inset:0; background:rgba(0,0,0,.6); opacity:0; transition:opacity .25s; pointer-events:none; }
+#confirm-sheet {
+  position:absolute; bottom:0; left:0; right:0; background:var(--surface);
+  border-radius:20px 20px 0 0; border-top:1px solid var(--border);
+  transform:translateY(100%); transition:transform .3s cubic-bezier(.4,0,.2,1);
+  padding:0 20px calc(var(--safe-bot) + 20px);
+}
+#confirm-panel.open { pointer-events:all; }
+#confirm-panel.open #confirm-backdrop { opacity:1; pointer-events:all; }
+#confirm-panel.open #confirm-sheet { transform:translateY(0); }
+#confirm-msg { font-size:15px; color:var(--text); line-height:1.5; text-align:center; padding:8px 4px 18px; }
+.confirm-btns { display:flex; gap:10px; }
+.confirm-btns button { flex:1; min-height:48px; border-radius:12px; font-size:15px; font-weight:600; border:1px solid var(--border); background:var(--card); color:var(--text); }
+.confirm-btns #confirm-ok { background:var(--crimson); border-color:var(--crimson); color:#fff; }
 .info-source { padding:16px 20px; border-bottom:1px solid rgba(31,45,66,.5); }
 .info-source h3 { font-family:'Cinzel',serif; font-size:13px; color:var(--gold); margin-bottom:6px; }
 .info-source p { font-size:12px; color:var(--text-dim); line-height:1.65; }
@@ -333,7 +350,7 @@ header {
   left:50%; transform:translateX(-50%) translateY(10px); background:var(--card2);
   border:1px solid var(--border); color:var(--text); padding:8px 16px; border-radius:20px;
   font-size:12px; z-index:300; opacity:0; transition:opacity .25s, transform .25s; pointer-events:none;
-  white-space:nowrap;
+  width:max-content; max-width:calc(100vw - 32px); text-align:center;
 }
 #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
@@ -577,6 +594,14 @@ header {
 #np-controls-large #np-play-large {
   width: 62px; height: 62px; border-radius: 50%; background: var(--gold); color: #1a1060;
 }
+/* Buffering ring around the play buttons while a song is loading */
+#play-btn, #np-controls-large #np-play-large { position: relative; }
+#play-btn.loading::after, #np-controls-large #np-play-large.loading::after {
+  content: ''; position: absolute; inset: -4px; border-radius: 50%;
+  border: 2px solid transparent; border-top-color: var(--gold); border-right-color: var(--gold);
+  animation: btn-spin .9s linear infinite; pointer-events: none;
+}
+@keyframes btn-spin { to { transform: rotate(360deg); } }
 #np-controls-large button.np-side { color: var(--text-mute); }
 #np-controls-large button.np-side.active { color: var(--gold); }
 #np-actions-large {
@@ -795,7 +820,7 @@ header {
 
       <div class="tips-section-lbl">Listening</div>
       <div class="tip-row"><span class="tip-ico">&#9835;</span><span class="tip-txt">Tap the <strong>mini player</strong> at the bottom to expand it into a full view with large artwork, lyrics, and easy-to-tap controls.</span></div>
-      <div class="tip-row"><span class="tip-ico">&#8635;</span><span class="tip-txt">Tap the <strong>shuffle icon</strong> to play songs in random order within the current library tab.</span></div>
+      <div class="tip-row"><span class="tip-ico">&#8635;</span><span class="tip-txt">Tap the bar at the bottom to open the full player, then tap the <strong>shuffle icon</strong> to play songs in random order within the current library tab.</span></div>
       <div class="tip-row"><span class="tip-ico">A</span><span class="tip-txt">Turn on <strong>AUTO</strong> to automatically continue to the next hymn when one finishes &mdash; great for hands-free listening during devotions.</span></div>
 
       <div class="tips-section-lbl">Lyrics &amp; Search</div>
@@ -855,23 +880,23 @@ header {
       </button>
     </div>
     <div class="info-source">
-      <h3>🎼 Olmstead Baptist Church (61 hymns)</h3>
+      <h3>🎼 Olmstead Baptist Church (<span data-count="olmstead">61</span> hymns)</h3>
       <p>Classic congregational hymns recorded live. Public domain, freely available for ministry use.</p>
     </div>
     <div class="info-source">
-      <h3>🎵 Bible Baptist DeLand (38 hymns)</h3>
+      <h3>🎵 Bible Baptist DeLand (<span data-count="knox">38</span> hymns)</h3>
       <p>Piano arrangements of beloved hymns and gospel standards.</p>
     </div>
     <div class="info-source">
-      <h3>🎙️ IFB Specials &amp; Choir (174 recordings)</h3>
+      <h3>🎙️ IFB Specials &amp; Choir (<span data-count="telegram">174</span> recordings)</h3>
       <p>Quartets, choirs, soloists, and ensembles from Independent Fundamental Baptist churches across America. Growing regularly.</p>
     </div>
     <div class="info-source">
-      <h3>🎤 First Baptist Hammond (69 recordings)</h3>
+      <h3>🎤 First Baptist Hammond (<span data-count="hammond">69</span> recordings)</h3>
       <p>Choir specials and service music from First Baptist Church of Hammond, Indiana.</p>
     </div>
     <div class="info-source">
-      <h3>📜 Sung Psalms &mdash; Sing the KJV</h3>
+      <h3>📜 Sung Psalms &mdash; Sing the KJV<span data-count-wrap="psalms" hidden> (<span data-count="psalms"></span> recordings)</span></h3>
       <p>Verbatim Scripture set to music, word-for-word from the King James Version. Shared with gracious permission from the ministry at <a href="https://singthekjv.app" target="_blank" rel="noopener">singthekjv.app</a>, which freely offers Psalms, hymns, and Scripture songs to the body of Christ.</p>
       <p style="margin-top:6px;font-size:11px"><a href="https://singthekjv.app/about" target="_blank" rel="noopener">Learn more about this ministry</a> &nbsp;&middot;&nbsp; <a href="https://singthekjv.app/donate" target="_blank" rel="noopener" id="stk-donate-link">Support their work</a></p>
     </div>
@@ -880,6 +905,19 @@ header {
       <p>Live congregational singing recordings in the public domain. All 150+ hymns freely reproducible. Hosted at <a href="http://baptistarchive.com" target="_blank">baptistarchive.com</a> and <a href="http://olmsteadbaptistchurch.org/hymnal.htm" target="_blank">olmsteadbaptistchurch.org</a>.</p>
     </div>
 
+  </div>
+</div>
+
+<!-- CONFIRM SHEET -->
+<div id="confirm-panel" role="dialog" aria-modal="true" aria-labelledby="confirm-msg">
+  <div id="confirm-backdrop"></div>
+  <div id="confirm-sheet">
+    <div class="sheet-handle"></div>
+    <div id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button id="confirm-cancel">Keep it</button>
+      <button id="confirm-ok">Remove</button>
+    </div>
   </div>
 </div>
 
@@ -3011,6 +3049,8 @@ let activeSource = 'all';
 let searchQuery  = '';
 let activeView   = 'browse'; // browse | psalms | favorites
 let favorites    = new Set(JSON.parse(localStorage.getItem('sh_favs') || '[]'));
+var SHEET_CLOSERS = {};   // name → function that hides the sheet (no history work)
+var openSheets = [];      // names, most recent last
 var playHistory = [];
 try { playHistory = JSON.parse(localStorage.getItem('sh_history_v1') || '[]'); } catch(e) { playHistory = []; }
 function recordHistory(id) {
@@ -3107,6 +3147,7 @@ function render() {
     playHistory.forEach((e, i) => { order[e.id] = i; });
     filteredList = filteredList.slice().sort((a, b) => (order[a.id] ?? 0) - (order[b.id] ?? 0));
   }
+  currentIdx = currentHymn ? filteredList.findIndex(x => x.id === currentHymn.id) : -1;
 
   if (filteredList.length === 0) {
     const msg = activeSource === 'favorites' || activeView === 'favorites'
@@ -3178,43 +3219,72 @@ function hymnRow(h, fi) {
 }
 
 function srcLabel(s) {
-  return {olmstead:'Congr.',knox:'Piano',telegram:'Special'}[s] || s;
+  return {olmstead:'Congr.',knox:'Piano',telegram:'Special',hammond:'Hammond',psalms:'Psalm'}[s] || s;
 }
 function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 // ══════════════════════════════════════════════════════════════════
 // PLAYBACK
 // ══════════════════════════════════════════════════════════════════
-function loadAndPlay(idx) {
-  if (idx < 0 || idx >= filteredList.length) return;
-  currentIdx = idx;
-  const h = filteredList[idx];
+// The one place a song starts playing. Plays the downloaded copy when there
+// is one, otherwise streams. Works whether or not the song is in the list on
+// screen (e.g. resuming the last-played song after switching tabs).
+var _playToken = 0;
+function playHymn(h) {
+  if (!h) return;
   currentHymn = h;
+  currentIdx = filteredList.indexOf(h);
   if (typeof shuffleOn !== 'undefined' && shuffleOn) shufflePlayed.add(h.id);
   const src = SOURCES[h.source];
+  const token = ++_playToken;
 
   // Update mediaSession BEFORE loading so OS knows what's next (single source of truth)
   updateMediaSession();
   if ('mediaSession' in navigator) { try { navigator.mediaSession.playbackState = 'playing'; } catch(e){} }
-  if (window._lastBlobUrl) { try { URL.revokeObjectURL(window._lastBlobUrl); } catch(e){} window._lastBlobUrl = null; }
-  audio.src = h.url;
-  audio.load();
-  audio.play().catch(()=>{ setPlaying(false); });
 
   npTitle.textContent = h.title;
-  npSource.textContent = src.label + (h.tune ? ' · ' + h.tune : '');
+  npSource.textContent = (h.artist || src.label) + (h.tune ? ' · ' + h.tune : '');
   npArt.textContent = src.icon;
   npArt.className = 'np-art';
-  playBtn.className = '';
   playerBar.classList.toggle('playing-state', true);
-
-  // Update fav button in player
   updateFavBtn(h.id);
   setPlaying(true);
+  setLoading(true);
   render();
+  try { localStorage.setItem('sh_last', JSON.stringify({id:h.id,src:h.source})); } catch(e){}
+  if (typeof npPanel !== 'undefined' && npPanel.classList.contains('open')) syncNowPlayingSheet();
 
-  // Store last played
-  try { localStorage.setItem('sh_last', JSON.stringify({id:h.id,src:h.source})); } catch{}
+  function start(url, offline) {
+    if (token !== _playToken) { if (offline) { try { URL.revokeObjectURL(url); } catch(e){} } return; } // a newer tap won
+    if (window._lastBlobUrl) { try { URL.revokeObjectURL(window._lastBlobUrl); } catch(e){} window._lastBlobUrl = null; }
+    if (offline) {
+      window._lastBlobUrl = url;
+      npSource.innerHTML = esc(h.artist || src.label) + (h.tune ? ' \u00b7 ' + esc(h.tune) : '') + ' <span class="offline-pill">OFFLINE</span>';
+    }
+    audio.src = url;
+    audio.load();
+    audio.play().catch(function(err) {
+      if (err && err.name === 'AbortError') return; // replaced by another song
+      setPlaying(false); setLoading(false);
+    });
+  }
+  if (isDownloaded(h.id)) {
+    getOfflineUrl(h.url).then(function(blobUrl) { blobUrl ? start(blobUrl, true) : start(h.url, false); });
+  } else {
+    start(h.url, false);
+  }
+}
+
+function loadAndPlay(idx) {
+  if (idx < 0 || idx >= filteredList.length) return;
+  playHymn(filteredList[idx]);
+}
+
+// Spinner ring on the play buttons while audio is buffering
+function setLoading(on) {
+  playBtn.classList.toggle('loading', !!on);
+  var big = document.getElementById('np-play-large');
+  if (big) big.classList.toggle('loading', !!on);
 }
 
 function setPlaying(val) {
@@ -3229,7 +3299,8 @@ function togglePlay() {
     loadAndPlay(shuffleOn ? pickShuffleNextIdx() : 0);
     return;
   }
-  if (audio.paused) { audio.play(); setPlaying(true); }
+  if (!audio.getAttribute('src')) { playHymn(currentHymn); return; } // restored from last visit, not loaded yet
+  if (audio.paused) { audio.play().catch(function(){ setPlaying(false); setLoading(false); }); setPlaying(true); }
   else { audio.pause(); setPlaying(false); }
   render();
 }
@@ -3243,6 +3314,11 @@ function resyncCurrentIdx() {
 }
 
 function playNext() {
+  if (shuffleOn) {
+    var sIdx = pickShuffleNextIdx();
+    if (sIdx >= 0) loadAndPlay(sIdx);
+    return;
+  }
   resyncCurrentIdx();
   const next = (currentIdx + 1) % (filteredList.length || 1);
   loadAndPlay(next);
@@ -3305,9 +3381,11 @@ function openLyrics() {
   }
 
   lyricsPanel.classList.add('open');
+  sheetOpened('lyrics');
 }
 
-function closeLyrics() { lyricsPanel.classList.remove('open'); }
+SHEET_CLOSERS.lyrics = function() { lyricsPanel.classList.remove('open'); };
+function closeLyrics() { closeSheet('lyrics'); }
 
 // ══════════════════════════════════════════════════════════════════
 // TOAST
@@ -3318,6 +3396,60 @@ function toast(msg) {
   toastEl.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>toastEl.classList.remove('show'), 2000);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SHEETS & THE BACK BUTTON
+// ══════════════════════════════════════════════════════════════════
+// Every sheet adds a history step when it opens, so the phone's Back button
+// closes the sheet instead of leaving the app. Closing with ✕ or the backdrop
+// takes that step back off again.
+// (SHEET_CLOSERS and openSheets are declared with the rest of the state, up top)
+function sheetOpened(name) {
+  if (openSheets.indexOf(name) >= 0) return;
+  openSheets.push(name);
+  try { history.pushState({ sheet: name }, ''); } catch(e) {}
+}
+function closeSheet(name) {
+  var i = openSheets.indexOf(name);
+  if (i < 0) { SHEET_CLOSERS[name] && SHEET_CLOSERS[name](); return; }
+  if (i === openSheets.length - 1 && history.state && history.state.sheet === name) {
+    history.back(); // popstate below does the closing
+  } else {
+    openSheets.splice(i, 1);
+    SHEET_CLOSERS[name]();
+  }
+}
+window.addEventListener('popstate', function() {
+  var top = openSheets.pop();
+  if (top) SHEET_CLOSERS[top]();
+});
+
+// The app's own "are you sure?" sheet. Resolves true only on the red button.
+var _confirmResolve = null, _confirmResult = false;
+function appConfirm(message, okLabel) {
+  if (_confirmResolve) _confirmResolve(false);
+  document.getElementById('confirm-msg').textContent = message;
+  document.getElementById('confirm-ok').textContent = okLabel || 'Remove';
+  _confirmResult = false;
+  document.getElementById('confirm-panel').classList.add('open');
+  sheetOpened('confirm');
+  return new Promise(function(resolve) { _confirmResolve = resolve; });
+}
+SHEET_CLOSERS.confirm = function() {
+  document.getElementById('confirm-panel').classList.remove('open');
+  var r = _confirmResolve; _confirmResolve = null;
+  if (r) r(_confirmResult);
+};
+document.getElementById('confirm-ok').addEventListener('click', function() { _confirmResult = true; closeSheet('confirm'); });
+document.getElementById('confirm-cancel').addEventListener('click', function() { closeSheet('confirm'); });
+document.getElementById('confirm-backdrop').addEventListener('click', function() { closeSheet('confirm'); });
+
+function confirmRemoveDownload(id) {
+  var e = dlIndex[id];
+  var name = (e && e.title) ? '“' + e.title + '”' : 'this song';
+  return appConfirm('Remove the downloaded copy of ' + name + '? It will still play when you’re online.', 'Remove')
+    .then(function(ok) { return ok ? removeDownload(id).then(function(){ return true; }) : false; });
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -3359,17 +3491,25 @@ audio.addEventListener('play', () => {
 });
 audio.addEventListener('pause', () => {
   setPlaying(false);
+  setLoading(false);
   render();
   updateNowPlayingButtons();
   releaseWakeLock();
   if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
 });
 let _consecErrors = 0;
-audio.addEventListener('playing', () => { _consecErrors = 0; });
+audio.addEventListener('playing', () => { _consecErrors = 0; setLoading(false); });
+audio.addEventListener('waiting', () => { if (!audio.paused) setLoading(true); });
 audio.addEventListener('error', () => {
   if (!audio.src || audio.src === location.href) return; // no real source loaded
+  setLoading(false);
   _consecErrors++;
-  if (_consecErrors >= 3) { toast('Playback unavailable — check your connection'); setPlaying(false); return; }
+  const why = navigator.onLine
+    ? 'Couldn’t play this song — check your connection'
+    : 'You’re offline — only downloaded songs can play';
+  // Say so every time; AUTO only moves on to the next song (up to 3 failures in a row)
+  if (!autoPlay || _consecErrors >= 3) { toast(why); setPlaying(false); render(); return; }
+  toast(why + '. Trying the next one…');
   setTimeout(() => { if (autoPlay) playNext(); }, 1200);
 });
 
@@ -3410,10 +3550,22 @@ if ('serviceWorker' in navigator) {
 }
 document.getElementById('info-btn').addEventListener('click', function() {
   refreshAppVersion();
+  updateSourceCounts();
   infoPanel.classList.add('open');
+  sheetOpened('info');
 });
-document.getElementById('close-info').addEventListener('click', ()=>infoPanel.classList.remove('open'));
-document.getElementById('info-backdrop').addEventListener('click', ()=>infoPanel.classList.remove('open'));
+SHEET_CLOSERS.info = function() { infoPanel.classList.remove('open'); };
+document.getElementById('close-info').addEventListener('click', ()=>closeSheet('info'));
+document.getElementById('info-backdrop').addEventListener('click', ()=>closeSheet('info'));
+
+// About sheet: show how many recordings each library really has right now
+function updateSourceCounts() {
+  const n = {};
+  HYMNS.forEach(h => { n[h.source] = (n[h.source] || 0) + 1; });
+  document.querySelectorAll('[data-count]').forEach(el => { el.textContent = n[el.dataset.count] || 0; });
+  const ps = document.querySelector('[data-count-wrap="psalms"]');
+  if (ps) ps.hidden = !n.psalms;
+}
 
 favBtnP.addEventListener('click', () => {
   if (!currentHymn) return;
@@ -3495,6 +3647,9 @@ clearBtn.addEventListener('click', () => {
 // Keyboard shortcuts
 document.addEventListener('keydown', e => {
   if (e.target === searchEl) return;
+  if (e.key === 'Escape' && openSheets.length) { closeSheet(openSheets[openSheets.length - 1]); return; }
+  if (openSheets.indexOf('confirm') >= 0) return;
+  if ((e.key === ' ' || e.key === 'Enter') && e.target.closest && e.target.closest('button, a, .hymn-item, [role="button"]')) return;
   if (e.key === 'ArrowRight' || e.key === 'n') playNext();
   if (e.key === 'ArrowLeft'  || e.key === 'p') playPrev();
   if (e.key === ' ') { e.preventDefault(); togglePlay(); }
@@ -3674,15 +3829,7 @@ function pickShuffleNextIdx() {
   shufflePlayed.add(pick.id);
   return filteredList.indexOf(pick);
 }
-var _origPlayNext = playNext;
-playNext = function() {
-  if (shuffleOn && autoPlay) {
-    var idx = pickShuffleNextIdx();
-    if (idx >= 0) loadAndPlay(idx);
-    return;
-  }
-  _origPlayNext();
-};
+
 
 
 // -- EXPANDABLE PLAYER ----------------------------------------------------
@@ -3739,24 +3886,25 @@ if (_pbGuard) _pbGuard.classList.remove('collapsed');
 })();
 
 
-// Prefill player bar with last-played hymn (does NOT autoplay)
-try {
-  const lastRaw = localStorage.getItem('sh_last');
-  if (lastRaw) {
-    const last = JSON.parse(lastRaw);
-    const li = filteredList.findIndex(h => h.id === last.id);
-    if (li >= 0) {
-      currentIdx = li;
-      const lh = filteredList[li];
-      const lsrc = SOURCES[lh.source];
-      npTitle.textContent = lh.title;
-      npSource.textContent = (lh.artist || lsrc.label) + (lh.tune ? ' · ' + lh.tune : '');
-      npArt.textContent = lsrc.icon;
-      updateFavBtn(lh.id);
-      render();
-    }
-  }
-} catch(e) {}
+// Prefill player bar with last-played hymn (does NOT autoplay). It becomes the
+// current song, so Play, ♡, lyrics and the full player all act on it. Tried
+// again once the Psalms/Specials lists arrive, since it may be one of those.
+function restoreLastPlayed() {
+  if (currentHymn) return;
+  try {
+    const last = JSON.parse(localStorage.getItem('sh_last') || 'null');
+    const lh = last && HYMNS.find(h => h.id === last.id);
+    if (!lh) return;
+    currentHymn = lh;
+    const lsrc = SOURCES[lh.source];
+    npTitle.textContent = lh.title;
+    npSource.textContent = (lh.artist || lsrc.label) + (lh.tune ? ' · ' + lh.tune : '');
+    npArt.textContent = lsrc.icon;
+    updateFavBtn(lh.id);
+    render();
+  } catch(e) {}
+}
+restoreLastPlayed();
 
 // -- OFFLINE DOWNLOADS (state initialized earlier, near favorites) --------
 function saveDlIndex() {
@@ -3883,7 +4031,7 @@ document.addEventListener('click', function(e) {
     var id = dlBtn.dataset.id;
     var url = dlBtn.dataset.url;
     if (isDownloaded(id)) {
-      removeDownload(id);
+      confirmRemoveDownload(id);
     } else if (!dlInProgress[id]) {
       var h = HYMNS.find(function(x){ return x.id === id; });
       downloadHymn(id, url, h ? h.title : '');
@@ -3892,7 +4040,7 @@ document.addEventListener('click', function(e) {
   }
   var removeBtn = e.target.closest('[data-remove-id]');
   if (removeBtn) {
-    removeDownload(removeBtn.dataset.removeId);
+    confirmRemoveDownload(removeBtn.dataset.removeId);
   }
 });
 
@@ -3912,7 +4060,7 @@ if (npDownloadLarge) {
     if (!currentHymn) return;
     var h = currentHymn;
     if (isDownloaded(h.id)) {
-      removeDownload(h.id).then(syncLargeDownloadButton);
+      confirmRemoveDownload(h.id).then(syncLargeDownloadButton);
     } else {
       downloadHymn(h.id, h.url, h.title).then(syncLargeDownloadButton);
     }
@@ -3924,58 +4072,20 @@ updateNowPlayingButtons = function() {
   syncLargeDownloadButton();
 };
 
-// Prefer offline (cached) audio when available
-var _origLoadAndPlay2 = loadAndPlay;
-loadAndPlay = function(idx) {
-  if (idx < 0 || idx >= filteredList.length) return;
-  var h = filteredList[idx];
-  if (isDownloaded(h.id)) {
-    getOfflineUrl(h.url).then(function(blobUrl) {
-      if (blobUrl) {
-        currentIdx = idx;
-        currentHymn = h;
-        if (shuffleOn) shufflePlayed.add(h.id);
-        var src = SOURCES[h.source];
-        if (window._lastBlobUrl) { try { URL.revokeObjectURL(window._lastBlobUrl); } catch(e){} }
-        window._lastBlobUrl = blobUrl;
-        audio.src = blobUrl;
-        audio.load();
-        audio.play().catch(function(){ setPlaying(false); });
-        npTitle.textContent = h.title;
-        npSource.innerHTML = (h.artist || src.label) + (h.tune ? ' \u00b7 ' + h.tune : '') + ' <span class="offline-pill">OFFLINE</span>';
-        npArt.textContent = src.icon;
-        npArt.className = 'np-art';
-        playBtn.className = '';
-        playerBar.classList.toggle('playing-state', true);
-        updateFavBtn(h.id);
-        setPlaying(true);
-        render();
-        try { localStorage.setItem('sh_last', JSON.stringify({id:h.id,src:h.source})); } catch(e){}
-        if (typeof npPanel !== 'undefined' && npPanel.classList.contains('open')) syncNowPlayingSheet();
-      } else {
-        _origLoadAndPlay2(idx);
-      }
-    });
-  } else {
-    _origLoadAndPlay2(idx);
-  }
-};
-
 // -- TIPS SHEET --------------------------------------------------------
 var tipsPanel = document.getElementById('tips-panel');
 document.getElementById('tips-btn').addEventListener('click', function() {
   renderDownloadsList();
   tipsPanel.classList.add('open');
   document.body.style.overflow = 'hidden';
+  sheetOpened('tips');
 });
-document.getElementById('close-tips').addEventListener('click', function() {
+SHEET_CLOSERS.tips = function() {
   tipsPanel.classList.remove('open');
   document.body.style.overflow = '';
-});
-document.getElementById('tips-backdrop').addEventListener('click', function() {
-  tipsPanel.classList.remove('open');
-  document.body.style.overflow = '';
-});
+};
+document.getElementById('close-tips').addEventListener('click', function() { closeSheet('tips'); });
+document.getElementById('tips-backdrop').addEventListener('click', function() { closeSheet('tips'); });
 
 // Initial sync on load
 renderDownloadsList();
@@ -4001,11 +4111,13 @@ function openNowPlaying() {
   syncNowPlayingSheet();
   npPanel.classList.add('open');
   document.body.style.overflow = 'hidden';
+  sheetOpened('np');
 }
-function closeNowPlaying() {
+SHEET_CLOSERS.np = function() {
   npPanel.classList.remove('open');
   document.body.style.overflow = '';
-}
+};
+function closeNowPlaying() { closeSheet('np'); }
 
 function syncNowPlayingSheet() {
   if (!currentHymn) return;
@@ -4088,12 +4200,54 @@ if (progWrapLarge) {
 
 
 
-var _origLoadAndPlay = loadAndPlay;
-loadAndPlay = function(idx) {
-  _origLoadAndPlay(idx);
-  if (npPanel.classList.contains('open')) syncNowPlayingSheet();
-};
 
+
+// ── STABLE IDS FOR SONGS LOADED FROM THE SERVER ─────────────────────────────
+// Songs found in the live listing get an id made from their file name, so a
+// favorite, a History entry, a download or a shared link keeps pointing at the
+// same song when new files are uploaded. (Older copies numbered them by
+// position — tgnew9000, psnew9000… — which shifted with every upload.)
+function fileSongId(prefix, filename) {
+  let h = 5381;
+  for (let i = 0; i < filename.length; i++) h = ((h << 5) + h + filename.charCodeAt(i)) >>> 0;
+  return prefix + h.toString(36);
+}
+var LEGACY_IDS = {}; // old positional id → new id, for old favorites and shared links
+
+// Rebuild the positional ids an older copy gave this listing, and move saved
+// favorites, History and the last-played song over to the new ids (once).
+function migrateLegacyIds(oldPrefix, files, known, newIdFor) {
+  const map = {};
+  let n = 9000;
+  files.forEach(f => { if (!known.has(f.filename)) map[oldPrefix + (n++)] = newIdFor(f.filename); });
+  Object.assign(LEGACY_IDS, map);
+  const flag = 'sh_ids_v2_' + oldPrefix;
+  if (localStorage.getItem(flag)) return;
+  let changed = false;
+  const fix = id => (map[id] ? (changed = true, map[id]) : id);
+  favorites = new Set([...favorites].map(fix));
+  playHistory = playHistory.map(e => ({ id: fix(e.id), ts: e.ts }));
+  try {
+    const last = JSON.parse(localStorage.getItem('sh_last') || 'null');
+    if (last && map[last.id]) localStorage.setItem('sh_last', JSON.stringify({ id: map[last.id], src: last.src }));
+  } catch(e) {}
+  if (changed) {
+    saveFavs();
+    try { localStorage.setItem('sh_history_v1', JSON.stringify(playHistory)); } catch(e) {}
+  }
+  try { localStorage.setItem(flag, '1'); } catch(e) {}
+}
+
+// Downloads remember their audio address, so re-key them by that (exact).
+function rekeyDownloadsByUrl() {
+  let changed = false;
+  Object.keys(dlIndex).forEach(id => {
+    if (HYMNS.some(h => h.id === id)) return;
+    const h = HYMNS.find(x => x.url === dlIndex[id].url);
+    if (h && !dlIndex[h.id]) { dlIndex[h.id] = dlIndex[id]; delete dlIndex[id]; changed = true; }
+  });
+  if (changed) { saveDlIndex(); renderDownloadsList(); }
+}
 
 // -- DYNAMIC TELEGRAM SPECIALS LOADER --------------------------------------
 // Fetches the live file listing from the Cloudflare Worker and auto-adds
@@ -4169,13 +4323,14 @@ async function loadDynamicTelegramSongs() {
     }
 
     const known = tgKnownFilenames();
+    // Ids the older copy handed out came from the listing it last saw (the cache)
+    migrateLegacyIds('tgnew', ((parsedCache && parsedCache.data) || data).files || [], known, fn => fileSongId('tg-', fn));
     let added = 0;
-    let nextId = 9000;
     (data.files || []).forEach(f => {
       if (known.has(f.filename)) return;
       const { title, artist } = tgTitleFromFilename(f.filename);
       HYMNS.push({
-        id: 'tgnew' + (nextId++),
+        id: fileSongId('tg-', f.filename),
         title: title,
         source: 'telegram',
         artist: artist,
@@ -4185,8 +4340,9 @@ async function loadDynamicTelegramSongs() {
       added++;
     });
 
+    rekeyDownloadsByUrl();
     if (added > 0) {
-      HYMNS.sort((a, b) => a.title.localeCompare(b.title));
+      HYMNS.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' }));
       render();
       console.log('Loaded ' + added + ' new Specials track(s) from R2');
     }
@@ -4275,14 +4431,14 @@ async function loadDynamicPsalmSongs() {
       titleCounts[title] = (titleCounts[title] || 0) + 1;
     });
 
+    migrateLegacyIds('psnew', ((parsedCache && parsedCache.data) || data).files || [], known, fn => fileSongId('ps-', fn));
     let added = 0;
-    let nextId = 9000;
     (data.files || []).forEach(f => {
       if (known.has(f.filename)) return;
       const { title, verses } = psTitleFromFilename(f.filename);
       const displayTitle = (titleCounts[title] > 1 && verses) ? (title + ' (vv. ' + verses + ')') : title;
       HYMNS.push({
-        id: 'psnew' + (nextId++),
+        id: fileSongId('ps-', f.filename),
         title: displayTitle,
         source: 'psalms',
         artist: 'Sing the KJV',
@@ -4299,6 +4455,7 @@ async function loadDynamicPsalmSongs() {
       });
       console.log('Loaded ' + added + ' Sung Psalm track(s) from R2' + (usedStale ? ' (stale cache)' : ''));
     }
+    rekeyDownloadsByUrl();
     psalmsLoadState = 'ok';
     render(); // unconditional — clears a "Loading…"/failed empty-state even when added === 0
   } catch (err) {
@@ -4313,6 +4470,10 @@ function resolveSharedSongLink() {
     var params = new URLSearchParams(window.location.search);
     var songId = params.get('song');
     if (!songId) return;
+    if (LEGACY_IDS[songId]) songId = LEGACY_IDS[songId];
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', window.location.origin + window.location.pathname);
+    }
     var target = HYMNS.find(function(h){ return h.id === songId; });
     if (!target) { toast('That song link is no longer available'); return; }
     activeSource = 'all';
@@ -4325,15 +4486,13 @@ function resolveSharedSongLink() {
       loadAndPlay(idx);
       openNowPlaying();
     }
-    if (window.history && window.history.replaceState) {
-      window.history.replaceState({}, '', window.location.origin + window.location.pathname);
-    }
   } catch (e) {}
 }
 
 // Kick off after initial render so the static list shows immediately
 var _dynLoadersDone = Promise.all([loadDynamicTelegramSongs(), loadDynamicPsalmSongs()]);
-_dynLoadersDone.then(resolveSharedSongLink).catch(resolveSharedSongLink);
+function afterDynamicLoad() { restoreLastPlayed(); resolveSharedSongLink(); }
+_dynLoadersDone.then(afterDynamicLoad).catch(afterDynamicLoad);
 
 // Re-render after tick to ensure DOM is ready
 setTimeout(function() { render(); }, 0);
@@ -4364,8 +4523,9 @@ setTimeout(function() { render(); }, 0);
     if(!loaded){loadEmbed("PLq3FwPEx_WZXnb0ig3CS2TCbKJXqRU7LG","playlist","IFB Congregational Hymns");loaded=true;}
     panel.classList.add("open");
     document.body.style.overflow="hidden";
+    sheetOpened("yt");
   };
-  function closePanel(){
+  SHEET_CLOSERS.yt=function(){
     // Stop YT video by clearing the iframe
     fw.innerHTML='';
     loaded=false;
@@ -4374,7 +4534,8 @@ setTimeout(function() { render(); }, 0);
     document.querySelectorAll(".nav-btn").forEach(function(b){b.classList.remove("active");});
     var br=document.querySelector(".nav-btn[data-view=\"browse\"]");
     if(br) br.classList.add("active");
-  }
+  };
+  function closePanel(){ closeSheet("yt"); }
   xBtn.addEventListener("click",closePanel);
   bd.addEventListener("click",closePanel);
   document.getElementById("yt-chips").addEventListener("click",function(e){
