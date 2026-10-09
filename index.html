@@ -835,6 +835,7 @@ header {
       <div class="tips-section-lbl">Lyrics &amp; Search</div>
       <div class="tip-row"><span class="tip-ico">&#9834;</span><span class="tip-txt">Tap the <strong>lyrics icon</strong> in the player to follow along verse by verse while a hymn plays. Every Sung Psalm shows its verses straight from the King James Bible. Newer songs still under copyright show only their recording.</span></div>
       <div class="tip-row"><span class="tip-ico">&#127911;</span><span class="tip-txt">In the <strong>FBC KJV Bible app</strong>, the <strong>&#127911; Sung</strong> button under a Psalm&rsquo;s title opens that Psalm here, sung word for word from the King James Bible.</span></div>
+      <div class="tip-row"><span class="tip-ico">&#127925;</span><span class="tip-txt">The FBC KJV Bible app&rsquo;s <strong>Search &rarr; Hymns</strong> holds 224 hymns of the faith with every stanza. On a hymn sung here, its <strong>&#127911; Listen</strong> button opens it in this app.</span></div>
       <div class="tip-row"><span class="tip-ico">&#128214;</span><span class="tip-txt">Under the words, tap a <strong>&#128214; Scripture</strong> button to open the verses behind the hymn in the FBC KJV Bible app &mdash; the music keeps playing while you read.</span></div>
       <div class="tip-row"><span class="tip-ico">&#128269;</span><span class="tip-txt">Use the <strong>search bar</strong> to find hymns by title or theme &mdash; try searching "grace," "comfort," or "heaven."</span></div>
 
@@ -4343,6 +4344,12 @@ function ownLyricsByNorm(n) {
   return _lyrIndex[n] || null;
 }
 
+// Songs recorded under a shorter or fuller title than the Bible app's hymn
+const KJV_ALIAS = {};
+[['Come Thou Fount', 'Come, Thou Fount of Every Blessing'], ['Pass Me Not, O Gentle Savior', 'Pass Me Not'],
+ ['Brighten the Corner', 'Brighten the Corner Where You Are']].forEach(([a, b]) => { KJV_ALIAS[lyrNorm(a)] = lyrNorm(b); });
+function kjvHymnFor(h) { const n = lyrNorm(h.title); return KJV_HYMNS[n] || KJV_HYMNS[KJV_ALIAS[n]] || null; }
+
 var KJV_HYMNS = {}; // normalized title → { refs: [[label, jumpRef]…], lyr: {verses, attr} }
 function loadKjvHymns() {
   return fetch(KJV_APP + 'hymns.json').then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -4366,7 +4373,8 @@ function lyricsFor(h) {
   if (!h) return null;
   if (HYMN_LYRICS[h.title]) return HYMN_LYRICS[h.title];
   const n = lyrNorm(h.title);
-  return ownLyricsByNorm(n) || (KJV_HYMNS[n] && KJV_HYMNS[n].lyr) || null;
+  const k = kjvHymnFor(h);
+  return ownLyricsByNorm(n) || (k && k.lyr) || null;
 }
 
 // "Psalm 23" + "1-6" → { ch:23, from:1, to:6 }; no range means the whole psalm
@@ -4380,7 +4388,7 @@ function psalmOf(h) { return h.psalm || psalmRange(h.title, ''); }
 
 // The Scriptures to offer under a song's words
 function scriptureFor(h) {
-  const k = KJV_HYMNS[lyrNorm(h.title)];
+  const k = kjvHymnFor(h);
   if (k && k.refs.length) return { lbl: 'Scripture behind this hymn', refs: k.refs };
   const p = psalmOf(h);
   if (p && p.ch >= 1 && p.ch <= 150) {
