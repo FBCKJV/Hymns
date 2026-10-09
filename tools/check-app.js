@@ -61,7 +61,9 @@ if (fs.existsSync(path.join(KJV_DIR, 'hymns.json'))) {
   KJV_FILES['bible/Psalms.json'] = fs.readFileSync(path.join(KJV_DIR, 'bible', 'Psalms.json'));
 } else {
   KJV_FILES['hymns.json'] = JSON.stringify({ h: [['Leaning on the Everlasting Arms', 'Elisha A. Hoffman', 1887, 'Assurance and Trust',
-    [['Deuteronomy 33:27', 'Deuteronomy 33:27']], [['What a fellowship, what a joy divine,', 'Leaning on the everlasting arms;']], ['Leaning, leaning,']]] });
+    [['Deuteronomy 33:27', 'Deuteronomy 33:27']], [['What a fellowship, what a joy divine,', 'Leaning on the everlasting arms;']], ['Leaning, leaning,']],
+    ['A Mighty Fortress Is Our God', 'Martin Luther', 1529, 'Praise and Worship', [['Psalm 46:1', 'Psalms 46:1']], [['A mighty fortress is our God,']], []],
+    ['Pass Me Not', 'Fanny J. Crosby', 1868, 'Salvation and Invitation', [['Luke 18:38', 'Luke 18:38']], [['Pass me not, O gentle Saviour,']], []]] });
   const chapters = Array.from({ length: 150 }, (_, i) => ({ chapter: String(i + 1), verses: [{ verse: '1', text: 'Verse one of Psalm ' + (i + 1) + '.' }] }));
   chapters[22].verses = [{ verse: '1', text: 'The LORD is my shepherd; I shall not want.' }, { verse: '2', text: 'He maketh me to lie down in green pastures.' }];
   KJV_FILES['bible/Psalms.json'] = JSON.stringify({ book: 'Psalms', chapters });
@@ -225,6 +227,10 @@ const isOpen = (page, id) => page.$eval(id, el => el.classList.contains('open'))
   ok(/victory/i.test(w.text) && !/aren’t shown/.test(w.text), 'words found past a "(Congregational)" note');
   w = await words('My Savior\'s Love');
   ok(/I stand amazed/.test(w.text), 'a newly added public-domain hymn has its words');
+  w = await words('A Mighty Fortress Is Our God');
+  ok(w.chips.some(([t, href]) => /Psalm 46/.test(t) && /KJVBible\/#Psalms\+46:1$/.test(href)), 'a hymn added to the Bible app later also gets its 📖 Scripture button');
+  w = await words('Pass Me Not, O Gentle Savior');
+  ok(w.chips.length > 0, 'a song recorded under a fuller title (Pass Me Not, O Gentle Savior) finds its hymn');
   w = await words('Psalm 23');
   ok(/The LORD is my shepherd/.test(w.text), 'a Sung Psalm shows its verses from the KJV');
   ok(w.chips.some(([t, href]) => /Psalm 23/.test(t) && /#Psalms\+23:1$/.test(href)), 'and a 📖 button to read it in the Bible app');
